@@ -1,4 +1,17 @@
 OCamlEV3-bindings
 =================
 
-TODO
+by Tortrat-Gentilhomme Nicolas, Raymond Nicolas and Runarvot Loïc;
+created during a course named "Projet Long" at Paris 7.
+
+The project was used as is (see the tag v0.1) during the final project; it was
+working correctly, but due to lack of time, the bindings were implemented
+without using the full strength of OCaml.
+
+It's currently WIP, and many changes may occurs during next weeks before its
+usability.
+
+Few changes example:
+    - better usage of GADT
+    - implementation for every available sensors at ev3dev wiki.
+    - integration of an opam package
