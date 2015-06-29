@@ -1,0 +1,49 @@
+./src/files.cmi :
+./src/led.cmi :
+./src/motors/motors.cmi :
+./src/motors/tachoMotors.cmi : src/motors/motors.cmi
+./src/sensors/color_sensors.cmi : src/sensors/common_sensors.cmi
+./src/sensors/common_sensors.cmi :
+./src/sensors/infrared_sensors.cmi : src/sensors/common_sensors.cmi
+./src/sensors/nxt_color_sensors.cmi : src/sensors/common_sensors.cmi
+./src/sensors/nxt_ultrasonic_sensors.cmi : src/sensors/common_sensors.cmi
+./src/sensors/touch_sensors.cmi : src/sensors/common_sensors.cmi
+./src/sound.cmi :
+./src/files.cmo : ./src/files.cmi
+./src/files.cmx : ./src/files.cmi
+./src/led.cmo : src/files.cmi ./src/led.cmi
+./src/led.cmx : src/files.cmx ./src/led.cmi
+./src/motors/motors.cmo : src/files.cmi ./src/motors/motors.cmi
+./src/motors/motors.cmx : src/files.cmx ./src/motors/motors.cmi
+./src/motors/tachoMotors.cmo : src/motors/motors.cmi \
+    ./src/motors/tachoMotors.cmi
+./src/motors/tachoMotors.cmx : src/motors/motors.cmx \
+    ./src/motors/tachoMotors.cmi
+./src/sensors/color_sensors.cmo : src/files.cmi \
+    src/sensors/common_sensors.cmi ./src/sensors/color_sensors.cmi
+./src/sensors/color_sensors.cmx : src/files.cmx \
+    src/sensors/common_sensors.cmx ./src/sensors/color_sensors.cmi
+./src/sensors/common_sensors.cmo : src/files.cmi \
+    ./src/sensors/common_sensors.cmi
+./src/sensors/common_sensors.cmx : src/files.cmx \
+    ./src/sensors/common_sensors.cmi
+./src/sensors/infrared_sensors.cmo : src/files.cmi \
+    src/sensors/common_sensors.cmi ./src/sensors/infrared_sensors.cmi
+./src/sensors/infrared_sensors.cmx : src/files.cmx \
+    src/sensors/common_sensors.cmx ./src/sensors/infrared_sensors.cmi
+./src/sensors/nxt_color_sensors.cmo : src/files.cmi \
+    src/sensors/common_sensors.cmi src/sensors/color_sensors.cmi \
+    ./src/sensors/nxt_color_sensors.cmi
+./src/sensors/nxt_color_sensors.cmx : src/files.cmx \
+    src/sensors/common_sensors.cmx src/sensors/color_sensors.cmx \
+    ./src/sensors/nxt_color_sensors.cmi
+./src/sensors/nxt_ultrasonic_sensors.cmo : src/files.cmi \
+    src/sensors/common_sensors.cmi ./src/sensors/nxt_ultrasonic_sensors.cmi
+./src/sensors/nxt_ultrasonic_sensors.cmx : src/files.cmx \
+    src/sensors/common_sensors.cmx ./src/sensors/nxt_ultrasonic_sensors.cmi
+./src/sensors/touch_sensors.cmo : src/sensors/common_sensors.cmi \
+    ./src/sensors/touch_sensors.cmi
+./src/sensors/touch_sensors.cmx : src/sensors/common_sensors.cmx \
+    ./src/sensors/touch_sensors.cmi
+./src/sound.cmo : ./src/sound.cmi
+./src/sound.cmx : ./src/sound.cmi
