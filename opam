@@ -1,0 +1,24 @@
+opam-version: "1.2"
+
+name        : "OCamlEV3-bindings"
+version     : "0.1"
+maintainer  : "Loïc Runarvot <loic.runarvot@gmail.com>"
+authors     : "Tortrat-Gentilhomme Nicolas, Raymond Nicolas, Runarvot Loïc"
+
+homepage    : "https://github.com/OCamlEV3/OCamlEV3-bindings"
+bug-reports : "https://github.com/OCamlEV3/OCamlEV3-bindings/issues"
+dev-repo    : "https://github.com/OCamlEV3/OCamlEV3-bindings.git"
+
+build       : [ [make] ]
+install     : [make "install"]
+remove      : ["ocamlfind" "remove" "OCamlEV3-bindings"]
+depends     : "ocamlfind" {build}
+
+ocaml-version : [= "4.02.1"]
+post-messages : [
+    "OCamlEV3-bindings install.
+     WIP
+    "
+
+    {success}
+]

@@ -1,0 +1,5 @@
+version = "0.1"
+name = "OCamlEV3-bindings"
+description = " TODO "
+archive(byte) = "OCamlEV3-bindings.cma"
+archive(native) = "OCamlEV3-bindings.cmxa"

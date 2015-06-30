@@ -5,13 +5,14 @@ FLAGS     = -I $(SOURCES_FOLDER) -I $(SOURCES_FOLDER)/motors \
 			-I $(SOURCES_FOLDER)/sensors
 
 LIB_FOLDER 		  = lib
-LIB_NAME	 	  = OCamlEV3_bindings
+LIB_NAME	 	  = OCamlEV3-bindings
 LIB_BYTECODE      = $(LIB_FOLDER)/$(LIB_NAME).cma
 LIB_NATIVE		  = $(LIB_BYTECODE:.cma=.cmxa)
 
 SOURCES_FOLDER = src
-SOURCES=$(shell find . -name "*.ml")
+SOURCES=$(shell find src -name "*.ml")
 SOURCES_MLI=$(SOURCES:.ml=.mli)
+SOURCES_CMI=$(SOURCES:.ml=.cmi)
 SOURCES_OBJ_BYT=$(SOURCES:.ml=.cmo)
 SOURCES_OBJ_NAT=$(SOURCES:.ml=.cmx)
 
@@ -19,7 +20,7 @@ SOURCES_OBJ_NAT=$(SOURCES:.ml=.cmx)
 all: $(LIB_BYTECODE) $(LIB_NATIVE)
 
 
-# library compilation
+# Library compilation
 
 $(LIB_BYTECODE): $(SOURCES_OBJ_BYT)
 	@ mkdir -p $(LIB_FOLDER)
@@ -32,6 +33,25 @@ $(LIB_NATIVE): $(SOURCES_OBJ_NAT)
 	@ $(OCAMLFIND) $(OCAMLOPT) -I src/ $(FLAGS) -a -o $@ $? \
 		&& echo "Native library compiled." \
 		|| echo "Error while compile native library."
+
+# Opam
+
+PACKAGE = OCamlEV3-bindings
+INSTALL = META $(LIB_BYTECODE) $(LIB_NATIVE) $(SOURCES_ML) $(SOURCES_MLI) \
+		  $(SOURCES_OBJ_BYT) $(SOURCES_OBJ_NAT) $(SOURCES_CMI)
+
+install: $(LIB_BYTECODE) $(LIB_NATIVE)
+	ocamlfind install $(PACKAGE) $(INSTALL)
+
+.PHONY: uninstall
+uninstall:
+	ocamlfind remove $(PACKAGE)
+
+.PHONY: reinstall
+reinstall:
+	$(MAKE) uninstall
+	$(MAKE)
+	$(MAKE) install
 
 
 # Others
