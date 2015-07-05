@@ -11,9 +11,13 @@ type mode =
 exception Invalid_file of string
 
 
-val store_filename : ?usage:usage -> ?mode:mode -> string -> unit
+module type MonadicFileManager = sig
+  type 'a m
+  val store_filename : ?usage:usage -> ?mode:mode -> string -> unit m
+  val write : ?usage:usage -> string -> string -> unit m
+  val read : ?usage:usage -> string -> string m
+end
 
-val write : ?usage:usage -> string -> string -> unit
-
-val read : ?usage:usage -> string -> unit
+module SimpleFileManager : MonadicFileManager
+module LwtFileManager    : MonadicFileManager
 
