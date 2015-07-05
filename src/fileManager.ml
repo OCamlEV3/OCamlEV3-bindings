@@ -38,14 +38,6 @@ type mode =
 
 exception Invalid_file of string
 
-module type MONADIC_FILE_MANAGER =
-sig
-  type 'a m
-  val store_filename : ?usage:usage -> ?mode:mode -> string -> unit m
-  val write : ?usage:usage -> string -> string -> unit m
-  val read : ?usage:usage -> string -> string m
-end
-
 module type UNIX =
 sig
   type 'a m

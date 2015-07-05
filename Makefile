@@ -1,14 +1,14 @@
 OCAMLC    		= ocamlc
 OCAMLOPT  		= ocamlopt
+OCAMLMKLIB		= ocamlmklib
 OCAMLFIND 		= ocamlfind
 OCAMLC_FLAGS 	= -I $(SOURCES_FOLDER)
 OCAMLFIND_FLAGS = $(OCAMLC_FLAGS) \
-				  -package lwt -linkpkg
+				  -package lwt,lwt.unix -linkpkg
 
 LIB_FOLDER 		  = lib
 LIB_NAME	 	  = OCamlEV3-bindings
-LIB_BYTECODE      = $(LIB_FOLDER)/$(LIB_NAME).cma
-LIB_NATIVE		  = $(LIB_BYTECODE:.cma=.cmxa)
+LIB_DIST		  = $(LIB_FOLDER)/$(LIB_NAME)
 
 SOURCES_FOLDER = src
 SOURCES=$(shell find src -name "*.ml")
@@ -18,22 +18,22 @@ SOURCES_OBJ_BYT=$(SOURCES:.ml=.cmo)
 SOURCES_OBJ_NAT=$(SOURCES:.ml=.cmx)
 
 .PHONY: all
-all: $(LIB_BYTECODE) $(LIB_NATIVE)
+all: library
 
 
 # Library compilation
 
-$(LIB_BYTECODE): $(SOURCES_OBJ_BYT)
-	@ mkdir -p $(LIB_FOLDER)
-	@ $(OCAMLFIND) $(OCAMLC) $(OCAMLFIND_FLAGS) -a -o $@ $? \
-		&& echo "Bytecode library compiled." \
-		|| echo "Error while compile bytecode library."
+COMPILATION_ORDER = src/monads.cmx src/fileManager.cmx
 
-$(LIB_NATIVE): $(SOURCES_OBJ_NAT)
+library: $(SOURCES_OBJ_BYT) $(SOURCES_OBJ_NAT)
 	@ mkdir -p $(LIB_FOLDER)
-	@ $(OCAMLFIND) $(OCAMLOPT) -I src/ $(OCAMLFIND_FLAGS) -a -o $@ $? \
-		&& echo "Native library compiled." \
-		|| echo "Error while compile native library."
+	$(OCAMLFIND) $(OCAMLMKLIB) $(OCAMLFIND_FLAGS) -o $(LIB_DIST) \
+		$(COMPILATION_ORDER) \
+		&& echo "Library compiled." \
+		|| echo "Error while compiling library."
+
+
+
 
 # Opam
 
