@@ -1,8 +1,9 @@
-OCAMLC    = ocamlc
-OCAMLOPT  = ocamlopt
-OCAMLFIND = ocamlfind
-FLAGS     = -I $(SOURCES_FOLDER) -I $(SOURCES_FOLDER)/motors \
-			-I $(SOURCES_FOLDER)/sensors
+OCAMLC    		= ocamlc
+OCAMLOPT  		= ocamlopt
+OCAMLFIND 		= ocamlfind
+OCAMLC_FLAGS 	= -I $(SOURCES_FOLDER)
+OCAMLFIND_FLAGS = $(OCAMLC_FLAGS) \
+				  -package lwt -linkpkg
 
 LIB_FOLDER 		  = lib
 LIB_NAME	 	  = OCamlEV3-bindings
@@ -24,13 +25,13 @@ all: $(LIB_BYTECODE) $(LIB_NATIVE)
 
 $(LIB_BYTECODE): $(SOURCES_OBJ_BYT)
 	@ mkdir -p $(LIB_FOLDER)
-	@ $(OCAMLFIND) $(OCAMLC) $(FLAGS) -a -o $@ $? \
+	@ $(OCAMLFIND) $(OCAMLC) $(OCAMLFIND_FLAGS) -a -o $@ $? \
 		&& echo "Bytecode library compiled." \
 		|| echo "Error while compile bytecode library."
 
 $(LIB_NATIVE): $(SOURCES_OBJ_NAT)
 	@ mkdir -p $(LIB_FOLDER)
-	@ $(OCAMLFIND) $(OCAMLOPT) -I src/ $(FLAGS) -a -o $@ $? \
+	@ $(OCAMLFIND) $(OCAMLOPT) -I src/ $(OCAMLFIND_FLAGS) -a -o $@ $? \
 		&& echo "Native library compiled." \
 		|| echo "Error while compile native library."
 
@@ -69,17 +70,17 @@ clean:
 .SUFFIXES: .ml .mli .cmo .cmi .cmx
 
 .ml.cmo:
-	$(OCAMLC) $(FLAGS) -c $<
+	$(OCAMLFIND) $(OCAMLC) $(OCAMLFIND_FLAGS) -c $<
 
 .mli.cmi:
-	$(OCAMLC) $(FLAGS) -c $<
+	$(OCAMLFIND) $(OCAMLC) $(OCAMLFIND_FLAGS) -c $<
 
 .ml.cmx:
-	$(OCAMLOPT) $(FLAGS) -c $<
+	$(OCAMLFIND) $(OCAMLOPT) $(OCAMLFIND_FLAGS) -c $<
 
 .PHONY: ocamlev3bindings-dep
 depend:
-	ocamldep $(FLAGS) $(SOURCES_MLI) $(SOURCES) > .depend
+	ocamldep $(OCAMLC_FLAGS) $(SOURCES_MLI) $(SOURCES) > .depend
 include .depend
 
 
