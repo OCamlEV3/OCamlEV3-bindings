@@ -42,7 +42,7 @@ module LwtMonadType = struct
   type 'a m = 'a Lwt.t
 end
 
-module LwtMonad : MONAD = struct
+module LwtMonad : MONAD with type 'a m = 'a Lwt.t = struct
   include LwtMonadType
 
   let bind   = Lwt.bind
