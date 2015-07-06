@@ -25,13 +25,8 @@
  * DEALINGS IN THE SOFTWARE.                                                  *
  *****************************************************************************)
 
-module type MONAD_TYPE =
-sig
-  type 'a m
-end
-
 module type MONAD = sig
-  include MONAD_TYPE
+  type 'a m
 
   val bind   : 'a m -> ('a -> 'b m) -> 'b m
   val map    : ('a -> 'b) -> 'a m -> 'b m
@@ -45,12 +40,8 @@ module type MONAD = sig
   end
 end
 
-module SimpleMonadType = struct
-  type 'a m = 'a
-end
-
 module SimpleMonad : MONAD = struct
-  include SimpleMonadType
+  type 'a m = 'a
 
   let bind x f = f x
   let map f x  = f x
@@ -64,12 +55,8 @@ module SimpleMonad : MONAD = struct
   end
 end
 
-module LwtMonadType = struct
-  type 'a m = 'a Lwt.t
-end
-
 module LwtMonad : MONAD with type 'a m = 'a Lwt.t = struct
-  include LwtMonadType
+  type 'a m = 'a Lwt.t
 
   let bind   = Lwt.bind
   let map    = Lwt.map

@@ -25,14 +25,9 @@
  * DEALINGS IN THE SOFTWARE.                                                  *
  *****************************************************************************)
 
-module type MONAD_TYPE =
-sig
-  type 'a m
-end
-
 module type MONAD =
 sig
-  include MONAD_TYPE
+  type 'a m
 
   val bind   : 'a m -> ('a -> 'b m) -> 'b m
   val map    : ('a -> 'b) -> 'a m -> 'b m
