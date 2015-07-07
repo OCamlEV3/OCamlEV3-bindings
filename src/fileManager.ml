@@ -113,14 +113,14 @@ struct
       | false ->
         unix_flag_of_flag mode            >>= fun flag ->
         U.openfile filename [flag] 0o640  >>= fun fd ->
-        add usage filename (fd, usage)    >>= fun () ->
+        add usage filename (fd, usage)    >>
         M.return (fd, usage)
       end
     | false ->
       raise (Invalid_file (Printf.sprintf "`%s' doesn't exists." filename))
 
   let store_filename ?(usage = ReleaseAfterUse) ?(mode = Both) filename =
-    store_and_return usage mode filename >>= fun _ ->
+    store_and_return usage mode filename >>=?
     M.return ()
 
   let find_or_create filename mode usage =
@@ -138,17 +138,17 @@ struct
 
   let write ?(usage = ReleaseAfterUse) filename message =
     find_or_create filename Write usage          >>= fun (fd, usage) ->
-    U.lseek fd 0 Unix.SEEK_SET                   >>= fun _ ->
-    U.write fd message 0 (String.length message) >>= fun _ ->
+    U.lseek fd 0 Unix.SEEK_SET                   >>=?
+    U.write fd message 0 (String.length message) >>=?
     check_file_usage filename fd usage
 
   let read ?(usage = ReleaseAfterUse) filename =
     find_or_create filename Read usage      >>= fun (fd, usage) ->
-    U.lseek fd 0 Unix.SEEK_SET              >>= fun _ ->
+    U.lseek fd 0 Unix.SEEK_SET              >>=?
     let buffer = Bytes.create 64 in
-    U.read fd buffer 0 64                   >>= fun _ ->
+    U.read fd buffer 0 64                   >>=?
     let message = Bytes.to_string buffer in
-    check_file_usage filename fd usage      >>= fun () ->
+    check_file_usage filename fd usage      >>
     M.return message
 
 end

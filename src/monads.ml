@@ -37,6 +37,8 @@ module type MONAD = sig
     val ( =<< ) : ('a -> 'b m) -> 'a m -> 'b m
     val ( >|= ) : 'a m -> ('a -> 'b) -> 'b m
     val ( =|< ) : ('a -> 'b) -> 'a m -> 'b m
+    val ( >>=? ) : 'a m -> 'b m -> 'b m
+    val ( >>   ) : unit m -> 'b m -> 'b m
   end
 end
 
@@ -48,10 +50,12 @@ module SimpleMonad : MONAD = struct
   let return x = x
 
   module INFIX = struct
-    let ( >>= )     = bind
-    let ( =<< ) f x = bind x f
-    let ( >|= ) x f = map f x
-    let ( =|< )     = map
+    let ( >>= )      = bind
+    let ( =<< )  f x = bind x f
+    let ( >|= )  x f = map f x
+    let ( =|< )      = map
+    let ( >>=? ) x y = x >>= (fun _ -> y)
+    let ( >>   ) x y = x >>= (fun () -> y)
   end
 end
 
@@ -67,5 +71,7 @@ module LwtMonad : MONAD with type 'a m = 'a Lwt.t = struct
     let ( =<< ) = Lwt.Infix.( =<< )
     let ( >|= ) = Lwt.Infix.( >|= )
     let ( =|< ) = Lwt.Infix.( =|< )
+    let ( >>=? ) x y = x >>= (fun _ -> y)
+    let ( >>   ) x y = x >>= (fun () -> y)
   end
 end
