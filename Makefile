@@ -1,14 +1,14 @@
-OCAMLC    		= ocamlc
-OCAMLOPT  		= ocamlopt
-OCAMLMKLIB		= ocamlmklib
-OCAMLFIND 		= ocamlfind
-OCAMLC_FLAGS 	= -I $(SOURCES_FOLDER)
-OCAMLFIND_FLAGS = $(OCAMLC_FLAGS) \
-				  -package lwt,lwt.unix -linkpkg
+OCAMLC          = ocamlc
+OCAMLOPT        = ocamlopt
+OCAMLMKLIB      = ocamlmklib
+OCAMLFIND       = ocamlfind
+FOLDERS_OPT     = -I $(SOURCES_FOLDER)
+OCAMLC_FLAGS    = $(FOLDERS_OPT) -w @1..8 -w @10..25 -w @28..31 -w @39..49
+OCAMLFIND_FLAGS = -package lwt,lwt.unix -linkpkg
 
-LIB_FOLDER 		  = lib
-LIB_NAME	 	  = OCamlEV3-bindings
-LIB_DIST		  = $(LIB_FOLDER)/$(LIB_NAME)
+LIB_FOLDER = lib
+LIB_NAME   = OCamlEV3-bindings
+LIB_DIST   = $(LIB_FOLDER)/$(LIB_NAME)
 
 SOURCES_FOLDER = src
 SOURCES=$(shell find src -name "*.ml")
@@ -18,17 +18,17 @@ SOURCES_OBJ_BYT=$(SOURCES:.ml=.cmo)
 SOURCES_OBJ_NAT=$(SOURCES:.ml=.cmx)
 
 .PHONY: all
-all: library
+all: depend library
 
 
 # Library compilation
 
-COMPILATION_ORDER = src/monads.cmx src/fileManager.cmx
+COMPILATION_ORDER = src/monads.cmx src/fileManager.cmx src/device.cmx
 
-library: $(SOURCES_OBJ_BYT) $(SOURCES_OBJ_NAT)
+library: depend $(SOURCES_OBJ_BYT) $(SOURCES_OBJ_NAT)
 	@ mkdir -p $(LIB_FOLDER)
-	$(OCAMLFIND) $(OCAMLMKLIB) $(OCAMLFIND_FLAGS) -o $(LIB_DIST) \
-		$(COMPILATION_ORDER) \
+	$(OCAMLFIND) $(OCAMLMKLIB) $(FOLDERS_OPT) $(OCAMLFIND_FLAGS) \
+		-o $(LIB_DIST) $(COMPILATION_ORDER) \
 		&& echo "Library compiled." \
 		|| echo "Error while compiling library."
 
@@ -70,17 +70,15 @@ clean:
 .SUFFIXES: .ml .mli .cmo .cmi .cmx
 
 .ml.cmo:
-	$(OCAMLFIND) $(OCAMLC) $(OCAMLFIND_FLAGS) -c $<
+	$(OCAMLFIND) $(OCAMLC) $(OCAMLC_FLAGS) $(OCAMLFIND_FLAGS) -c $<
 
 .mli.cmi:
-	$(OCAMLFIND) $(OCAMLC) $(OCAMLFIND_FLAGS) -c $<
+	$(OCAMLFIND) $(OCAMLC) $(OCAMLC_FLAGS) $(OCAMLFIND_FLAGS) -c $<
 
 .ml.cmx:
-	$(OCAMLFIND) $(OCAMLOPT) $(OCAMLFIND_FLAGS) -c $<
+	$(OCAMLFIND) $(OCAMLOPT) $(OCAMLC_FLAGS) $(OCAMLFIND_FLAGS) -c $<
 
 .PHONY: ocamlev3bindings-dep
 depend:
-	ocamldep $(OCAMLC_FLAGS) $(SOURCES_MLI) $(SOURCES) > .depend
+	ocamldep $(FOLDERS_OPT) $(SOURCES_MLI) $(SOURCES) > .depend
 include .depend
-
-
