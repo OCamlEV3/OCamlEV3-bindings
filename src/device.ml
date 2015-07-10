@@ -28,10 +28,9 @@
 open Core
 open Port
 
-let connected_device = Hashtbl.create 8
-
-exception Invalid_value of string
+exception Invalid_value     of string
 exception Connection_failed of string
+exception Is_not_connected  of string
 
 module type PATH = sig
   val path : string
@@ -40,6 +39,7 @@ end
 
 module type DEVICE = sig
   type 'a m
+  val connect : unit -> unit m
   val is_connected : unit -> bool m
   val get_path : unit -> string m
 end
@@ -50,18 +50,17 @@ struct
 
   let path = P.path
 
-  let is_connected () =
+  let connected = ref false
+
+  let connect () =
     match Sys.is_directory path with
     | true  ->
-      M.return true
-
+      M.return (connected := true)
     | false ->
-      if P.exception_on_fail then
-        M.fail (Connection_failed path)
-      else
-        M.return false
+      if P.exception_on_fail then M.fail (Connection_failed path)
+      else M.return ()
+
+  let is_connected () = M.return !connected
 
   let get_path () = M.return path
-
-  let _ = is_connected ()
 end

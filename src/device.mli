@@ -27,8 +27,9 @@
 
 open Core
 
-exception Invalid_value of string
+exception Invalid_value     of string
 exception Connection_failed of string
+exception Is_not_connected  of string
 
 module type PATH = sig
   val path : string
@@ -38,6 +39,7 @@ end
 module type DEVICE =
   sig
     type 'a m
+    val connect : unit -> unit m
     val is_connected : unit -> bool m
     val get_path : unit -> string m
   end
