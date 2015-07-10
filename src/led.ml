@@ -67,6 +67,14 @@ struct
     let exception_on_fail = true
   end)
 
+  type led = {
+    mutable brightness : int;
+  }
+
+  let current_led = {
+    brightness = 0;
+  }
+
   let max_brightness = 100
 
   let fail what value =
@@ -75,15 +83,18 @@ struct
   let set_brightness i =
     (if i < 0 || i > max_brightness then
        fail "set_brightness" i else M.return ()) >>
-    get_path () >>= fun path ->
-    IO.write ~usage:ReleaseAfterUse path (string_of_int i)
+    match current_led.brightness = i with
+    | false ->
+      get_path () >>= fun path ->
+      current_led.brightness <- i;
+      IO.write ~usage:ReleaseAfterUse path (string_of_int i)
+    | true ->
+      M.return ()
 
   let get_brightness () =
-    get_path () >>= fun path ->
-    IO.read ~usage:ReleaseAfterUse path >>= fun x ->
-    return (int_of_string x)
+    M.return current_led.brightness
 
-  let connected = ref false
+  let connected = ref true
   let is_connected () = M.return !connected
 end
 
