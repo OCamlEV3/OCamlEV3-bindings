@@ -25,7 +25,19 @@
  * DEALINGS IN THE SOFTWARE.                                                  *
  *****************************************************************************)
 
-module type MONAD = sig
+type usage =
+  | ReleaseAfterUse
+  | NeverRelease
+
+type mode =
+  | Read
+  | Write
+  | Both
+
+exception Invalid_file of string
+
+module type MONAD =
+sig
   type 'a m
 
   val bind   : 'a m -> ('a -> 'b m) -> 'b m
@@ -33,45 +45,29 @@ module type MONAD = sig
   val return : 'a -> 'a m
 
   module INFIX : sig
-    val ( >>= ) : 'a m -> ('a -> 'b m) -> 'b m
-    val ( =<< ) : ('a -> 'b m) -> 'a m -> 'b m
-    val ( >|= ) : 'a m -> ('a -> 'b) -> 'b m
-    val ( =|< ) : ('a -> 'b) -> 'a m -> 'b m
+    val ( >>=  ) : 'a m -> ('a -> 'b m) -> 'b m
+    val ( =<<  ) : ('a -> 'b m) -> 'a m -> 'b m
+    val ( >|=  ) : 'a m -> ('a -> 'b) -> 'b m
+    val ( =|<  ) : ('a -> 'b) -> 'a m -> 'b m
     val ( >>=? ) : 'a m -> 'b m -> 'b m
     val ( >>   ) : unit m -> 'b m -> 'b m
   end
-end
 
-module SimpleMonad : MONAD = struct
-  type 'a m = 'a
+  module UNIX : sig
+    type filedescr
+    val openfile : string -> Unix.open_flag list -> Unix.file_perm -> filedescr m
+    val close : filedescr -> unit m
+    val lseek : filedescr -> int -> Unix.seek_command -> int m
+    val read  : filedescr -> string -> int -> int -> int m
+    val write : filedescr -> string -> int -> int -> int m
+  end
 
-  let bind x f = f x
-  let map f x  = f x
-  let return x = x
-
-  module INFIX = struct
-    let ( >>= )      = bind
-    let ( =<< )  f x = bind x f
-    let ( >|= )  x f = map f x
-    let ( =|< )      = map
-    let ( >>=? ) x y = x >>= (fun _ -> y)
-    let ( >>   ) x y = x >>= (fun () -> y)
+  module IO : sig
+    val store_filename : ?usage:usage -> ?mode:mode -> string -> unit m
+    val write : ?usage:usage -> string -> string -> unit m
+    val read : ?usage:usage -> string -> string m
   end
 end
 
-module LwtMonad : MONAD with type 'a m = 'a Lwt.t = struct
-  type 'a m = 'a Lwt.t
-
-  let bind   = Lwt.bind
-  let map    = Lwt.map
-  let return = Lwt.return
-
-  module INFIX = struct
-    let ( >>= ) = Lwt.Infix.( >>= )
-    let ( =<< ) = Lwt.Infix.( =<< )
-    let ( >|= ) = Lwt.Infix.( >|= )
-    let ( =|< ) = Lwt.Infix.( =|< )
-    let ( >>=? ) x y = x >>= (fun _ -> y)
-    let ( >>   ) x y = x >>= (fun () -> y)
-  end
-end
+module SimpleMonad : MONAD
+module LwtMonad    : MONAD with type 'a m = 'a Lwt.t
