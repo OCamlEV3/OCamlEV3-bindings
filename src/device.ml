@@ -57,7 +57,7 @@ struct
 
     | false ->
       if P.exception_on_fail then
-        raise (Connection_failed path)
+        M.fail (Connection_failed path)
       else
         M.return false
 

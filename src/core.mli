@@ -43,6 +43,7 @@ sig
   val bind   : 'a m -> ('a -> 'b m) -> 'b m
   val map    : ('a -> 'b) -> 'a m -> 'b m
   val return : 'a -> 'a m
+  val fail   : exn -> 'a m
 
   module INFIX : sig
     val ( >>=  ) : 'a m -> ('a -> 'b m) -> 'b m

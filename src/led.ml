@@ -69,11 +69,12 @@ struct
 
   let max_brightness = 100
 
+  let fail what value =
+    M.fail (Invalid_value (Printf.sprintf "LedDevice [%s] : %d" what value))
+
   let set_brightness i =
-    if i < 0 || i > max_brightness then
-      raise (Invalid_value
-               (Printf.sprintf "LedDevice [set_brightness] : %d" i))
-    ;
+    (if i < 0 || i > max_brightness then
+       fail "set_brightness" i else M.return ()) >>
     get_path () >>= fun path ->
     IO.write ~usage:ReleaseAfterUse path (string_of_int i)
 

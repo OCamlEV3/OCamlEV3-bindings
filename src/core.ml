@@ -47,6 +47,7 @@ module type MONAD = sig
   val bind   : 'a m -> ('a -> 'b m) -> 'b m
   val map    : ('a -> 'b) -> 'a m -> 'b m
   val return : 'a -> 'a m
+  val fail   : exn -> 'a m
 
   module INFIX : sig
     val ( >>= ) : 'a m -> ('a -> 'b m) -> 'b m
@@ -79,6 +80,7 @@ module SimpleMonad : MONAD = struct
   let bind x f = f x
   let map f x  = f x
   let return x = x
+  let fail ex  = raise ex
 
   module INFIX = struct
     let ( >>= )      = bind
@@ -174,6 +176,7 @@ module LwtMonad : MONAD with type 'a m = 'a Lwt.t = struct
   let bind   = Lwt.bind
   let map    = Lwt.map
   let return = Lwt.return
+  let fail   = Lwt.fail
 
   module INFIX = struct
     let ( >>= ) = Lwt.Infix.( >>= )
