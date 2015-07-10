@@ -41,7 +41,6 @@ module type LED_DEVICE = sig
   val max_brightness : int
   val set_brightness : int  -> unit m
   val get_brightness : unit -> int  m
-  val is_connected   : unit -> bool m
 end
 
 (* Default LED, using Simple Monad *)

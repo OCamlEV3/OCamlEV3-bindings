@@ -49,7 +49,6 @@ module type LED_DEVICE = sig
   val max_brightness : int
   val set_brightness : int  -> unit m
   val get_brightness : unit -> int  m
-  val is_connected   : unit -> bool m
 end
 
 module LedDevice (M : MONAD) (I : LED_INFOS) =
@@ -77,6 +76,12 @@ struct
 
   let max_brightness = 100
 
+  let connect () =
+    connect () >>
+    get_path () >>= fun path ->
+    IO.read ~usage:ReleaseAfterUse path >>= fun brightness ->
+    M.return (current_led.brightness <- (int_of_string brightness))
+
   let fail what value =
     M.fail (Invalid_value (Printf.sprintf "LedDevice [%s] : %d" what value))
 
@@ -93,9 +98,6 @@ struct
 
   let get_brightness () =
     M.return current_led.brightness
-
-  let connected = ref true
-  let is_connected () = M.return !connected
 end
 
 
