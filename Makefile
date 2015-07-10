@@ -3,7 +3,7 @@ OCAMLOPT        = ocamlopt
 OCAMLMKLIB      = ocamlmklib
 OCAMLFIND       = ocamlfind
 FOLDERS_OPT     = -I $(SOURCES_FOLDER)
-OCAMLC_FLAGS    = $(FOLDERS_OPT) -w @1..8 -w @10..25 -w @28..31 -w @39..49
+OCAMLC_FLAGS    = $(FOLDERS_OPT) -w @1..8 -w @10..26 -w @28..31 -w @39..49
 OCAMLFIND_FLAGS = -package lwt,lwt.unix -linkpkg
 
 LIB_FOLDER = lib
@@ -23,7 +23,7 @@ all: depend library
 
 # Library compilation
 
-COMPILATION_ORDER = src/monads.cmx src/fileManager.cmx src/device.cmx
+COMPILATION_ORDER = src/core.cmx src/device.cmx src/led.cmx
 
 library: depend $(SOURCES_OBJ_BYT) $(SOURCES_OBJ_NAT)
 	@ mkdir -p $(LIB_FOLDER)
