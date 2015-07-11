@@ -52,13 +52,20 @@ struct
 
   let connected = ref false
 
+  let fail () =
+    if P.exception_on_fail then M.fail (Connection_failed path)
+    else M.return ()
+
   let connect () =
-    match Sys.is_directory path with
-    | true  ->
-      M.return (connected := true)
-    | false ->
-      if P.exception_on_fail then M.fail (Connection_failed path)
-      else M.return ()
+    try
+      begin match Sys.is_directory path with
+      | true  ->
+        M.return (connected := true)
+      | false -> fail ()
+      end
+    with Sys_error _ ->
+      fail ()
+
 
   let is_connected () = M.return !connected
 
