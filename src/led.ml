@@ -67,14 +67,24 @@ struct
   end)
 
   type led = {
+    name : string;
     mutable brightness : int;
   }
 
   let current_led = {
+    name       = Printf.sprintf
+                   "Led:%s:%s"
+                   (string_of_position I.position)
+                   (string_of_color I.color);
     brightness = 0;
   }
 
   let max_brightness = 100
+
+  let check_connection () =
+    is_connected () >>= function
+    | true  -> M.return ()
+    | false -> M.fail (Is_not_connected current_led.name)
 
   let connect () =
     connect () >>
@@ -86,6 +96,7 @@ struct
     M.fail (Invalid_value (Printf.sprintf "LedDevice [%s] : %d" what value))
 
   let set_brightness i =
+    check_connection () >>
     (if i < 0 || i > max_brightness then
        fail "set_brightness" i else M.return ()) >>
     match current_led.brightness = i with
@@ -97,6 +108,7 @@ struct
       M.return ()
 
   let get_brightness () =
+    check_connection () >>
     M.return current_led.brightness
 end
 
