@@ -3,7 +3,7 @@ OCAMLOPT        = ocamlopt
 OCAMLMKLIB      = ocamlmklib
 OCAMLFIND       = ocamlfind
 FOLDERS_OPT     = -I $(SOURCES_FOLDER)
-OCAMLC_FLAGS    = $(FOLDERS_OPT) -w @1..8 -w @10..26 -w @28..31 -w @39..49
+OCAMLC_FLAGS    = $(FOLDERS_OPT) -w @1..8 -w @10..26 -w @28..31 -w @39..49 -annot
 OCAMLFIND_FLAGS = -package lwt,lwt.unix -linkpkg
 
 LIB_FOLDER = lib
