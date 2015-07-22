@@ -1,6 +1,0 @@
-src/fileManager.cmi :
-src/monads.cmi :
-src/fileManager.cmo : src/monads.cmi src/fileManager.cmi
-src/fileManager.cmx : src/monads.cmx src/fileManager.cmi
-src/monads.cmo : src/monads.cmi
-src/monads.cmx : src/monads.cmi
