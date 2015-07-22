@@ -78,7 +78,7 @@ clean:
 .ml.cmx:
 	$(OCAMLFIND) $(OCAMLOPT) $(OCAMLC_FLAGS) $(OCAMLFIND_FLAGS) -c $<
 
-.PHONY: ocamlev3bindings-dep
+.PHONY: depend
 depend:
 	ocamldep $(FOLDERS_OPT) $(SOURCES_MLI) $(SOURCES) > .depend
-include .depend
+-include .depend
