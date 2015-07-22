@@ -25,15 +25,6 @@
  * DEALINGS IN THE SOFTWARE.                                                  *
  *****************************************************************************)
 
-type usage =
-  | ReleaseAfterUse
-  | NeverRelease
-
-type mode =
-  | Read
-  | Write
-  | Both
-
 exception Invalid_file of string
 
 module type MONAD =
@@ -45,7 +36,8 @@ sig
   val return : 'a -> 'a m
   val fail   : exn -> 'a m
 
-  module INFIX : sig
+  module INFIX :
+  sig
     val ( >>=  ) : 'a m -> ('a -> 'b m) -> 'b m
     val ( =<<  ) : ('a -> 'b m) -> 'a m -> 'b m
     val ( >|=  ) : 'a m -> ('a -> 'b) -> 'b m
@@ -53,22 +45,22 @@ sig
     val ( >>=? ) : 'a m -> 'b m -> 'b m
     val ( >>   ) : unit m -> 'b m -> 'b m
   end
-
-  module UNIX : sig
-    type filedescr
-    val openfile : string -> Unix.open_flag list -> Unix.file_perm -> filedescr m
-    val close : filedescr -> unit m
-    val lseek : filedescr -> int -> Unix.seek_command -> int m
-    val read  : filedescr -> string -> int -> int -> int m
-    val write : filedescr -> string -> int -> int -> int m
-  end
-
-  module IO : sig
-    val store_filename : ?usage:usage -> ?mode:mode -> string -> unit m
-    val write : ?usage:usage -> string -> string -> unit m
-    val read : ?usage:usage -> string -> string m
-  end
 end
 
-module SimpleMonad : MONAD
-module LwtMonad    : MONAD with type 'a m = 'a Lwt.t
+module type IO = sig
+  type 'a m
+  val read         : string -> (string -> 'a m) -> 'a m
+  val read_string  : string -> string m
+  val read_int     : string -> int m
+  val write        : string -> ('a -> string m) -> 'a -> unit m
+  val write_string : string -> string -> unit m
+  val write_int    : string -> int -> unit m
+end
+
+module type CORE = sig
+  include MONAD
+  module IO : IO with type 'a m = 'a m
+end
+
+module Core    : CORE
+module LwtCore : CORE with type 'a m = 'a Lwt.t

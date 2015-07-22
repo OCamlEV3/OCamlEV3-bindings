@@ -40,34 +40,36 @@ end
 module type DEVICE = sig
   type 'a m
   val connect : unit -> unit m
+  val disconnect : unit -> unit m
   val is_connected : unit -> bool m
   val get_path : unit -> string m
 end
 
-module Device (M : MONAD) (P : PATH) =
+module Device (C : CORE) (P : PATH) =
 struct
-  type 'a m = 'a M.m
+  type 'a m = 'a C.m
 
   let path = P.path
 
   let connected = ref false
 
   let fail () =
-    if P.exception_on_fail then M.fail (Connection_failed path)
-    else M.return ()
+    if P.exception_on_fail then C.fail (Connection_failed path)
+    else C.return ()
 
   let connect () =
     try
       begin match Sys.is_directory path with
       | true  ->
-        M.return (connected := true)
+        C.return (connected := true)
       | false -> fail ()
       end
     with Sys_error _ ->
       fail ()
 
+  let disconnect () = C.return (connected := false)
 
-  let is_connected () = M.return !connected
+  let is_connected () = C.return !connected
 
-  let get_path () = M.return path
+  let get_path () = C.return path
 end

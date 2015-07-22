@@ -40,9 +40,9 @@ module type DEVICE =
   sig
     type 'a m
     val connect : unit -> unit m
+    val disconnect : unit -> unit m
     val is_connected : unit -> bool m
     val get_path : unit -> string m
   end
 
-module Device (M : MONAD) (P : PATH) : DEVICE with type 'a m = 'a M.m
-
+module Device (C : CORE) (P : PATH) : DEVICE with type 'a m = 'a C.m

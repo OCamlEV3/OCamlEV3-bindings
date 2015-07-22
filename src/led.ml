@@ -51,12 +51,12 @@ module type LED_DEVICE = sig
   val get_brightness : unit -> int  m
 end
 
-module LedDevice (M : MONAD) (I : LED_INFOS) =
+module LedDevice (C : CORE) (I : LED_INFOS) =
 struct
-  open M
-  open M.INFIX
+  open C
+  open C.INFIX
 
-  include Device(M)(struct
+  include Device(C)(struct
     let path =
       Printf.sprintf
         "/sys/class/leds/ev3:%s:%s/"
@@ -83,55 +83,55 @@ struct
 
   let check_connection () =
     is_connected () >>= function
-    | true  -> M.return ()
-    | false -> M.fail (Is_not_connected current_led.name)
+    | true  -> C.return ()
+    | false -> C.fail (Is_not_connected current_led.name)
 
   let connect () =
     connect () >>
     get_path () >>= fun path ->
-    IO.read ~usage:ReleaseAfterUse path >>= fun brightness ->
-    M.return (current_led.brightness <- (int_of_string brightness))
+    IO.read_int path >>= fun brightness ->
+    C.return (current_led.brightness <- brightness)
 
   let fail what value =
-    M.fail (Invalid_value (Printf.sprintf "LedDevice [%s] : %d" what value))
+    C.fail (Invalid_value (Printf.sprintf "LedDevice [%s] : %d" what value))
 
   let set_brightness i =
     check_connection () >>
     (if i < 0 || i > max_brightness then
-       fail "set_brightness" i else M.return ()) >>
+       fail "set_brightness" i else C.return ()) >>
     match current_led.brightness = i with
     | false ->
       get_path () >>= fun path ->
       current_led.brightness <- i;
-      IO.write ~usage:ReleaseAfterUse path (string_of_int i)
+      IO.write_int path i
     | true ->
-      M.return ()
+      C.return ()
 
   let get_brightness () =
     check_connection () >>
-    M.return current_led.brightness
+    C.return current_led.brightness
 end
 
 
 
 (* Default LED, using Simple Monad *)
 
-module LedLeftGreen = LedDevice(SimpleMonad)(struct
+module LedLeftGreen = LedDevice(Core)(struct
   let position = Left
   let color    = Green
 end)
 
-module LedRightGreen = LedDevice(SimpleMonad)(struct
+module LedRightGreen = LedDevice(Core)(struct
   let position = Right
   let color    = Green
 end)
 
-module LedLeftRed = LedDevice(SimpleMonad)(struct
+module LedLeftRed = LedDevice(Core)(struct
   let position = Left
   let color    = Red
 end)
 
-module LedRightRed = LedDevice(SimpleMonad)(struct
+module LedRightRed = LedDevice(Core)(struct
   let position = Right
   let color    = Red
 end)
@@ -141,23 +141,22 @@ end)
 (* Lwt Led *)
 
 
-module LedLeftGreenLwt = LedDevice(LwtMonad)(struct
+module LedLeftGreenLwt = LedDevice(LwtCore)(struct
   let position = Left
   let color    = Green
 end)
 
-module LedRightGreenLwt = LedDevice(LwtMonad)(struct
+module LedRightGreenLwt = LedDevice(LwtCore)(struct
   let position = Right
   let color    = Green
 end)
 
-module LedLeftRedLwt = LedDevice(LwtMonad)(struct
+module LedLeftRedLwt = LedDevice(LwtCore)(struct
   let position = Left
   let color    = Red
 end)
 
-module LedRightRedLwt = LedDevice(LwtMonad)(struct
+module LedRightRedLwt = LedDevice(LwtCore)(struct
   let position = Right
   let color    = Red
 end)
-

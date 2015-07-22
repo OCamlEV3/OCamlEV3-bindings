@@ -25,21 +25,7 @@
  * DEALINGS IN THE SOFTWARE.                                                  *
  *****************************************************************************)
 
-(* File manager *)
-
-type usage =
-  | ReleaseAfterUse
-  | NeverRelease
-
-type mode =
-  | Read
-  | Write
-  | Both
-
 exception Invalid_file of string
-
-
-(* Core operations *)
 
 module type MONAD = sig
   type 'a m
@@ -49,7 +35,8 @@ module type MONAD = sig
   val return : 'a -> 'a m
   val fail   : exn -> 'a m
 
-  module INFIX : sig
+  module INFIX :
+  sig
     val ( >>= ) : 'a m -> ('a -> 'b m) -> 'b m
     val ( =<< ) : ('a -> 'b m) -> 'a m -> 'b m
     val ( >|= ) : 'a m -> ('a -> 'b) -> 'b m
@@ -57,32 +44,72 @@ module type MONAD = sig
     val ( >>=? ) : 'a m -> 'b m -> 'b m
     val ( >>   ) : unit m -> 'b m -> 'b m
   end
-
-  module UNIX : sig
-    type filedescr
-    val openfile : string -> Unix.open_flag list -> Unix.file_perm -> filedescr m
-    val close : filedescr -> unit m
-    val lseek : filedescr -> int -> Unix.seek_command -> int m
-    val read  : filedescr -> string -> int -> int -> int m
-    val write : filedescr -> string -> int -> int -> int m
-  end
-
-  module IO : sig
-    val store_filename : ?usage:usage -> ?mode:mode -> string -> unit m
-    val write : ?usage:usage -> string -> string -> unit m
-    val read : ?usage:usage -> string -> string m
-  end
 end
 
-module SimpleMonad : MONAD = struct
-  type 'a m = 'a
+module type IO = sig
+  type 'a m
+  val read         : string -> (string -> 'a m) -> 'a m
+  val read_string  : string -> string m
+  val read_int     : string -> int m
+  val write        : string -> ('a -> string m) -> 'a -> unit m
+  val write_string : string -> string -> unit m
+  val write_int    : string -> int -> unit m
+end
+
+module type CORE = sig
+  include MONAD
+  module IO : IO with type 'a m = 'a m
+end
+
+module IO_FONCTOR =
+  functor (M : MONAD) ->
+  functor (R : sig
+             val read : string -> string M.m
+             val write : string -> string -> unit M.m
+           end) ->
+  struct
+    open M.INFIX
+
+    type 'a m= 'a M.m
+
+    let r f = (fun x -> M.return (f x))
+
+    let read filename translater =
+      R.read filename >>= fun data ->
+      translater data
+
+    let read_string filename =
+      read filename (r (fun x -> x))
+
+    let read_int filename =
+      read filename (r int_of_string)
+
+    let write filename translater data =
+      translater data >>= fun translated_data ->
+      R.write filename translated_data
+
+    let write_string filename data =
+      write filename (r (fun x -> x)) data
+
+    let write_int filename data =
+      write filename (r string_of_int) data
+  end
+
+
+(*
+   Usual core declaration
+*)
+
+module Monad : MONAD = struct
+type 'a m = 'a
 
   let bind x f = f x
   let map f x  = f x
   let return x = x
   let fail ex  = raise ex
 
-  module INFIX = struct
+  module INFIX =
+  struct
     let ( >>= )      = bind
     let ( =<< )  f x = bind x f
     let ( >|= )  x f = map f x
@@ -90,85 +117,30 @@ module SimpleMonad : MONAD = struct
     let ( >>=? ) x y = x >>= (fun _ -> y)
     let ( >>   ) x y = x >>= (fun () -> y)
   end
-
-  module UNIX = struct
-    type filedescr = Unix.file_descr
-    let openfile str flags fp = return (Unix.openfile str flags fp)
-    let close fd = return (Unix.close fd)
-    let lseek fd i s = return (Unix.lseek fd i s)
-    let read fd s i j = return (Unix.read fd s i j)
-    let write fd s i j = return (Unix.write fd s i j)
-  end
-
-  module IO = struct
-    open INFIX
-    open UNIX
-
-    let file_table = Hashtbl.create 4
-
-    let add usage key value =
-      match usage with
-      | ReleaseAfterUse -> return ()
-      | NeverRelease    -> return (Hashtbl.add file_table key value)
-
-    let exists elt = return (Hashtbl.mem file_table elt)
-    let find   elt = return (Hashtbl.find file_table elt)
-    let remove elt = return (Hashtbl.remove file_table elt)
-
-    let unix_flag_of_flag flag = return (match flag with
-      | Read  -> Unix.O_RDONLY
-      | Write -> Unix.O_WRONLY
-      | Both  -> Unix.O_RDWR
-    )
-
-    let store_and_return usage mode filename =
-      match Sys.file_exists filename with
-      | true ->
-        begin match Filename.is_relative filename with
-        | true ->
-          raise (Invalid_file (Printf.sprintf "`%s' have to be absolute" filename))
-        | false ->
-          unix_flag_of_flag mode            >>= fun flag ->
-          openfile filename [flag] 0o640    >>= fun fd ->
-          add usage filename (fd, usage)    >>
-          return (fd, usage)
-        end
-      | false ->
-        raise (Invalid_file (Printf.sprintf "`%s' doesn't exists." filename))
-
-    let store_filename ?(usage = ReleaseAfterUse) ?(mode = Both) filename =
-      store_and_return usage mode filename >>=?
-      return ()
-
-    let find_or_create filename mode usage =
-      exists filename >>= function
-      | true  -> find filename
-      | false -> store_and_return usage mode filename
-
-    let check_file_usage filename fd usage =
-      match usage with
-      | ReleaseAfterUse ->
-        close fd >>= fun () ->
-        remove filename
-      | NeverRelease ->
-        return ()
-
-    let write ?(usage = ReleaseAfterUse) filename message =
-      find_or_create filename Write usage          >>= fun (fd, usage) ->
-      lseek fd 0 Unix.SEEK_SET                   >>=?
-      write fd message 0 (String.length message) >>=?
-      check_file_usage filename fd usage
-
-    let read ?(usage = ReleaseAfterUse) filename =
-      find_or_create filename Read usage      >>= fun (fd, usage) ->
-      lseek fd 0 Unix.SEEK_SET              >>=?
-      let buffer = Bytes.create 64 in
-      read fd buffer 0 64                   >>=?
-      let message = Bytes.to_string buffer in
-      check_file_usage filename fd usage      >>
-      return message
-  end
 end
+
+module Core : CORE = struct
+
+  include Monad
+
+  module IO = IO_FONCTOR(Monad)(struct
+      let read path =
+        let in_ = open_in path in
+        let line = input_line in_ in
+        close_in in_; return line
+
+      let write path msg =
+        let out = open_out path in
+        output_string out msg;
+        return ()
+    end)
+
+end
+
+
+(*
+   Lwt Core
+*)
 
 module LwtMonad : MONAD with type 'a m = 'a Lwt.t = struct
   type 'a m = 'a Lwt.t
@@ -186,83 +158,24 @@ module LwtMonad : MONAD with type 'a m = 'a Lwt.t = struct
     let ( >>=? ) x y = x >>= (fun _ -> y)
     let ( >>   ) x y = x >>= (fun () -> y)
   end
-
-  module UNIX = struct
-    type filedescr = Lwt_unix.file_descr
-    let openfile = Lwt_unix.openfile
-    let close    = Lwt_unix.close
-    let lseek    = Lwt_unix.lseek
-    let read     = Lwt_unix.read
-    let write    = Lwt_unix.write
-  end
-
-  module IO = struct
-    open INFIX
-    open UNIX
-
-    let file_table = Hashtbl.create 4
-
-    let add usage key value =
-      match usage with
-      | ReleaseAfterUse -> return ()
-      | NeverRelease    -> return (Hashtbl.add file_table key value)
-
-    let exists elt = return (Hashtbl.mem file_table elt)
-    let find   elt = return (Hashtbl.find file_table elt)
-    let remove elt = return (Hashtbl.remove file_table elt)
-
-    let unix_flag_of_flag flag = return (match flag with
-      | Read  -> Unix.O_RDONLY
-      | Write -> Unix.O_WRONLY
-      | Both  -> Unix.O_RDWR
-    )
-
-    let store_and_return usage mode filename =
-      match Sys.file_exists filename with
-      | true ->
-        begin match Filename.is_relative filename with
-        | true ->
-          raise (Invalid_file (Printf.sprintf "`%s' have to be absolute" filename))
-        | false ->
-          unix_flag_of_flag mode            >>= fun flag ->
-          openfile filename [flag] 0o640    >>= fun fd ->
-          add usage filename (fd, usage)    >>
-          return (fd, usage)
-        end
-      | false ->
-        raise (Invalid_file (Printf.sprintf "`%s' doesn't exists." filename))
-
-    let store_filename ?(usage = ReleaseAfterUse) ?(mode = Both) filename =
-      store_and_return usage mode filename >>=?
-      return ()
-
-    let find_or_create filename mode usage =
-      exists filename >>= function
-      | true  -> find filename
-      | false -> store_and_return usage mode filename
-
-    let check_file_usage filename fd usage =
-      match usage with
-      | ReleaseAfterUse ->
-        close fd >>= fun () ->
-        remove filename
-      | NeverRelease ->
-        return ()
-
-    let write ?(usage = ReleaseAfterUse) filename message =
-      find_or_create filename Write usage          >>= fun (fd, usage) ->
-      lseek fd 0 Unix.SEEK_SET                   >>=?
-      write fd message 0 (String.length message) >>=?
-      check_file_usage filename fd usage
-
-    let read ?(usage = ReleaseAfterUse) filename =
-      find_or_create filename Read usage      >>= fun (fd, usage) ->
-      lseek fd 0 Unix.SEEK_SET              >>=?
-      let buffer = Bytes.create 64 in
-      read fd buffer 0 64                   >>=?
-      let message = Bytes.to_string buffer in
-      check_file_usage filename fd usage      >>
-      return message
-  end
 end
 
+module LwtCore : CORE with type 'a m = 'a Lwt.t = struct
+
+  include LwtMonad
+
+  module IO = IO_FONCTOR(LwtMonad)(struct
+      open INFIX
+
+      let read filename =
+        Lwt_io.with_file ~flags:[Unix.O_RDONLY]
+          ~mode:Lwt_io.input filename
+          Lwt_io.read_line
+
+      let write filename msg =
+        Lwt_io.with_file ~flags:[Unix.O_WRONLY]
+          ~mode:Lwt_io.output filename
+          (fun channel -> Lwt_io.write_line channel msg)
+    end)
+
+end
