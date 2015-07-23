@@ -81,11 +81,6 @@ struct
 
   let max_brightness = 100
 
-  let check_connection () =
-    is_connected () >>= function
-    | true  -> C.return ()
-    | false -> C.fail (Is_not_connected current_led.name)
-
   let connect () =
     connect () >>
     get_path () >>= fun path ->
@@ -96,7 +91,7 @@ struct
     C.fail (Invalid_value (Printf.sprintf "LedDevice [%s] : %d" what value))
 
   let set_brightness i =
-    check_connection () >>
+    check_connection current_led.name >>
     (if i < 0 || i > max_brightness then
        fail "set_brightness" i else C.return ()) >>
     match current_led.brightness = i with
@@ -108,7 +103,7 @@ struct
       C.return ()
 
   let get_brightness () =
-    check_connection () >>
+    check_connection current_led.name >>
     C.return current_led.brightness
 end
 
