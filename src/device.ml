@@ -42,11 +42,14 @@ module type DEVICE = sig
   val connect : unit -> unit m
   val disconnect : unit -> unit m
   val is_connected : unit -> bool m
+  val check_connection : string -> unit m
   val get_path : unit -> string m
 end
 
 module Device (C : CORE) (P : PATH) =
 struct
+  open C.INFIX
+  
   type 'a m = 'a C.m
 
   let path = P.path
@@ -56,7 +59,7 @@ struct
   let fail () =
     if P.exception_on_fail then C.fail (Connection_failed path)
     else C.return ()
-
+  
   let connect () =
     try
       begin match Sys.is_directory path with
@@ -71,5 +74,10 @@ struct
 
   let is_connected () = C.return !connected
 
+  let check_connection name =
+    is_connected () >>= function
+    | true -> C.return ()
+    | false -> C.fail (Is_not_connected name)
+  
   let get_path () = C.return path
 end

@@ -42,6 +42,7 @@ module type DEVICE =
     val connect : unit -> unit m
     val disconnect : unit -> unit m
     val is_connected : unit -> bool m
+    val check_connection : string -> unit m 
     val get_path : unit -> string m
   end
 
