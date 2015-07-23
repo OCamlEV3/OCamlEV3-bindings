@@ -60,9 +60,9 @@ struct
     let path =
       Printf.sprintf
         "/sys/class/leds/ev3:%s:%s/"
-        (string_of_position I.position)
         (string_of_color    I.color)
-
+        (string_of_position I.position)
+        
     let exception_on_fail = true
   end)
 
