@@ -31,50 +31,88 @@ open Port
 exception Invalid_value     of string
 exception Connection_failed of string
 exception Is_not_connected  of string
+exception Invalid_connection of string
 
-module type PATH = sig
+(* Table: path -> name; usefull for multiple connection *)
+let device_table : (string, string) Hashtbl.t = Hashtbl.create 13
+let device_add = Hashtbl.add device_table
+let device_remove = Hashtbl.remove device_table
+let device_mem = Hashtbl.mem device_table
+let device_find = Hashtbl.find device_table
+
+module type DEVICE_INFO = sig
   val path : string
-  val exception_on_fail : bool
+  val name : string
+  val multiple_connection : bool
+  val exception_on_fail   : bool
 end
 
 module type DEVICE = sig
   type 'a m
+  val path : string
+  val name : string
   val connect : unit -> unit m
   val disconnect : unit -> unit m
   val is_connected : unit -> bool m
-  val check_connection : string -> unit m
+  val check_connection : unit -> unit m
   val get_path : unit -> string m
 end
 
-module Device (C : CORE) (P : PATH) =
+module Device (C : CORE) (DI : DEVICE_INFO) =
 struct
   open C.INFIX
   
   type 'a m = 'a C.m
 
-  let path = P.path
+  let path = DI.path
 
+  let name = DI.name
+  
   let connected = ref false
 
   let fail () =
-    if P.exception_on_fail then C.fail (Connection_failed path)
+    if DI.exception_on_fail then C.fail (Connection_failed path)
     else C.return ()
+
+  let check_consistent_name () =
+    if device_mem path && device_find path <> name then
+      C.fail (Invalid_connection "Multiple name for the same path")
+    else
+      C.return ()
+  
+  let check_multiple_connection () =
+    if DI.multiple_connection then C.return ()
+    else begin
+      if device_mem path then
+        C.fail (Invalid_connection "A connection already exists")
+      else
+        C.return ()
+    end
   
   let connect () =
     try
       begin match Sys.is_directory path with
       | true  ->
-        C.return (connected := true)
+        check_consistent_name () >>
+        check_multiple_connection () >>
+        (device_add path name;
+         C.return (connected := true))
       | false -> fail ()
       end
     with Sys_error _ ->
       fail ()
 
-  let disconnect () = C.return (connected := false)
-
   let is_connected () = C.return !connected
+  
+  let disconnect () =
+    is_connected () >>= function
+    | true ->
+      device_remove path;
+      C.return (connected := false)
+    | false ->
+      C.return ()
 
-  let check_connection name =
+  let check_connection () =
     is_connected () >>= function
     | true -> C.return ()
     | false -> C.fail (Is_not_connected name)

@@ -30,20 +30,25 @@ open Core
 exception Invalid_value     of string
 exception Connection_failed of string
 exception Is_not_connected  of string
+exception Invalid_connection of string
 
-module type PATH = sig
+module type DEVICE_INFO = sig
   val path : string
+  val name : string
+  val multiple_connection : bool
   val exception_on_fail : bool
 end
 
 module type DEVICE =
   sig
     type 'a m
+    val path : string
+    val name : string
     val connect : unit -> unit m
     val disconnect : unit -> unit m
     val is_connected : unit -> bool m
-    val check_connection : string -> unit m 
+    val check_connection : unit -> unit m 
     val get_path : unit -> string m
   end
 
-module Device (C : CORE) (P : PATH) : DEVICE with type 'a m = 'a C.m
+module Device (C : CORE) (DI : DEVICE_INFO) : DEVICE with type 'a m = 'a C.m

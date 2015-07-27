@@ -57,25 +57,25 @@ struct
   open C.INFIX
 
   include Device(C)(struct
-    let path =
-      Printf.sprintf
-        "/sys/class/leds/ev3:%s:%s/"
-        (string_of_color    I.color)
-        (string_of_position I.position)
-        
-    let exception_on_fail = true
-  end)
+      let color_str = string_of_color I.color
+      let position_str = string_of_position I.position
+
+      let name = Printf.sprintf "Led:%s:%s" color_str position_str
+      let path =
+        Printf.sprintf
+          "/sys/class/leds/ev3:%s:%s/"
+          color_str position_str
+
+      let multiple_connection = true
+
+      let exception_on_fail = true
+    end)
 
   type led = {
-    name : string;
     mutable brightness : int;
   }
 
   let current_led = {
-    name       = Printf.sprintf
-                   "Led:%s:%s"
-                   (string_of_position I.position)
-                   (string_of_color I.color);
     brightness = 0;
   }
 
@@ -91,7 +91,7 @@ struct
     C.fail (Invalid_value (Printf.sprintf "LedDevice [%s] : %d" what value))
 
   let set_brightness i =
-    check_connection current_led.name >>
+    check_connection () >>
     (if i < 0 || i > max_brightness then
        fail "set_brightness" i else C.return ()) >>
     match current_led.brightness = i with
@@ -103,7 +103,7 @@ struct
       C.return ()
 
   let get_brightness () =
-    check_connection current_led.name >>
+    check_connection () >>
     C.return current_led.brightness
 end
 

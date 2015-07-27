@@ -42,12 +42,14 @@ module MakePowerSupply (C : CORE) (P : PATH_TO) = struct
   open C.INFIX
 
   include Device(C)(struct
-    let path = P.path
-    let exception_on_fail = true
+      let name = "power_supply"
+      let path = P.path
+      let multiple_connection = true
+      let exception_on_fail = true
   end)
 
   let get_power () =
-    check_connection "Power Supply" >>
+    check_connection () >>
     get_path () >>= fun path ->
     IO.read_int path
     
