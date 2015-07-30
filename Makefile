@@ -1,17 +1,23 @@
 OCAMLC          = ocamlc
+OCAMLDOC	= ocamldoc
 OCAMLOPT        = ocamlopt
 OCAMLMKLIB      = ocamlmklib
 OCAMLFIND       = ocamlfind
 FOLDERS_OPT     = -I $(SOURCES_FOLDER)
 OCAMLC_FLAGS    = $(FOLDERS_OPT) -w @1..8 -w @10..26 -w @28..31 -w @39..49 -annot
-OCAMLFIND_FLAGS = 
+OCAMLFIND_FLAGS =
+
+OCAMLDOC_FLAGS  = -html -d $(OCAMLDOC_FOLDER) -t OCamlEV3-bindings \
+			-colorize-code
+OCAMLDOC_FOLDER = doc
 
 LIB_FOLDER = lib
 LIB_NAME   = OCamlEV3-bindings
 LIB_DIST   = $(LIB_FOLDER)/$(LIB_NAME)
 
-SOURCES_FOLDER = src
-SOURCES=$(shell find src -name "*.ml")
+SOURCES_FOLDER=src
+TEST=IO path_finder
+SOURCES=$(shell find $(SOURCES_FOLDER) -name "*.ml")
 SOURCES_MLI=$(SOURCES:.ml=.mli)
 SOURCES_CMI=$(SOURCES:.ml=.cmi)
 SOURCES_OBJ_BYT=$(SOURCES:.ml=.cmo)
@@ -23,7 +29,7 @@ all: depend library
 
 # Library compilation
 
-COMPILATION_ORDER = src/IO.cmx src/path_finder.cmx
+COMPILATION_ORDER = IO.cmx path_finder.cmx
 
 library: depend $(SOURCES_OBJ_BYT) $(SOURCES_OBJ_NAT)
 	@ mkdir -p $(LIB_FOLDER)
@@ -32,6 +38,10 @@ library: depend $(SOURCES_OBJ_BYT) $(SOURCES_OBJ_NAT)
 		&& echo "Library compiled." \
 		|| echo "Error while compiling library."
 
+doc: depend
+	mkdir -p $(OCAMLDOC_FOLDER)
+	$(OCAMLFIND) $(OCAMLDOC) $(OCAMLDOC_FLAGS) \
+		$(FOLDERS_OPT) $(SOURCES_MLI)
 
 
 
@@ -62,6 +72,7 @@ clean:
 	find . \( -name "*.cm*" -o -name "*.o" -o -name "*.a" \
 		-o -name "*.ml.*" -o -name "dump_*" \) -delete
 	rm -f $(LIB_BYTECODE) $(LIB_NATIVE)
+	rm -rf $(OCAMLDOC_FOLDER)
 
 
 
