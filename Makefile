@@ -1,13 +1,14 @@
-OCAMLC    = ocamlc
-OCAMLOPT  = ocamlopt
-OCAMLFIND = ocamlfind
-FLAGS     = -I $(SOURCES_FOLDER) -I $(SOURCES_FOLDER)/motors \
-			-I $(SOURCES_FOLDER)/sensors
+OCAMLC          = ocamlc
+OCAMLOPT        = ocamlopt
+OCAMLMKLIB      = ocamlmklib
+OCAMLFIND       = ocamlfind
+FOLDERS_OPT     = -I $(SOURCES_FOLDER)
+OCAMLC_FLAGS    = $(FOLDERS_OPT) -w @1..8 -w @10..26 -w @28..31 -w @39..49 -annot
+OCAMLFIND_FLAGS = 
 
-LIB_FOLDER 		  = lib
-LIB_NAME	 	  = OCamlEV3-bindings
-LIB_BYTECODE      = $(LIB_FOLDER)/$(LIB_NAME).cma
-LIB_NATIVE		  = $(LIB_BYTECODE:.cma=.cmxa)
+LIB_FOLDER = lib
+LIB_NAME   = OCamlEV3-bindings
+LIB_DIST   = $(LIB_FOLDER)/$(LIB_NAME)
 
 SOURCES_FOLDER = src
 SOURCES=$(shell find src -name "*.ml")
@@ -17,22 +18,22 @@ SOURCES_OBJ_BYT=$(SOURCES:.ml=.cmo)
 SOURCES_OBJ_NAT=$(SOURCES:.ml=.cmx)
 
 .PHONY: all
-all: $(LIB_BYTECODE) $(LIB_NATIVE)
+all: depend library
 
 
 # Library compilation
 
-$(LIB_BYTECODE): $(SOURCES_OBJ_BYT)
-	@ mkdir -p $(LIB_FOLDER)
-	@ $(OCAMLFIND) $(OCAMLC) $(FLAGS) -a -o $@ $? \
-		&& echo "Bytecode library compiled." \
-		|| echo "Error while compile bytecode library."
+COMPILATION_ORDER = src/IO.cmx src/path_finder.cmx
 
-$(LIB_NATIVE): $(SOURCES_OBJ_NAT)
+library: depend $(SOURCES_OBJ_BYT) $(SOURCES_OBJ_NAT)
 	@ mkdir -p $(LIB_FOLDER)
-	@ $(OCAMLFIND) $(OCAMLOPT) -I src/ $(FLAGS) -a -o $@ $? \
-		&& echo "Native library compiled." \
-		|| echo "Error while compile native library."
+	$(OCAMLFIND) $(OCAMLMKLIB) $(FOLDERS_OPT) $(OCAMLFIND_FLAGS) \
+		-o $(LIB_DIST) $(COMPILATION_ORDER) \
+		&& echo "Library compiled." \
+		|| echo "Error while compiling library."
+
+
+
 
 # Opam
 
@@ -69,17 +70,15 @@ clean:
 .SUFFIXES: .ml .mli .cmo .cmi .cmx
 
 .ml.cmo:
-	$(OCAMLC) $(FLAGS) -c $<
+	$(OCAMLFIND) $(OCAMLC) $(OCAMLC_FLAGS) $(OCAMLFIND_FLAGS) -c $<
 
 .mli.cmi:
-	$(OCAMLC) $(FLAGS) -c $<
+	$(OCAMLFIND) $(OCAMLC) $(OCAMLC_FLAGS) $(OCAMLFIND_FLAGS) -c $<
 
 .ml.cmx:
-	$(OCAMLOPT) $(FLAGS) -c $<
+	$(OCAMLFIND) $(OCAMLOPT) $(OCAMLC_FLAGS) $(OCAMLFIND_FLAGS) -c $<
 
-.PHONY: ocamlev3bindings-dep
+.PHONY: depend
 depend:
-	ocamldep $(FLAGS) $(SOURCES_MLI) $(SOURCES) > .depend
-include .depend
-
-
+	ocamldep $(FOLDERS_OPT) $(SOURCES_MLI) $(SOURCES) > .depend
+-include .depend
