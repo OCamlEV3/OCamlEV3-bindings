@@ -35,7 +35,7 @@ module type CONDITIONS = sig
   val conditions : (string * string) list
 end
 
-module Path_finder(C : CONDITIONS) = struct
+module Make(C : CONDITIONS) = struct
 
   let saved_path = ref None
 
@@ -76,8 +76,8 @@ module Path_finder(C : CONDITIONS) = struct
     
 end
 
-module Absolute_path_finder(C : sig val path : string end) = struct
-  include Path_finder(struct
+module Make_absolute(C : sig val path : string end) = struct
+  include Make(struct
       let prefix = C.path
       let conditions = []
     end)

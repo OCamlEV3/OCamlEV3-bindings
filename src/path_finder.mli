@@ -24,6 +24,7 @@
 (* OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR  *)
 (* THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                *)
 (*****************************************************************************)
+
 (**
    Simple representation of a path finder.
 *)
@@ -51,9 +52,12 @@ module type CONDITIONS = sig
       
 end
 
-module Path_finder(C : CONDITIONS) : PATH_FINDER
+(** Create a path finder with the given conditions. *)
+module Make(C : CONDITIONS) : PATH_FINDER
 
-module Absolute_path_finder(C : sig val path : string end) : PATH_FINDER
+(** Create an absolute path. It's the same as using Make with empty
+    conditions. *)
+module Make_absolute(C : sig val path : string end) : PATH_FINDER
 
 (*
 Local Variables:
