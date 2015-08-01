@@ -25,37 +25,69 @@
 (* THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                *)
 (*****************************************************************************)
 
-(** The IO module contains every usefull functions to read and write any data
-    coming from a file.
-    For now, it doesn't keep in memory any channel. *)
+open Path_finder
+
+exception Connection_failed of string
+(** Raised only when connection has failed. *)
+
+exception Device_not_connected of string
+(** Raised by all functions which needs the device connected. *)
+
+exception Name_already_exists of string
+(** Raised when two connected device have the same name, but two different paths *)
 
 
-(** {2 Reader} *)
+(** Gives informations about the device. *)
+module type DEVICE_INFO = sig
 
-val mk_reader : (string -> 'a) -> (string -> 'a)
-(** [mk_reader wrapper] create a reader where the given string is wrapped into
-    the needed type.
-    For example, int reader is created as [mk_reader int_of_string] *)
+  val name : string
+  (** The device's name.
+      Two connected device can have the name, but they have to point to the
+      same path to be valid, and have the [multiple_connection] set
+      to on. *)
 
-val read_string : string -> string
-(** [read_string path] read the first line of the file at [path]. *)
+  val multiple_connection : bool
+  (** Check if an another connection exists with the same name; if the boolean
+      is set to false, then it raise an error. *)
+  
+end
 
-val read_int : string -> int
-(** [read_int path] read the first integer of the file at [path]. *)
+(** The signature of a Device. *)
+module type DEVICE = sig
 
+  val connect : unit -> unit
+  (** [connect ()] connects the device and register it to the connected devices
+      if no error occurs. 
+      @raise Connection_failed when the path is not available
+      @raise Name_already_exists when multiple connection is not allowed, or
+      when two devices with the same name have not the same path. *)
 
-(** {2 Writer} *)
+  val disconnect : unit -> unit
+  (** [disconnect ()] disconnect the device andremove it from the registered
+      devices. 
+      If the device is already disconnected, does nothing. *)
+  
+  val is_connected : unit -> bool
+  (** [is_connected ()] check if the device is connected. *)
+  
+  val get_path : unit -> string
+  (** [get_path ()] return the path associated to the device. *)
+  
+  val action_read : (string -> 'a) -> 'a
+  (** [action_read unwrapper] will read to the device path, returning the
+      result using the wrapper. 
+      @raise Device_not_connected when the device is disconnceted. *)
 
-val mk_writer : ('a -> string) -> (string -> 'a -> unit)
-(** [mk_writer unwrapper] create a writer that make the transformation of the
-    data into a string, and write it to the first line.
-    For example, int writer is created as [mk_writer string_of_int] *)
+  val action_write : (string -> 'a -> unit) -> 'a -> unit
+  (** [action_write wrapper] wrap the given data to a string and writes it
+      to the device path.
+      @raise Device_not_connected when the device is disconnceted. *)
 
-val write_string : string -> string -> unit
-(** [write_string path data] write [data] to the file at [path] *)
+end
 
-val write_int : string -> int -> unit
-(** [write_int path data] write [data] as an integer to the file at [path] *)
+(** Device Maker. *)
+module Make_device (DI : DEVICE_INFO) (P : PATH_FINDER) : DEVICE
+
 
 (*
 Local Variables:

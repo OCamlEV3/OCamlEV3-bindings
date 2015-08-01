@@ -25,37 +25,83 @@
 (* THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                *)
 (*****************************************************************************)
 
-(** The IO module contains every usefull functions to read and write any data
-    coming from a file.
-    For now, it doesn't keep in memory any channel. *)
+open Path_finder
 
+exception Connection_failed of string
+exception Device_not_connected of string
+exception Name_already_exists of string
 
-(** {2 Reader} *)
+(* Table name -> path; usefull for multiple connection *)
+let device_table  : (string, string) Hashtbl.t = Hashtbl.create 13
+let device_add    = Hashtbl.add device_table
+let device_remove = Hashtbl.remove device_table
+let device_mem    = Hashtbl.mem device_table
+let device_find   = Hashtbl.find device_table
 
-val mk_reader : (string -> 'a) -> (string -> 'a)
-(** [mk_reader wrapper] create a reader where the given string is wrapped into
-    the needed type.
-    For example, int reader is created as [mk_reader int_of_string] *)
+module type DEVICE = sig
+  val connect : unit -> unit
+  val disconnect : unit -> unit
+  val is_connected : unit -> bool
+  val get_path : unit -> string
+  val action_read : (string -> 'a) -> 'a
+  val action_write : (string -> 'a -> unit) -> 'a -> unit
+end
 
-val read_string : string -> string
-(** [read_string path] read the first line of the file at [path]. *)
+module type DEVICE_INFO = sig
+  val name : string
+  val multiple_connection : bool
+end
 
-val read_int : string -> int
-(** [read_int path] read the first integer of the file at [path]. *)
+module Make_device (DI : DEVICE_INFO) (P : PATH_FINDER) = struct
 
+  let connected =
+    ref false
+  
+  let is_connected () =
+    !connected
+  
+  let connect () =
+    if not (is_connected ()) then begin
 
-(** {2 Writer} *)
+      let path = P.get_path () in
 
-val mk_writer : ('a -> string) -> (string -> 'a -> unit)
-(** [mk_writer unwrapper] create a writer that make the transformation of the
-    data into a string, and write it to the first line.
-    For example, int writer is created as [mk_writer string_of_int] *)
+      if not (P.is_available ()) then
+        raise (Connection_failed "Invalid path.");
+      connected := true;
 
-val write_string : string -> string -> unit
-(** [write_string path data] write [data] to the file at [path] *)
+      if device_mem DI.name && not DI.multiple_connection then
+        raise (Name_already_exists DI.name);
+      
+      if device_mem DI.name then begin
+        let existing_path = device_find DI.name in
+        if String.compare path existing_path <> 0 then
+          raise (Name_already_exists
+                   (Format.sprintf "%s : different path '%s' & '%s'"
+                      DI.name path existing_path))
+      end;
+      device_add DI.name path
+    end
 
-val write_int : string -> int -> unit
-(** [write_int path data] write [data] as an integer to the file at [path] *)
+  let disconnect () =
+    if is_connected () then begin
+      connected := false;
+      device_remove DI.name
+    end
+      
+  let get_path =
+    P.get_path
+
+  let fail_when_disconnected () =
+    if not (is_connected ()) then
+      raise (Device_not_connected DI.name)
+
+  let action_read reader =
+    reader (P.get_path ())
+
+  let action_write writer data =
+    writer (P.get_path ()) data
+
+end
 
 (*
 Local Variables:
