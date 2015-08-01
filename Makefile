@@ -8,7 +8,7 @@ OCAMLC_FLAGS    = $(FOLDERS_OPT) -w @1..8 -w @10..26 -w @28..31 -w @39..49 -anno
 OCAMLFIND_FLAGS =
 
 OCAMLDOC_FLAGS  = -html -d $(OCAMLDOC_FOLDER) -t OCamlEV3-bindings \
-			-colorize-code
+			-colorize-code -short-functors
 OCAMLDOC_FOLDER = doc
 
 LIB_FOLDER = lib
@@ -38,7 +38,7 @@ library: depend $(SOURCES_OBJ_BYT) $(SOURCES_OBJ_NAT)
 		&& echo "Library compiled." \
 		|| echo "Error while compiling library."
 
-doc: depend
+doc: library
 	mkdir -p $(OCAMLDOC_FOLDER)
 	$(OCAMLFIND) $(OCAMLDOC) $(OCAMLDOC_FLAGS) \
 		$(FOLDERS_OPT) $(SOURCES_MLI)
