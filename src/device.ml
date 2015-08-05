@@ -42,6 +42,7 @@ module type DEVICE = sig
   val connect : unit -> unit
   val disconnect : unit -> unit
   val is_connected : unit -> bool
+  val fail_when_disconnected : unit -> unit
   val get_path : unit -> string
   val action_read : (string -> 'a) -> 'a
   val action_write : (string -> 'a -> unit) -> 'a -> unit

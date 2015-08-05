@@ -69,6 +69,10 @@ module type DEVICE = sig
   
   val is_connected : unit -> bool
   (** [is_connected ()] check if the device is connected. *)
+
+  val fail_when_disconnected : unit -> unit
+  (** [fail_when_disconnected ()] check if the device is connected, and if
+      not, raise Device_not_connected. *)
   
   val get_path : unit -> string
   (** [get_path ()] return the path associated to the device. *)
