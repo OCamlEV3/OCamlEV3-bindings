@@ -25,11 +25,10 @@
 (* THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                *)
 (*****************************************************************************)
 
-(**
-   Simple representation of a path finder.
-*)
+(** Simple representation of a path finder. *)
 
-(** The signature of every path finder implementation *)
+(** {2 Path finder creation} *)
+
 module type PATH_FINDER = sig
   
   val get_path : unit -> string
@@ -40,8 +39,9 @@ module type PATH_FINDER = sig
   (** [is_available ()] check if the path is available.contents *)
     
 end
+(** The signature of every path finder implementation *)
 
-(** Conditions to search the correct path *)
+
 module type CONDITIONS = sig
   
   val prefix : string
@@ -51,13 +51,17 @@ module type CONDITIONS = sig
   (** [conditions] is a list of (filename, expected_value). *)
       
 end
+(** Conditions to search the correct path *)
 
-(** Create a path finder with the given conditions. *)
+
+
 module Make(C : CONDITIONS) : PATH_FINDER
+(** Create a path finder with the given conditions. *)
 
+
+module Make_absolute(C : sig val path : string end) : PATH_FINDER
 (** Create an absolute path. It's the same as using Make with empty
     conditions. *)
-module Make_absolute(C : sig val path : string end) : PATH_FINDER
 
 (*
 Local Variables:

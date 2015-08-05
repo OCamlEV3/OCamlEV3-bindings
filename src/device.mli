@@ -27,6 +27,10 @@
 
 open Path_finder
 
+(** A set of modules to create a device. *)
+
+(** {2 Exceptions} *)
+
 exception Connection_failed of string
 (** Raised only when connection has failed. *)
 
@@ -37,7 +41,8 @@ exception Name_already_exists of string
 (** Raised when two connected device have the same name, but two different paths *)
 
 
-(** Gives informations about the device. *)
+(** {2 Device construction} *)
+
 module type DEVICE_INFO = sig
 
   val name : string
@@ -51,8 +56,9 @@ module type DEVICE_INFO = sig
       is set to false, then it raise an error. *)
   
 end
+(** Gives informations about the device. *)
 
-(** The signature of a Device. *)
+
 module type DEVICE = sig
 
   val connect : unit -> unit
@@ -86,12 +92,11 @@ module type DEVICE = sig
   (** [action_write wrapper] wrap the given data to a string and writes it
       to the device path.
       @raise Device_not_connected when the device is disconnceted. *)
-
 end
+(** The signature of a Device. *)
 
-(** Device Maker. *)
 module Make_device (DI : DEVICE_INFO) (P : PATH_FINDER) : DEVICE
-
+(** Device Maker. *)
 
 (*
 Local Variables:

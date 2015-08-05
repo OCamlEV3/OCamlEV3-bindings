@@ -27,6 +27,8 @@
 
 (** This module handles Led on a EV3 robot. *)
 
+(** {2 Leds creation} *)
+
 module type LED_STRUCTURE = sig
   type position
   (** The type of the position. *)
@@ -65,7 +67,6 @@ end
     color, its name and if multiple connection are allowed *)
 
 
-
 module type LED_DEVICE = sig
   include Device.DEVICE
     
@@ -92,12 +93,16 @@ module type LED_DEVICE = sig
 end
 (** Handles a real led, allowing to change brightness of color. *)
 
+
 module Make_led
     (LS : LED_STRUCTURE)
     (LI : LED_INFOS with
       type position := LS.position and type color := LS.color)
     (P : Path_finder.PATH_FINDER) : LED_DEVICE
 (** Creates a led according of all informations given. *)
+
+
+(** {2 Default Leds} *)
 
 module LedLeftGreen  : LED_DEVICE
 (** The green color of the left led. *)
