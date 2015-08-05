@@ -5,7 +5,6 @@
 open Device
 open Path_finder
 
-(** Defintition of a power supply device *)
 module type POWER_SUPPLY = sig
 
   include DEVICE
@@ -14,9 +13,12 @@ module type POWER_SUPPLY = sig
   (** [get_power ()] returns the power as an integer of the robot. *)
   
 end
+(** Definition of a power supply device *)
 
+
+module Make_power_supply (DI : DEVICE_INFO) (P : PATH_FINDER) : POWER_SUPPLY
 (** Create a power supply according to his path. *)
-module Make_power_supply (P : PATH_FINDER) : POWER_SUPPLY
 
-(** The default power supply module *)
-module DefaultPowerSupply : POWER_SUPPLY
+module PowerSupply : POWER_SUPPLY
+(** The default power supply module binded to the path given on the standard
+    documentation of ev3dev *)
