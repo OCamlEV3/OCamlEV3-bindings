@@ -70,8 +70,8 @@ reinstall:
 .PHONY: clean
 clean:
 	find . \( -name "*.cm*" -o -name "*.o" -o -name "*.a" \
-		-o -name "*.ml.*" -o -name "dump_*" \) -delete
-	rm -f $(LIB_BYTECODE) $(LIB_NATIVE)
+		-o -name "*.ml.*" -o -name "dump_*" -o -name "*.annot" \) \
+		-delete
 	rm -rf $(OCAMLDOC_FOLDER)
 
 
