@@ -44,8 +44,8 @@ module type DEVICE = sig
   val is_connected : unit -> bool
   val fail_when_disconnected : unit -> unit
   val get_path : unit -> string
-  val action_read : (string -> 'a) -> 'a
-  val action_write : (string -> 'a -> unit) -> 'a -> unit
+  val action_read : (string -> 'a) -> string -> 'a
+  val action_write : (string -> 'a -> unit) -> 'a -> string -> unit
 end
 
 module type DEVICE_INFO = sig
@@ -96,11 +96,20 @@ module Make_device (DI : DEVICE_INFO) (P : PATH_FINDER) = struct
     if not (is_connected ()) then
       raise (Device_not_connected DI.name)
 
-  let action_read reader =
-    reader (P.get_path ())
+  let get_complete_path subfile =
+    let complete = Filename.concat (get_path ()) subfile in
+    if not (Sys.file_exists complete) then
+      failwith (Printf.sprintf "Invalid file %s" complete)
+    else
+      complete
+  
+  let action_read reader subfile =
+    fail_when_disconnected ();
+    reader (get_complete_path subfile)
 
-  let action_write writer data =
-    writer (P.get_path ()) data
+  let action_write writer data subfile =
+    fail_when_disconnected ();
+    writer (get_complete_path subfile) data
 
 end
 

@@ -37,7 +37,7 @@ module Make_power_supply (DI : DEVICE_INFO) (P : PATH_FINDER) = struct
   include Make_device(DI)(P)
 
   let get_power () =
-    action_read IO.read_int
+    action_read IO.read_int "legoev3-battery"
 end
 
 module PowerSupplyInfo = struct

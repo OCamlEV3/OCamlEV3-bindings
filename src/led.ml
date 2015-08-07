@@ -70,21 +70,17 @@ struct
   let max_brightness = 100
   let min_brightness = 0
 
-  let connect () =
-    connect ();
-    led.brightness <- action_read IO.read_int
-
   let set_brightness i =
     if i < min_brightness || i > max_brightness then
       raise (Invalid_argument
                (Printf.sprintf "%s -> invalid brightness %d." LI.name i))
     else if not (i = led.brightness) then
-      action_write IO.write_int i
+      action_write IO.write_int i "brightness"
 
   let get_brightness ?(force = false) () =
     fail_when_disconnected ();
     if force then begin
-      let b = action_read IO.read_int in
+      let b = action_read IO.read_int "brightness" in
       set_brightness b;
       b
     end else
@@ -93,6 +89,12 @@ struct
   let turn_off () = set_brightness min_brightness
       
   let turn_on () = set_brightness max_brightness
+
+
+  let connect () =
+    connect ();
+    ignore (get_brightness ~force:true ())
+
 end
 
 (* Default creation, according to ev3dev standard documentation *)

@@ -83,14 +83,14 @@ module type DEVICE = sig
   val get_path : unit -> string
   (** [get_path ()] return the path associated to the device. *)
   
-  val action_read : (string -> 'a) -> 'a
-  (** [action_read unwrapper] will read to the device path, returning the
-      result using the wrapper. 
+  val action_read : (string -> 'a) -> string -> 'a
+  (** [action_read unwrapper subfile] will read to the device path at the
+      file [subfile], returning the result using the wrapper. 
       @raise Device_not_connected when the device is disconnceted. *)
 
-  val action_write : (string -> 'a -> unit) -> 'a -> unit
+  val action_write : (string -> 'a -> unit) -> 'a -> string -> unit
   (** [action_write wrapper] wrap the given data to a string and writes it
-      to the device path.
+      to the device path, at the file [subfile].
       @raise Device_not_connected when the device is disconnceted. *)
 end
 (** The signature of a Device. *)
