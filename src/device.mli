@@ -40,6 +40,8 @@ exception Device_not_connected of string
 exception Name_already_exists of string
 (** Raised when two connected device have the same name, but two different paths *)
 
+exception Invalid_value of string
+(** Raised when a value is not valid for the device. *)
 
 (** {2 Device construction} *)
 
@@ -89,9 +91,25 @@ module type DEVICE = sig
       @raise Device_not_connected when the device is disconnceted. *)
 
   val action_write : (string -> 'a -> unit) -> 'a -> string -> unit
-  (** [action_write wrapper] wrap the given data to a string and writes it
-      to the device path, at the file [subfile].
+  (** [action_write wrapper subfile] wrap the given data to a string and writes
+      it to the device path, at the file [subfile].
       @raise Device_not_connected when the device is disconnceted. *)
+
+  val action_read_int : string -> int
+  (** [action_read_int filename] is a shortcut
+      to [action_read IO.read_int filename] *)
+
+  val action_write_int : int -> string -> unit
+  (** [action_write_int i filename] is a shortcut to
+      [action_write IO.write_int filename] *)
+
+  val action_read_string : string -> string
+  (** [action_read_string filename] is a shortcut
+      to [action_read IO.read_string filename] *)
+
+  val action_write_string : string -> string -> unit 
+  (** [action_write_string i filename] is a shortcut to
+      [action_write IO.write_string filename] *)
 end
 (** The signature of a Device. *)
 

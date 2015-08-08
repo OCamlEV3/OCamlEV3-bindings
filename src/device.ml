@@ -30,6 +30,7 @@ open Path_finder
 exception Connection_failed of string
 exception Device_not_connected of string
 exception Name_already_exists of string
+exception Invalid_value of string
 
 (* Table name -> path; usefull for multiple connection *)
 let device_table  : (string, string) Hashtbl.t = Hashtbl.create 13
@@ -46,6 +47,10 @@ module type DEVICE = sig
   val get_path : unit -> string
   val action_read : (string -> 'a) -> string -> 'a
   val action_write : (string -> 'a -> unit) -> 'a -> string -> unit
+  val action_read_int : string -> int
+  val action_write_int : int -> string -> unit
+  val action_read_string : string -> string
+  val action_write_string : string -> string -> unit 
 end
 
 module type DEVICE_INFO = sig
@@ -111,6 +116,11 @@ module Make_device (DI : DEVICE_INFO) (P : PATH_FINDER) = struct
     fail_when_disconnected ();
     writer (get_complete_path subfile) data
 
+  let action_read_int = action_read IO.read_int
+  let action_write_int = action_write IO.write_int
+
+  let action_read_string = action_read IO.read_string
+  let action_write_string = action_write IO.write_string
 end
 
 (*
