@@ -1,32 +1,29 @@
-
-(*
-  command                   both
-  commands                  both
-  driver_name               both
-  duty_cycle                both
-  duty_cycle_sp             both
-  polarity                  both
-  port_name                 both
-  ramp_up_sp                both
-  ramp_down_sp              both
-  state                     both
-  stop_command              both
-  stop_commands             both
-  time_sp                   both
-  count_per_rot             tacho
-  encoder_polarity          tacho
-  position                  tacho
-  hold_pid/Kd               tacho
-  hold_pid/Ki               tacho
-  hold_pid/Kp               tacho
-  position_sp               tacho
-  speed                     tacho
-  speed_sp                  tacho
-  speed_regulation          tacho
-  speed_pid/Kd              tacho
-  speed_pid/Ki              tacho
-  speed_pid/Kp              tacho
-*)
+(*****************************************************************************)
+(* The MIT License (MIT)                                                     *)
+(*                                                                           *)
+(* Copyright (c) 2015 OCamlEV3                                               *)
+(*  Loïc Runarvot <loic.runarvot[at]gmail.com>                               *)
+(*  Nicolas Tortrat-Gentilhomme <nicolas.tortrat[at]gmail.com>               *)
+(*  Nicolas Raymond <noci.64[at]orange.fr>                                   *)
+(*                                                                           *)
+(* Permission is hereby granted, free of charge, to any person obtaining a   *)
+(* copy of this software and associated documentation files (the "Software"),*)
+(* to deal in the Software without restriction, including without limitation *)
+(* the rights to use, copy, modify, merge, publish, distribute, sublicense,  *)
+(* and/or sell copies of the Software, and to permit persons to whom the     *)
+(* Software is furnished to do so, subject to the following conditions:      *)
+(*                                                                           *)
+(* The above copyright notice and this permission notice shall be included   *)
+(* in all copies or substantial portions of the Software.                    *)
+(*                                                                           *)
+(* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS   *)
+(* OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF                *)
+(* MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.    *)
+(* IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY      *)
+(* CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT *)
+(* OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR  *)
+(* THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                *)
+(*****************************************************************************)
 
 open Device
 open Path_finder
@@ -54,20 +51,10 @@ module type AbstractMotor = sig
   
   val send_command : commands -> unit
   val driver_name : unit -> string
-  val duty_cycle : unit -> int
-  val duty_cycle_sp : unit -> int
-  val set_duty_cycle_sp : int -> unit
+  val port_name : unit -> string
   val polarity : unit -> polarity
   val set_polarity : polarity -> unit
   val state : unit -> [ `Running | `Ramping ]
-  val port_name : unit -> string
-  val stop : [ `Coast | `Brake ] -> unit
-  val ramp_down_sp : unit -> int
-  val set_ramp_down_sp : ?valid:(int -> bool) -> int -> unit
-  val ramp_up_sp : unit -> int
-  val set_ramp_up_sp : ?valid:(int -> bool) -> int -> unit
-  val time_sp : unit -> int
-  val set_time_sp : int -> unit
 end
 
 module Make_abstract_motor
@@ -99,17 +86,6 @@ struct
   let driver_name () =
     action_read_string "driver_name"
 
-  let duty_cycle () =
-    action_read_int "duty_cycle"
-    
-  let duty_cycle_sp () =
-    action_read_int "duty_cycle_sp"
-    
-  let set_duty_cycle_sp i =
-    if i < (-100) || i > 100 then
-      invalid_value DI.name "set_duty_cycle_sp" (string_of_int i);
-    action_write_int i "duty_cycle_sp"
-      
   let polarity () =
     read_polarity "polarity"
 
@@ -125,38 +101,160 @@ struct
   let port_name () =
     action_read_string "port_name"
 
+end
+
+(* SERVO MOTOR *)
+
+module type SERVO_MOTOR_TYPE = sig
+
+  type servo_commands =
+    | Run
+    | Float
+
+  include AbstractMotor
+    with type commands := servo_commands
+
+  val max_pulse_sp : unit -> int
+  val set_max_pulse_sp : int -> unit
+  val mid_pulse_sp : unit -> int
+  val set_mid_pulse_sp : int -> unit
+  val min_pulse_sp : unit -> int
+  val set_min_pulse_sp : int -> unit
+  val position_sp : unit -> int
+  val set_position_sp : int -> unit
+  val rate_sp : unit -> int
+  val set_rate_sp : int -> unit
+
+end
+
+module ServoMotor (DI : DEVICE_INFO) (M : MOTOR_INFOS) = struct
+
+  type servo_commands =
+    | Run
+    | Float
+ 
+  module ServoMotorCommands = struct
+
+    type commands = servo_commands
+
+    let string_of_command = function
+      | Run -> "run"
+      | Float -> "float"
+        
+  end
+  
+  module ServoMotorPathFinder = Path_finder.Make(struct
+      let prefix = "/sys/class/servo-motor/" 
+      let conditions = [
+        ("name", M.motor_name);
+        ("port", string_of_output_port M.output_port);
+      ]
+    end)
+
+  include Make_abstract_motor
+      (ServoMotorCommands)(DI)(ServoMotorPathFinder)
+
+  
+  let max_pulse_sp () =
+    action_read_int "max_pulse_sp"
+    
+  let set_max_pulse_sp i =
+    if i < 2300 || i > 2700 then
+      invalid_value DI.name "set_max_pulse_sp" (string_of_int i);
+    action_write_int i "max_pulse_sp"
+
+  let mid_pulse_sp () =
+    action_read_int "mid_pulse_sp"
+    
+  let set_mid_pulse_sp i =
+    if i < 1300 || i > 1700 then
+      invalid_value DI.name "set_mid_pulse_sp" (string_of_int i);
+    action_write_int i "mid_pulse_sp"
+
+  let min_pulse_sp () =
+    action_read_int "min_pulse_sp"
+    
+  let set_min_pulse_sp i =
+    if i < 300 || i > 700 then
+      invalid_value DI.name "set_min_pulse_sp" (string_of_int i);
+    action_write_int i "min_pulse_sp"
+
+  let position_sp () =
+    action_read_int "position_sp"
+    
+  let set_position_sp i =
+    if i < (-100) || i > 100 then
+      invalid_value DI.name "set_position_sp" (string_of_int i);
+    action_write_int i "position_sp"
+
+  let rate_sp () =
+    action_read_int "rate_sp"
+    
+  let set_rate_sp i =
+    action_write_int i "rate_sp"
+  
+end
+
+
+(* TM & DC COMMON *)
+
+module type DC_AND_TM_COMMON = sig
+  val duty_cycle : unit -> int
+  val duty_cycle_sp : unit -> int
+  val set_duty_cycle_sp : int -> unit
+  val stop : [ `Coast | `Brake ] -> unit
+  val ramp_down_sp : unit -> int
+  val set_ramp_down_sp : ?valid:(int -> bool) -> int -> unit
+  val ramp_up_sp : unit -> int
+  val set_ramp_up_sp : ?valid:(int -> bool) -> int -> unit
+  val time_sp : unit -> int
+  val set_time_sp : int -> unit
+end
+
+module DcAndTmCommons (D : DEVICE) (DI : DEVICE_INFO) = struct
+  let duty_cycle () =
+    D.action_read_int "duty_cycle"
+    
+  let duty_cycle_sp () =
+    D.action_read_int "duty_cycle_sp"
+    
+  let set_duty_cycle_sp i =
+    if i < (-100) || i > 100 then
+      invalid_value DI.name "set_duty_cycle_sp" (string_of_int i);
+    D.action_write_int i "duty_cycle_sp"
+      
   let stop s =
     let action = match s with
       | `Coast -> "coast"
       | `Brake -> "brake"
     in
-    action_write_string action "stop"
+    D.action_write_string action "stop"
 
   let ramp_down_sp () =
-    action_read_int "ramp_down_sp"
+    D.action_read_int "ramp_down_sp"
 
   let set_ramp_down_sp ?(valid = fun _ -> true) i =
     if not (valid i) then
       invalid_value DI.name "set_ramp_down_sp" (string_of_int i);
-    action_write_int i "ramp_down_sp"
+    D.action_write_int i "ramp_down_sp"
 
   let ramp_up_sp () =
-    action_read_int "ramp_up_sp"
+    D.action_read_int "ramp_up_sp"
 
   let set_ramp_up_sp ?(valid = fun _ -> true) i =
     if not (valid i) then
       invalid_value DI.name "set_ramp_up_sp" (string_of_int i);
-    action_write_int i "ramp_up_sp"
+    D.action_write_int i "ramp_up_sp"
 
   let time_sp () =
-    action_read_int "time_sp"
+    D.action_read_int "time_sp"
 
   let set_time_sp i =
-    action_write_int i "time_sp"
-
+    D.action_write_int i "time_sp"
+  
 end
 
-(* TACHO MOTOR PART *)
+(* TACHO MOTOR *)
 
 module type TM_MOTOR_TYPE = sig
 
@@ -172,6 +270,8 @@ module type TM_MOTOR_TYPE = sig
   include AbstractMotor
     with type commands := tm_commands
 
+  include DC_AND_TM_COMMON
+  
   val state : unit -> [ `Running | `Ramping | `Holding | `Stalled ]
   val set_ramp_down_sp : int -> unit
   val set_ramp_up_sp : int -> unit
@@ -216,7 +316,9 @@ module TachoMotor (DI : DEVICE_INFO) (M : MOTOR_INFOS) = struct
     | Reset
  
   module TMMotorCommands = struct
+
     type commands = tm_commands
+
     let string_of_command = function
       | RunForever  -> "run-forever"
       | RunToAbsPos -> "run-to-abs-pos"
@@ -225,6 +327,7 @@ module TachoMotor (DI : DEVICE_INFO) (M : MOTOR_INFOS) = struct
       | RunDirect   -> "run-direct"
       | Stop        -> "stop"
       | Reset       -> "reset"
+
   end
   
   module TMMotorPathFinder = Path_finder.Make(struct
@@ -234,10 +337,13 @@ module TachoMotor (DI : DEVICE_INFO) (M : MOTOR_INFOS) = struct
         ("port", string_of_output_port M.output_port);
       ]
     end)
-  
-  include Make_abstract_motor
+
+  module AbstractMotor =
+    Make_abstract_motor
       (TMMotorCommands)(DI)(TMMotorPathFinder)
 
+  include AbstractMotor
+  include DcAndTmCommons(AbstractMotor)(DI)
 
   let write_bool =
     action_write (IO.mk_writer (fun x -> if x then "on" else "off"))
@@ -338,9 +444,6 @@ module TachoMotor (DI : DEVICE_INFO) (M : MOTOR_INFOS) = struct
 end
 
 
-
-
-
 (* DC MOTOR *)
 
 
@@ -354,6 +457,8 @@ module type DC_MOTOR_TYPE = sig
   include AbstractMotor
     with type commands := dc_commands
 
+  include DC_AND_TM_COMMON
+  
   val set_ramp_down_sp : int -> unit
   val set_ramp_up_sp : int -> unit
   
@@ -396,9 +501,13 @@ module DCMotor (DI : DEVICE_INFO) (M : MOTOR_INFOS) = struct
       ]
     end)
   
-  include Make_abstract_motor
+  module AbstractMotor =
+    Make_abstract_motor
       (DCMotorCommands)(DI)(DCMotorPathFinder)
 
+  include AbstractMotor
+  include DcAndTmCommons(AbstractMotor)(DI)
+  
   let set_ramp_up_sp =
     set_ramp_up_sp ~valid:(fun x -> x >= 0 && x <= 10000)
 
@@ -407,3 +516,9 @@ module DCMotor (DI : DEVICE_INFO) (M : MOTOR_INFOS) = struct
 
 end
 
+
+(*
+Local Variables:
+compile-command: "make -C .."
+End:
+*)
