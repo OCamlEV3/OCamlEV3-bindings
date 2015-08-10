@@ -25,29 +25,38 @@
 (* THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                *)
 (*****************************************************************************)
 
+(** Module handling different ports. *)
+
+
 type input_port  = Input1 | Input2 | Input3 | Input4
-                   
+(** The type of input port. Used by sensors. *)
+
+
 type output_port = OutputA | OutputB | OutputC | OutputD
+(** The type of output port. Used by motors. *)
 
 module type INPUT_PORT = sig
+  
   val input_port : input_port
+  (** The choosen input port. *)
+
 end
+(** Allow to use an input port choice as a functor. *)
 
 module type OUTPUT_PORT = sig
+  
   val output_port : output_port
+  (** The choosen output port. *)
+    
 end
+(** Allow to use an output port choice as a functor. *)
 
-let string_of_input_port = function
-   | Input1 -> "in1"
-   | Input2 -> "in2"
-   | Input3 -> "in3"
-   | Input4 -> "in4"
 
-let string_of_output_port = function
-  | OutputA -> "outA"
-  | OutputB -> "outB"
-  | OutputC -> "outC"
-  | OutputD -> "outD"
+val string_of_input_port : input_port -> string
+(** [string_of_input_port ip] returns the string value of [ip] *)
+
+val string_of_output_port : output_port -> string
+(** [string_of_output_port op] returns the string value of [op] *)
 
 (*
 Local Variables:
