@@ -1,4 +1,31 @@
 
+(*****************************************************************************)
+(* The MIT License (MIT)                                                     *)
+(*                                                                           *)
+(* Copyright (c) 2015 OCamlEV3                                               *)
+(*  Loïc Runarvot <loic.runarvot[at]gmail.com>                               *)
+(*  Nicolas Tortrat-Gentilhomme <nicolas.tortrat[at]gmail.com>               *)
+(*  Nicolas Raymond <noci.64[at]orange.fr>                                   *)
+(*                                                                           *)
+(* Permission is hereby granted, free of charge, to any person obtaining a   *)
+(* copy of this software and associated documentation files (the "Software"),*)
+(* to deal in the Software without restriction, including without limitation *)
+(* the rights to use, copy, modify, merge, publish, distribute, sublicense,  *)
+(* and/or sell copies of the Software, and to permit persons to whom the     *)
+(* Software is furnished to do so, subject to the following conditions:      *)
+(*                                                                           *)
+(* The above copyright notice and this permission notice shall be included   *)
+(* in all copies or substantial portions of the Software.                    *)
+(*                                                                           *)
+(* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS   *)
+(* OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF                *)
+(* MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.    *)
+(* IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY      *)
+(* CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT *)
+(* OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR  *)
+(* THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                *)
+(*****************************************************************************)
+
 open Device
 open Path_finder
 
@@ -37,7 +64,8 @@ module type AbstractSensor = sig
   val set_mode : modes -> unit
   val get_mode : unit -> modes
 
-  val automatically_change_mode : unit -> unit
+  val toggle_auto_change_mode : unit -> unit
+  val set_auto_change_mode : bool -> unit
   
   val value0 : int ufun
   val value1 : int ufun
@@ -81,8 +109,9 @@ struct
   let get_mode () = assert false
 
   let change_mode = ref false
-  let automatically_change_mode () = change_mode := not !change_mode
- 
+
+  let toggle_auto_change_mode () = change_mode := not !change_mode
+  let set_auto_change_mode b = change_mode := b
   let value_n i =
     assert false
 
@@ -143,6 +172,11 @@ struct
     value0 (), value1 (), value2 (), value3 (), value4 (), value5 (),
     value6 (), value7 (), value8 (), value9 ()
 
-  let checked_read f m = check_mode m; (fun () -> f ())
+  let checked_read f m = check_mode m; f
 end
 
+(*
+Local Variables:
+compile-command: "make -C ../.."
+End:
+*)
