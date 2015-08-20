@@ -1,0 +1,14 @@
+[
+    {
+        "name": "legoEv3InfraredSensor",
+        "driver_name": "lego-ev3-ir",
+        "modes" : [
+            { "mode" : "ir-prox", "name" : "proximity", "nb" : 1 },
+            { "mode" : "ir-seeker", "name" : "ir seeker", "nb" : 8 },
+            { "mode" : "ir-remote", "name" : "ir remote control", "nb" : 4 },
+            { "mode" : "ir-rem-a", "name" : "ir remote control a", "nb" : 1 },
+            { "mode" : "ir-s-alt", "name" : "alternate ir seeker", "nb" : 4 },
+            { "mode" : "ir-cal", "name" : "calibration", "nb" : 2 }
+        ]
+    }
+]
