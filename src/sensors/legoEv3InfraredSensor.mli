@@ -26,6 +26,8 @@
 (* THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                *)
 (*****************************************************************************)
 
+(** Implementation of the sensor legoEv3InfraredSensor.
+    Documentation {{:http://www.ev3dev.org/docs/sensors/lego-ev3-infrared-sensor/} page} *)
 open Device
 open Port
 open Sensor
@@ -41,7 +43,7 @@ module type LEGO_EV3_INFRARED_SENSOR = sig
     | IR_CAL (** Constructor for IR_CAL mode. *)
   (** Type for modes of the sensor lego_ev3_infrared_sensor_modes. *)
   
-  include AbstractSensor
+  include Sensor.AbstractSensor
     with type commands := unit
      and type modes    := lego_ev3_infrared_sensor_modes
   
@@ -65,7 +67,7 @@ module type LEGO_EV3_INFRARED_SENSOR = sig
   
 end
 
-module LegoEv3InfraredSensor (DI : DEVICE_INFO) (P: OUTPUT_PORT) : LEGO_EV3_INFRARED_SENSOR
+module LegoEv3InfraredSensor (DI : Device.DEVICE_INFO) (P: Port.OUTPUT_PORT) : LEGO_EV3_INFRARED_SENSOR
 (** Implementation of Lego Ev3 Infrared Sensor. *)
 
 (*

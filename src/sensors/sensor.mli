@@ -26,9 +26,6 @@
 (* THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                *)
 (*****************************************************************************)
 
-open Device
-open Path_finder
-
 exception IncorrectMode of string
 (** exception raised when trying to read a value for an incorrect mode. *)
 
@@ -91,7 +88,7 @@ end
 
 module type AbstractSensor = sig
 
-  include DEVICE
+  include Device.DEVICE
   include COMMANDS
   include MODES
 
@@ -194,7 +191,8 @@ end
 (** Representation of an abstract sensor. *)
 
 module Make_abstract_sensor
-    (C : COMMANDS) (M : MODES) (DI : DEVICE_INFO) (P : PATH_FINDER) :
+    (C : COMMANDS) (M : MODES) (DI : Device.DEVICE_INFO)
+    (P : Path_finder.PATH_FINDER) :
   AbstractSensor
   with type modes = M.modes
    and type commands = C.commands

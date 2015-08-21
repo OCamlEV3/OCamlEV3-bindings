@@ -40,7 +40,7 @@ module type LEGO_EV3_INFRARED_SENSOR = sig
     | IR_S_ALT
     | IR_CAL
   
-  include AbstractSensor
+  include Sensor.AbstractSensor
     with type commands := unit
      and type modes    := lego_ev3_infrared_sensor_modes
   
