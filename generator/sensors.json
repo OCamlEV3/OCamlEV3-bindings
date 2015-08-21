@@ -9,6 +9,7 @@
             { "mode" : "ir-rem-a", "name" : "ir remote control a", "nb" : 1 },
             { "mode" : "ir-s-alt", "name" : "alternate ir seeker", "nb" : 4 },
             { "mode" : "ir-cal", "name" : "calibration", "nb" : 2 }
-        ]
+        ],
+        "link" : "http://www.ev3dev.org/docs/sensors/lego-ev3-infrared-sensor/"
     }
 ]

@@ -33,12 +33,14 @@ type sensor = {
   name : string option;
   driver_name : string option;
   modes : (string * string * int) list;
+  link : string option;
 }
 
 let empty_sensor = {
   name = None;
   driver_name = None;
   modes = [];
+  link = None;
 }
 
 let the = function
@@ -85,6 +87,9 @@ let sensor_of_association assocs =
           end
         in
         aux { sensor with modes } xs
+
+      | "link" ->
+        aux { sensor with link = (extract_string "link" right)} xs
 
       | x -> failwith ("Unknown key '" ^ x ^ "'")
   in
@@ -151,7 +156,7 @@ let write_vals fmt (vals, doc) =
     ) vals
 
 let write_include_abstract_sensor fmt type_modes =
-  fp fmt "@[<hov 2>include AbstractSensor@\n";
+  fp fmt "@[<hov 2>include Sensor.AbstractSensor@\n";
   fp fmt "with type commands := unit@\n";
   fp fmt " and type modes    := %s@]@\n" type_modes
 
@@ -234,9 +239,13 @@ let write_module_ml fmt name driver_name module_mode
 
 (* The module implementation writer on MLI file. *)
 let write_module_mli fmt name module_name module_type_name =
-  fp fmt "@[module %s (DI : DEVICE_INFO) (P: OUTPUT_PORT) : %s@]@\n"
+  fp fmt "@[module %s (DI : Device.DEVICE_INFO) (P: Port.OUTPUT_PORT) : %s@]@\n"
     module_name module_type_name;
   fp fmt "@[(** Implementation of %s. *)@]@\n" name
+
+let write_mli_header fmt name link =
+  fp fmt "@[(** Implementation of the sensor %s.@;<1 4>Documentation {{:%s} page} *)@]@\n"
+    name link
 
 let write_license fmt =
   fp fmt
@@ -309,6 +318,8 @@ let generate_sensor sensor where =
 
   (* Licenses *)
   write_on_both_t write_license;
+
+  write_mli_header mlifmt (the sensor.name) (the sensor.link);
   
   (* Opens *)
   write_on_both write_opens [ "Device"; "Port"; "Sensor" ];
