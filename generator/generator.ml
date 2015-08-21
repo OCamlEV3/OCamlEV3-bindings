@@ -117,6 +117,21 @@ let parse path =
 let modifier stringf regex modifier what =
   stringf (Str.(global_replace (regexp regex) modifier) what)
 
+let mk_ctor ctor =
+  let replace i o = Str.(global_replace (regexp i) o) in
+  replace "0" "ZERO" ctor |>
+  replace "1" "ONE"       |>
+  replace "2" "TWO"       |>
+  replace "3" "THREE"     |>
+  replace "4" "FOUR"      |>
+  replace "5" "FIVE"      |>
+  replace "6" "SIX"       |>
+  replace "7" "SEVEN"     |>
+  replace "8" "EIGHT"     |>
+  replace "9" "NINE"      |>
+  replace "&" "_AND_"
+  
+  
 let type_of_nb = function
   | 1 -> "int ufun"
   | n -> Printf.sprintf "int_tuple%d ufun" n
@@ -185,6 +200,13 @@ let write_to_string fmt (name, left, right) =
   fp fmt "@\n@[<hov 2>let string_of_%s = function%a@]@\n"
     name write_pattern_matching (left, right)
 
+let write_commands_structure fmt =
+  fp fmt "struct@\n\
+          type commands = unit@\n\
+          @[<hov 2>let string_of_commands () =@\n\
+          failwith \"This sensor does not support commands.\"@]@\n\
+          end"
+
 (* The module implementation writer for ML files. *)
 let write_module_ml fmt name driver_name module_mode
     path_mode type_modes informations =
@@ -211,11 +233,8 @@ let write_module_ml fmt name driver_name module_mode
       path_mode driver_name;
   in
   let write_includes fmt =
-    fp fmt "@\n@[<hov 2>include Make_abstract_sensor(struct@\n\
-            type commands = unit@\n\
-            let string_of_commands () = assert false@]@\n\
-            end)(%s)(DI)(%s)@\n"
-      module_mode path_mode
+    fp fmt "@\n@[<hov 2>include Make_abstract_sensor(%t)(%s)(DI)(%s)@\n"
+      write_commands_structure module_mode path_mode
   in
   let write_lets fmt vals =
     List.iter (fun (c, fn, n) ->
@@ -293,7 +312,7 @@ let generate_sensor sensor where =
   let path_finder = module_name ^ "PathFinder" in
   let modes_informations =
     List.map (fun (mode, name, nb) ->
-        let ctor = modifier uppercase "-" "_" mode in
+        let ctor = mk_ctor (modifier uppercase "-" "_" mode) in
         let fname = modifier lowercase " " "_" name in
         mode, (* The str-value : kind-like-this *)
         ctor, (* constructor : KIND_LIKE_THIS *)
