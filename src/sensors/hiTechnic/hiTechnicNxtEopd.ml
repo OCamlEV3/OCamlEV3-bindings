@@ -31,29 +31,28 @@ open Port
 open Sensor
 
 module type HI_TECHNIC_NXT_EOPD = sig
-  
+  type hi_technic_nxt_eopd_commands = unit
   type hi_technic_nxt_eopd_modes = 
     | LONG
     | SHORT
   
   include Sensor.AbstractSensor
-    with type commands := unit
+    with type commands := hi_technic_nxt_eopd_commands
      and type modes    := hi_technic_nxt_eopd_modes
   
   val long_proximity : int ufun
   val short_proximity : int ufun
 end
 
-
 module HiTechnicNxtEopd (DI : DEVICE_INFO)
-  (P : OUTPUT_PORT) = struct
+    (P : OUTPUT_PORT) = struct
+  type hi_technic_nxt_eopd_commands = unit
   type hi_technic_nxt_eopd_modes = 
     | LONG
     | SHORT
   
-  
   module HiTechnicNxtEopdCommands = struct
-    type commands = unit
+    type commands = hi_technic_nxt_eopd_commands
     let string_of_commands = function
       | _ -> failwith "commands are not available for this sensor."
     
@@ -69,27 +68,26 @@ module HiTechnicNxtEopd (DI : DEVICE_INFO)
     let string_of_modes = function
       | LONG -> "long"
       | SHORT -> "short"
+    
     let default_mode = LONG
   end
   
-  
   module HiTechnicNxtEopdPathFinder = Path_finder.Make(struct
-    let prefix = "/sys/class/lego-sensor"
-    let conditions = [
-      ("name", "ht-nxt-eopd");
-      ("port", string_of_output_port P.output_port)
-    ]
-  end)
+      let prefix = "/sys/class/lego-sensor"
+      let conditions = [
+        ("name", "ht-nxt-eopd");
+        ("port", string_of_output_port P.output_port)
+      ]
+    end)
   
   include Make_abstract_sensor(HiTechnicNxtEopdCommands)
-    (HiTechnicNxtEopdModes)(DI)
-    (HiTechnicNxtEopdPathFinder)
-    
-    let long_proximity = checked_read read1 LONG
-    let short_proximity = checked_read read1 SHORT
-  end
+      (HiTechnicNxtEopdModes)(DI)(HiTechnicNxtEopdPathFinder)
   
-  
+  let long_proximity = checked_read read1 LONG
+  let short_proximity = checked_read read1 SHORT
+end
+
+
 (*
 Local Variables:
 compile-command: "make -C ../.."

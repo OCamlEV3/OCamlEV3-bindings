@@ -31,29 +31,28 @@ open Port
 open Sensor
 
 module type LEGO_NXT_SOUND_SENSOR = sig
-  
+  type lego_nxt_sound_sensor_commands = unit
   type lego_nxt_sound_sensor_modes = 
     | DB
     | DBA
   
   include Sensor.AbstractSensor
-    with type commands := unit
+    with type commands := lego_nxt_sound_sensor_commands
      and type modes    := lego_nxt_sound_sensor_modes
   
   val sound_pressure_level_flat_weighting : int ufun
   val sound_pressure_level_a_weighting : int ufun
 end
 
-
 module LegoNxtSoundSensor (DI : DEVICE_INFO)
-  (P : OUTPUT_PORT) = struct
+    (P : OUTPUT_PORT) = struct
+  type lego_nxt_sound_sensor_commands = unit
   type lego_nxt_sound_sensor_modes = 
     | DB
     | DBA
   
-  
   module LegoNxtSoundSensorCommands = struct
-    type commands = unit
+    type commands = lego_nxt_sound_sensor_commands
     let string_of_commands = function
       | _ -> failwith "commands are not available for this sensor."
     
@@ -69,27 +68,26 @@ module LegoNxtSoundSensor (DI : DEVICE_INFO)
     let string_of_modes = function
       | DB -> "db"
       | DBA -> "dba"
+    
     let default_mode = DB
   end
   
-  
   module LegoNxtSoundSensorPathFinder = Path_finder.Make(struct
-    let prefix = "/sys/class/lego-sensor"
-    let conditions = [
-      ("name", "lego-nxt-sound");
-      ("port", string_of_output_port P.output_port)
-    ]
-  end)
+      let prefix = "/sys/class/lego-sensor"
+      let conditions = [
+        ("name", "lego-nxt-sound");
+        ("port", string_of_output_port P.output_port)
+      ]
+    end)
   
   include Make_abstract_sensor(LegoNxtSoundSensorCommands)
-    (LegoNxtSoundSensorModes)(DI)
-    (LegoNxtSoundSensorPathFinder)
-    
-    let sound_pressure_level_flat_weighting = checked_read read1 DB
-    let sound_pressure_level_a_weighting = checked_read read1 DBA
-  end
+      (LegoNxtSoundSensorModes)(DI)(LegoNxtSoundSensorPathFinder)
   
-  
+  let sound_pressure_level_flat_weighting = checked_read read1 DB
+  let sound_pressure_level_a_weighting = checked_read read1 DBA
+end
+
+
 (*
 Local Variables:
 compile-command: "make -C ../.."

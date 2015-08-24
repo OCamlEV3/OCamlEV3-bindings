@@ -33,13 +33,13 @@ open Port
 open Sensor
 
 module type MINDSENSORS_TOUCH_SENSOR_MULTIPLEXER = sig
-  
+  type mindsensors_touch_sensor_multiplexer_commands = unit
   type mindsensors_touch_sensor_multiplexer_modes = 
     | TOUCH_MUX (** Constructor for TOUCH_MUX mode. *)
   (** Type for modes of the sensor mindsensors_touch_sensor_multiplexer_modes. *)
   
   include Sensor.AbstractSensor
-    with type commands := unit
+    with type commands := mindsensors_touch_sensor_multiplexer_commands
      and type modes    := mindsensors_touch_sensor_multiplexer_modes
   
   val touch_sensors : int_tuple3 ufun
@@ -47,7 +47,8 @@ module type MINDSENSORS_TOUCH_SENSOR_MULTIPLEXER = sig
   
 end
 
-module MindsensorsTouchSensorMultiplexer (DI : Device.DEVICE_INFO) (P: Port.OUTPUT_PORT) : MINDSENSORS_TOUCH_SENSOR_MULTIPLEXER
+module MindsensorsTouchSensorMultiplexer (DI : DEVICE_INFO) (P : OUTPUT_PORT)
+      : MINDSENSORS_TOUCH_SENSOR_MULTIPLEXER
 (** Implementation of Mindsensors Touch Sensor Multiplexer. *)
 
 (*

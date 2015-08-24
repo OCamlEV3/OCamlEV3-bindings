@@ -33,6 +33,12 @@ open Port
 open Sensor
 
 module type MICROINFINITY_DIGITAL_GYROSCOPE_AND_ACCELEROMETER = sig
+  type microinfinity_digital_gyroscope_and_accelerometer_commands = 
+    | RESET (** Constructor for RESET mode. *)
+    | ACCEL_TWOG (** Constructor for ACCEL_TWOG mode. *)
+    | ACCEL_FOURG (** Constructor for ACCEL_FOURG mode. *)
+    | ACCEL_EIGHTG (** Constructor for ACCEL_EIGHTG mode. *)
+  (** Type for commands of the sensor microinfinity_digital_gyroscope_and_accelerometer_commands. *)
   
   type microinfinity_digital_gyroscope_and_accelerometer_modes = 
     | ANGLE (** Constructor for ANGLE mode. *)
@@ -42,7 +48,7 @@ module type MICROINFINITY_DIGITAL_GYROSCOPE_AND_ACCELEROMETER = sig
   (** Type for modes of the sensor microinfinity_digital_gyroscope_and_accelerometer_modes. *)
   
   include Sensor.AbstractSensor
-    with type commands := unit
+    with type commands := microinfinity_digital_gyroscope_and_accelerometer_commands
      and type modes    := microinfinity_digital_gyroscope_and_accelerometer_modes
   
   val angle : int ufun
@@ -59,7 +65,8 @@ module type MICROINFINITY_DIGITAL_GYROSCOPE_AND_ACCELEROMETER = sig
   
 end
 
-module MicroinfinityDigitalGyroscopeAndAccelerometer (DI : Device.DEVICE_INFO) (P: Port.OUTPUT_PORT) : MICROINFINITY_DIGITAL_GYROSCOPE_AND_ACCELEROMETER
+module MicroinfinityDigitalGyroscopeAndAccelerometer (DI : DEVICE_INFO)
+    (P : OUTPUT_PORT) : MICROINFINITY_DIGITAL_GYROSCOPE_AND_ACCELEROMETER
 (** Implementation of Microinfinity Digital Gyroscope And Accelerometer. *)
 
 (*

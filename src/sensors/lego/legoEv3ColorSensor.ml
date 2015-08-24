@@ -31,7 +31,7 @@ open Port
 open Sensor
 
 module type LEGO_EV3_COLOR_SENSOR = sig
-  
+  type lego_ev3_color_sensor_commands = unit
   type lego_ev3_color_sensor_modes = 
     | COL_REFLECT
     | COL_AMBIANT
@@ -41,7 +41,7 @@ module type LEGO_EV3_COLOR_SENSOR = sig
     | COL_CAL
   
   include Sensor.AbstractSensor
-    with type commands := unit
+    with type commands := lego_ev3_color_sensor_commands
      and type modes    := lego_ev3_color_sensor_modes
   
   val reflected_light : int ufun
@@ -52,9 +52,9 @@ module type LEGO_EV3_COLOR_SENSOR = sig
   val color_calibration : int_tuple4 ufun
 end
 
-
 module LegoEv3ColorSensor (DI : DEVICE_INFO)
-  (P : OUTPUT_PORT) = struct
+    (P : OUTPUT_PORT) = struct
+  type lego_ev3_color_sensor_commands = unit
   type lego_ev3_color_sensor_modes = 
     | COL_REFLECT
     | COL_AMBIANT
@@ -63,9 +63,8 @@ module LegoEv3ColorSensor (DI : DEVICE_INFO)
     | RGB_RAW
     | COL_CAL
   
-  
   module LegoEv3ColorSensorCommands = struct
-    type commands = unit
+    type commands = lego_ev3_color_sensor_commands
     let string_of_commands = function
       | _ -> failwith "commands are not available for this sensor."
     
@@ -89,31 +88,30 @@ module LegoEv3ColorSensor (DI : DEVICE_INFO)
       | REF_RAW -> "ref-raw"
       | RGB_RAW -> "rgb-raw"
       | COL_CAL -> "col-cal"
+    
     let default_mode = COL_REFLECT
   end
   
-  
   module LegoEv3ColorSensorPathFinder = Path_finder.Make(struct
-    let prefix = "/sys/class/lego-sensor"
-    let conditions = [
-      ("name", "lego-ev3-color");
-      ("port", string_of_output_port P.output_port)
-    ]
-  end)
+      let prefix = "/sys/class/lego-sensor"
+      let conditions = [
+        ("name", "lego-ev3-color");
+        ("port", string_of_output_port P.output_port)
+      ]
+    end)
   
   include Make_abstract_sensor(LegoEv3ColorSensorCommands)
-    (LegoEv3ColorSensorModes)(DI)
-    (LegoEv3ColorSensorPathFinder)
-    
-    let reflected_light = checked_read read1 COL_REFLECT
-    let ambiant_light = checked_read read1 COL_AMBIANT
-    let color = checked_read read1 COL_COLOR
-    let raw_reflected = checked_read read2 REF_RAW
-    let raw_color_components = checked_read read3 RGB_RAW
-    let color_calibration = checked_read read4 COL_CAL
-  end
+      (LegoEv3ColorSensorModes)(DI)(LegoEv3ColorSensorPathFinder)
   
-  
+  let reflected_light = checked_read read1 COL_REFLECT
+  let ambiant_light = checked_read read1 COL_AMBIANT
+  let color = checked_read read1 COL_COLOR
+  let raw_reflected = checked_read read2 REF_RAW
+  let raw_color_components = checked_read read3 RGB_RAW
+  let color_calibration = checked_read read4 COL_CAL
+end
+
+
 (*
 Local Variables:
 compile-command: "make -C ../.."

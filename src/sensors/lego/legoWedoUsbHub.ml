@@ -31,28 +31,37 @@ open Port
 open Sensor
 
 module type LEGO_WEDO_USB_HUB = sig
+  type lego_wedo_usb_hub_commands = 
+    | OUT_OFF
+    | OUT_ON
+    | CLEAR_ERR
   
   type lego_wedo_usb_hub_modes = 
     | HUB
   
   include Sensor.AbstractSensor
-    with type commands := unit
+    with type commands := lego_wedo_usb_hub_commands
      and type modes    := lego_wedo_usb_hub_modes
   
   val hub_status : int_tuple2 ufun
 end
 
-
 module LegoWedoUsbHub (DI : DEVICE_INFO)
-  (P : OUTPUT_PORT) = struct
+    (P : OUTPUT_PORT) = struct
+  type lego_wedo_usb_hub_commands = 
+    | OUT_OFF
+    | OUT_ON
+    | CLEAR_ERR
+  
   type lego_wedo_usb_hub_modes = 
     | HUB
   
-  
   module LegoWedoUsbHubCommands = struct
-    type commands = unit
+    type commands = lego_wedo_usb_hub_commands
     let string_of_commands = function
-      | _ -> failwith "commands are not available for this sensor."
+      | OUT_OFF -> "out-off"
+      | OUT_ON -> "out-on"
+      | CLEAR_ERR -> "clear-err"
     
   end
   
@@ -64,25 +73,25 @@ module LegoWedoUsbHub (DI : DEVICE_INFO)
     
     let string_of_modes = function
       | HUB -> "hub"
+    
     let default_mode = HUB
   end
   
-  
   module LegoWedoUsbHubPathFinder = Path_finder.Make(struct
-    let prefix = "/sys/class/lego-sensor"
-    let conditions = [
-      ("name", "wedo-hub");
-      ("port", string_of_output_port P.output_port)
-    ]
-  end)
+      let prefix = "/sys/class/lego-sensor"
+      let conditions = [
+        ("name", "wedo-hub");
+        ("port", string_of_output_port P.output_port)
+      ]
+    end)
   
   include Make_abstract_sensor(LegoWedoUsbHubCommands)(LegoWedoUsbHubModes)
-    (DI)(LegoWedoUsbHubPathFinder)
-    
-    let hub_status = checked_read read2 HUB
-  end
+      (DI)(LegoWedoUsbHubPathFinder)
   
-  
+  let hub_status = checked_read read2 HUB
+end
+
+
 (*
 Local Variables:
 compile-command: "make -C ../.."

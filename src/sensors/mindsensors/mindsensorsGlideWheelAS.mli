@@ -33,6 +33,9 @@ open Port
 open Sensor
 
 module type MINDSENSORS_GLIDE_WHEEL_A_S = sig
+  type mindsensors_glide_wheel_a_s_commands = 
+    | RESET (** Constructor for RESET mode. *)
+  (** Type for commands of the sensor mindsensors_glide_wheel_a_s_commands. *)
   
   type mindsensors_glide_wheel_a_s_modes = 
     | ANGLE (** Constructor for ANGLE mode. *)
@@ -42,7 +45,7 @@ module type MINDSENSORS_GLIDE_WHEEL_A_S = sig
   (** Type for modes of the sensor mindsensors_glide_wheel_a_s_modes. *)
   
   include Sensor.AbstractSensor
-    with type commands := unit
+    with type commands := mindsensors_glide_wheel_a_s_commands
      and type modes    := mindsensors_glide_wheel_a_s_modes
   
   val angle : int ufun
@@ -59,7 +62,8 @@ module type MINDSENSORS_GLIDE_WHEEL_A_S = sig
   
 end
 
-module MindsensorsGlideWheelAS (DI : Device.DEVICE_INFO) (P: Port.OUTPUT_PORT) : MINDSENSORS_GLIDE_WHEEL_A_S
+module MindsensorsGlideWheelAS (DI : DEVICE_INFO) (P : OUTPUT_PORT)
+      : MINDSENSORS_GLIDE_WHEEL_A_S
 (** Implementation of Mindsensors Glide Wheel A S. *)
 
 (*

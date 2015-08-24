@@ -33,7 +33,7 @@ open Port
 open Sensor
 
 module type HI_TECHNIC_NXT_I_R_SEEKER_V2 = sig
-  
+  type hi_technic_nxt_i_r_seeker_v2_commands = unit
   type hi_technic_nxt_i_r_seeker_v2_modes = 
     | DC (** Constructor for DC mode. *)
     | AC (** Constructor for AC mode. *)
@@ -42,7 +42,7 @@ module type HI_TECHNIC_NXT_I_R_SEEKER_V2 = sig
   (** Type for modes of the sensor hi_technic_nxt_i_r_seeker_v2_modes. *)
   
   include Sensor.AbstractSensor
-    with type commands := unit
+    with type commands := hi_technic_nxt_i_r_seeker_v2_commands
      and type modes    := hi_technic_nxt_i_r_seeker_v2_modes
   
   val unmodulated_direction : int ufun
@@ -59,7 +59,8 @@ module type HI_TECHNIC_NXT_I_R_SEEKER_V2 = sig
   
 end
 
-module HiTechnicNxtIRSeekerV2 (DI : Device.DEVICE_INFO) (P: Port.OUTPUT_PORT) : HI_TECHNIC_NXT_I_R_SEEKER_V2
+module HiTechnicNxtIRSeekerV2 (DI : DEVICE_INFO) (P : OUTPUT_PORT)
+      : HI_TECHNIC_NXT_I_R_SEEKER_V2
 (** Implementation of Hi Technic Nxt I R Seeker V2. *)
 
 (*

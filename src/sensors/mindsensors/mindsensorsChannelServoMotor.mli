@@ -33,14 +33,14 @@ open Port
 open Sensor
 
 module type MINDSENSORS_CHANNEL_SERVO_MOTOR = sig
-  
+  type mindsensors_channel_servo_motor_commands = unit
   type mindsensors_channel_servo_motor_modes = 
     | VTHREE (** Constructor for VTHREE mode. *)
     | OLD (** Constructor for OLD mode. *)
   (** Type for modes of the sensor mindsensors_channel_servo_motor_modes. *)
   
   include Sensor.AbstractSensor
-    with type commands := unit
+    with type commands := mindsensors_channel_servo_motor_commands
      and type modes    := mindsensors_channel_servo_motor_modes
   
   val ev3_compatible_value : int ufun
@@ -51,7 +51,8 @@ module type MINDSENSORS_CHANNEL_SERVO_MOTOR = sig
   
 end
 
-module MindsensorsChannelServoMotor (DI : Device.DEVICE_INFO) (P: Port.OUTPUT_PORT) : MINDSENSORS_CHANNEL_SERVO_MOTOR
+module MindsensorsChannelServoMotor (DI : DEVICE_INFO) (P : OUTPUT_PORT)
+      : MINDSENSORS_CHANNEL_SERVO_MOTOR
 (** Implementation of Mindsensors Channel Servo Motor. *)
 
 (*

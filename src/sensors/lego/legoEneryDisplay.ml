@@ -31,7 +31,7 @@ open Port
 open Sensor
 
 module type LEGO_ENERY_DISPLAY = sig
-  
+  type lego_enery_display_commands = unit
   type lego_enery_display_modes = 
     | IN_VOLT
     | IN_AMP
@@ -43,7 +43,7 @@ module type LEGO_ENERY_DISPLAY = sig
     | ALL
   
   include Sensor.AbstractSensor
-    with type commands := unit
+    with type commands := lego_enery_display_commands
      and type modes    := lego_enery_display_modes
   
   val input_voltage : int ufun
@@ -56,9 +56,9 @@ module type LEGO_ENERY_DISPLAY = sig
   val energy_all_values : int_tuple7 ufun
 end
 
-
 module LegoEneryDisplay (DI : DEVICE_INFO)
-  (P : OUTPUT_PORT) = struct
+    (P : OUTPUT_PORT) = struct
+  type lego_enery_display_commands = unit
   type lego_enery_display_modes = 
     | IN_VOLT
     | IN_AMP
@@ -69,9 +69,8 @@ module LegoEneryDisplay (DI : DEVICE_INFO)
     | OUT_WATT
     | ALL
   
-  
   module LegoEneryDisplayCommands = struct
-    type commands = unit
+    type commands = lego_enery_display_commands
     let string_of_commands = function
       | _ -> failwith "commands are not available for this sensor."
     
@@ -99,33 +98,32 @@ module LegoEneryDisplay (DI : DEVICE_INFO)
       | IN_WATT -> "in-watt"
       | OUT_WATT -> "out-watt"
       | ALL -> "all"
+    
     let default_mode = IN_VOLT
   end
   
-  
   module LegoEneryDisplayPathFinder = Path_finder.Make(struct
-    let prefix = "/sys/class/lego-sensor"
-    let conditions = [
-      ("name", "lego-power-storage");
-      ("port", string_of_output_port P.output_port)
-    ]
-  end)
+      let prefix = "/sys/class/lego-sensor"
+      let conditions = [
+        ("name", "lego-power-storage");
+        ("port", string_of_output_port P.output_port)
+      ]
+    end)
   
   include Make_abstract_sensor(LegoEneryDisplayCommands)
-    (LegoEneryDisplayModes)(DI)
-    (LegoEneryDisplayPathFinder)
-    
-    let input_voltage = checked_read read1 IN_VOLT
-    let input_current = checked_read read1 IN_AMP
-    let output_voltage = checked_read read1 OUT_VOLT
-    let output_current = checked_read read1 OUT_AMP
-    let energy = checked_read read1 JOUL
-    let input_power = checked_read read1 IN_WATT
-    let output_power = checked_read read1 OUT_WATT
-    let energy_all_values = checked_read read7 ALL
-  end
+      (LegoEneryDisplayModes)(DI)(LegoEneryDisplayPathFinder)
   
-  
+  let input_voltage = checked_read read1 IN_VOLT
+  let input_current = checked_read read1 IN_AMP
+  let output_voltage = checked_read read1 OUT_VOLT
+  let output_current = checked_read read1 OUT_AMP
+  let energy = checked_read read1 JOUL
+  let input_power = checked_read read1 IN_WATT
+  let output_power = checked_read read1 OUT_WATT
+  let energy_all_values = checked_read read7 ALL
+end
+
+
 (*
 Local Variables:
 compile-command: "make -C ../.."

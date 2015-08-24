@@ -31,7 +31,6 @@ open Port
 open Sensor
 
 module type HI_TECHNIC_NXT_SENSOR_MULTIPLEXER = sig
-  
   type hi_technic_nxt_sensor_multiplexer_commands = 
     | HALT
     | DETECT
@@ -47,9 +46,8 @@ module type HI_TECHNIC_NXT_SENSOR_MULTIPLEXER = sig
   val status : int_tuple2 ufun
 end
 
-
 module HiTechnicNxtSensorMultiplexer (DI : DEVICE_INFO)
-  (P : OUTPUT_PORT) = struct
+    (P : OUTPUT_PORT) = struct
   type hi_technic_nxt_sensor_multiplexer_commands = 
     | HALT
     | DETECT
@@ -57,7 +55,6 @@ module HiTechnicNxtSensorMultiplexer (DI : DEVICE_INFO)
   
   type hi_technic_nxt_sensor_multiplexer_modes = 
     | MUX
-  
   
   module HiTechnicNxtSensorMultiplexerCommands = struct
     type commands = hi_technic_nxt_sensor_multiplexer_commands
@@ -76,26 +73,26 @@ module HiTechnicNxtSensorMultiplexer (DI : DEVICE_INFO)
     
     let string_of_modes = function
       | MUX -> "mux"
+    
     let default_mode = MUX
   end
   
-  
   module HiTechnicNxtSensorMultiplexerPathFinder = Path_finder.Make(struct
-    let prefix = "/sys/class/lego-sensor"
-    let conditions = [
-      ("name", "ht-nxt-smux");
-      ("port", string_of_output_port P.output_port)
-    ]
-  end)
+      let prefix = "/sys/class/lego-sensor"
+      let conditions = [
+        ("name", "ht-nxt-smux");
+        ("port", string_of_output_port P.output_port)
+      ]
+    end)
   
   include Make_abstract_sensor(HiTechnicNxtSensorMultiplexerCommands)
-    (HiTechnicNxtSensorMultiplexerModes)(DI)
-    (HiTechnicNxtSensorMultiplexerPathFinder)
-    
-    let status = checked_read read2 MUX
-  end
+      (HiTechnicNxtSensorMultiplexerModes)(DI)
+      (HiTechnicNxtSensorMultiplexerPathFinder)
   
-  
+  let status = checked_read read2 MUX
+end
+
+
 (*
 Local Variables:
 compile-command: "make -C ../.."

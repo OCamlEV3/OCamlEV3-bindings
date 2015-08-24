@@ -31,26 +31,25 @@ open Port
 open Sensor
 
 module type HI_TECHNIC_NXT_MAGNETIC_SENSOR = sig
-  
+  type hi_technic_nxt_magnetic_sensor_commands = unit
   type hi_technic_nxt_magnetic_sensor_modes = 
     | MAG
   
   include Sensor.AbstractSensor
-    with type commands := unit
+    with type commands := hi_technic_nxt_magnetic_sensor_commands
      and type modes    := hi_technic_nxt_magnetic_sensor_modes
   
   val magnetic_field : int ufun
 end
 
-
 module HiTechnicNxtMagneticSensor (DI : DEVICE_INFO)
-  (P : OUTPUT_PORT) = struct
+    (P : OUTPUT_PORT) = struct
+  type hi_technic_nxt_magnetic_sensor_commands = unit
   type hi_technic_nxt_magnetic_sensor_modes = 
     | MAG
   
-  
   module HiTechnicNxtMagneticSensorCommands = struct
-    type commands = unit
+    type commands = hi_technic_nxt_magnetic_sensor_commands
     let string_of_commands = function
       | _ -> failwith "commands are not available for this sensor."
     
@@ -64,26 +63,26 @@ module HiTechnicNxtMagneticSensor (DI : DEVICE_INFO)
     
     let string_of_modes = function
       | MAG -> "mag"
+    
     let default_mode = MAG
   end
   
-  
   module HiTechnicNxtMagneticSensorPathFinder = Path_finder.Make(struct
-    let prefix = "/sys/class/lego-sensor"
-    let conditions = [
-      ("name", "ht-nxt-mag");
-      ("port", string_of_output_port P.output_port)
-    ]
-  end)
+      let prefix = "/sys/class/lego-sensor"
+      let conditions = [
+        ("name", "ht-nxt-mag");
+        ("port", string_of_output_port P.output_port)
+      ]
+    end)
   
   include Make_abstract_sensor(HiTechnicNxtMagneticSensorCommands)
-    (HiTechnicNxtMagneticSensorModes)(DI)
-    (HiTechnicNxtMagneticSensorPathFinder)
-    
-    let magnetic_field = checked_read read1 MAG
-  end
+      (HiTechnicNxtMagneticSensorModes)(DI)
+      (HiTechnicNxtMagneticSensorPathFinder)
   
-  
+  let magnetic_field = checked_read read1 MAG
+end
+
+
 (*
 Local Variables:
 compile-command: "make -C ../.."

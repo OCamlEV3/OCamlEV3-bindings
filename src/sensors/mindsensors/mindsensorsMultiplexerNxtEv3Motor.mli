@@ -33,14 +33,14 @@ open Port
 open Sensor
 
 module type MINDSENSORS_MULTIPLEXER_NXT_EV3_MOTOR = sig
-  
+  type mindsensors_multiplexer_nxt_ev3_motor_commands = unit
   type mindsensors_multiplexer_nxt_ev3_motor_modes = 
     | STATUS (** Constructor for STATUS mode. *)
     | STATUS_OLD (** Constructor for STATUS_OLD mode. *)
   (** Type for modes of the sensor mindsensors_multiplexer_nxt_ev3_motor_modes. *)
   
   include Sensor.AbstractSensor
-    with type commands := unit
+    with type commands := mindsensors_multiplexer_nxt_ev3_motor_commands
      and type modes    := mindsensors_multiplexer_nxt_ev3_motor_modes
   
   val status : int ufun
@@ -51,7 +51,8 @@ module type MINDSENSORS_MULTIPLEXER_NXT_EV3_MOTOR = sig
   
 end
 
-module MindsensorsMultiplexerNxtEv3Motor (DI : Device.DEVICE_INFO) (P: Port.OUTPUT_PORT) : MINDSENSORS_MULTIPLEXER_NXT_EV3_MOTOR
+module MindsensorsMultiplexerNxtEv3Motor (DI : DEVICE_INFO) (P : OUTPUT_PORT)
+      : MINDSENSORS_MULTIPLEXER_NXT_EV3_MOTOR
 (** Implementation of Mindsensors Multiplexer Nxt Ev3 Motor. *)
 
 (*

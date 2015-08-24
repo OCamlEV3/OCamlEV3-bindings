@@ -33,7 +33,7 @@ open Port
 open Sensor
 
 module type LEGO_EV3_COLOR_SENSOR = sig
-  
+  type lego_ev3_color_sensor_commands = unit
   type lego_ev3_color_sensor_modes = 
     | COL_REFLECT (** Constructor for COL_REFLECT mode. *)
     | COL_AMBIANT (** Constructor for COL_AMBIANT mode. *)
@@ -44,7 +44,7 @@ module type LEGO_EV3_COLOR_SENSOR = sig
   (** Type for modes of the sensor lego_ev3_color_sensor_modes. *)
   
   include Sensor.AbstractSensor
-    with type commands := unit
+    with type commands := lego_ev3_color_sensor_commands
      and type modes    := lego_ev3_color_sensor_modes
   
   val reflected_light : int ufun
@@ -67,7 +67,8 @@ module type LEGO_EV3_COLOR_SENSOR = sig
   
 end
 
-module LegoEv3ColorSensor (DI : Device.DEVICE_INFO) (P: Port.OUTPUT_PORT) : LEGO_EV3_COLOR_SENSOR
+module LegoEv3ColorSensor (DI : DEVICE_INFO) (P : OUTPUT_PORT)
+      : LEGO_EV3_COLOR_SENSOR
 (** Implementation of Lego Ev3 Color Sensor. *)
 
 (*

@@ -31,7 +31,7 @@ open Port
 open Sensor
 
 module type HI_TECHNIC_NXT_SUPERPRO_PROTOTYPE_BOARD = sig
-  
+  type hi_technic_nxt_superpro_prototype_board_commands = unit
   type hi_technic_nxt_superpro_prototype_board_modes = 
     | AIN
     | DIN
@@ -43,7 +43,7 @@ module type HI_TECHNIC_NXT_SUPERPRO_PROTOTYPE_BOARD = sig
     | AOUT_ONE
   
   include Sensor.AbstractSensor
-    with type commands := unit
+    with type commands := hi_technic_nxt_superpro_prototype_board_commands
      and type modes    := hi_technic_nxt_superpro_prototype_board_modes
   
   val analog_inputs : int_tuple4 ufun
@@ -56,9 +56,9 @@ module type HI_TECHNIC_NXT_SUPERPRO_PROTOTYPE_BOARD = sig
   val analog_output_o1 : int_tuple5 ufun
 end
 
-
 module HiTechnicNxtSuperproPrototypeBoard (DI : DEVICE_INFO)
-  (P : OUTPUT_PORT) = struct
+    (P : OUTPUT_PORT) = struct
+  type hi_technic_nxt_superpro_prototype_board_commands = unit
   type hi_technic_nxt_superpro_prototype_board_modes = 
     | AIN
     | DIN
@@ -69,9 +69,8 @@ module HiTechnicNxtSuperproPrototypeBoard (DI : DEVICE_INFO)
     | AOUT_ZERO
     | AOUT_ONE
   
-  
   module HiTechnicNxtSuperproPrototypeBoardCommands = struct
-    type commands = unit
+    type commands = hi_technic_nxt_superpro_prototype_board_commands
     let string_of_commands = function
       | _ -> failwith "commands are not available for this sensor."
     
@@ -99,33 +98,33 @@ module HiTechnicNxtSuperproPrototypeBoard (DI : DEVICE_INFO)
       | LED -> "led"
       | AOUT_ZERO -> "aout-0"
       | AOUT_ONE -> "aout-1"
+    
     let default_mode = AIN
   end
   
-  
   module HiTechnicNxtSuperproPrototypeBoardPathFinder = Path_finder.Make(struct
-    let prefix = "/sys/class/lego-sensor"
-    let conditions = [
-      ("name", "ht-super-pro");
-      ("port", string_of_output_port P.output_port)
-    ]
-  end)
+      let prefix = "/sys/class/lego-sensor"
+      let conditions = [
+        ("name", "ht-super-pro");
+        ("port", string_of_output_port P.output_port)
+      ]
+    end)
   
   include Make_abstract_sensor(HiTechnicNxtSuperproPrototypeBoardCommands)
-    (HiTechnicNxtSuperproPrototypeBoardModes)(DI)
-    (HiTechnicNxtSuperproPrototypeBoardPathFinder)
-    
-    let analog_inputs = checked_read read4 AIN
-    let digital_inputs = checked_read read1 DIN
-    let digital_outputs = checked_read read1 DOUT
-    let digital_controls = checked_read read1 DCTRL
-    let strobe_output = checked_read read1 STROBE
-    let led_control = checked_read read1 LED
-    let analog_output_o0 = checked_read read5 AOUT_ZERO
-    let analog_output_o1 = checked_read read5 AOUT_ONE
-  end
+      (HiTechnicNxtSuperproPrototypeBoardModes)(DI)
+      (HiTechnicNxtSuperproPrototypeBoardPathFinder)
   
-  
+  let analog_inputs = checked_read read4 AIN
+  let digital_inputs = checked_read read1 DIN
+  let digital_outputs = checked_read read1 DOUT
+  let digital_controls = checked_read read1 DCTRL
+  let strobe_output = checked_read read1 STROBE
+  let led_control = checked_read read1 LED
+  let analog_output_o0 = checked_read read5 AOUT_ZERO
+  let analog_output_o1 = checked_read read5 AOUT_ONE
+end
+
+
 (*
 Local Variables:
 compile-command: "make -C ../.."

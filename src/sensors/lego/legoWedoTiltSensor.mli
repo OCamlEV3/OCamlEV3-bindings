@@ -33,7 +33,7 @@ open Port
 open Sensor
 
 module type LEGO_WEDO_TILT_SENSOR = sig
-  
+  type lego_wedo_tilt_sensor_commands = unit
   type lego_wedo_tilt_sensor_modes = 
     | TILT (** Constructor for TILT mode. *)
     | TILT_AXIS (** Constructor for TILT_AXIS mode. *)
@@ -41,7 +41,7 @@ module type LEGO_WEDO_TILT_SENSOR = sig
   (** Type for modes of the sensor lego_wedo_tilt_sensor_modes. *)
   
   include Sensor.AbstractSensor
-    with type commands := unit
+    with type commands := lego_wedo_tilt_sensor_commands
      and type modes    := lego_wedo_tilt_sensor_modes
   
   val tilt_status : int ufun
@@ -55,7 +55,8 @@ module type LEGO_WEDO_TILT_SENSOR = sig
   
 end
 
-module LegoWedoTiltSensor (DI : Device.DEVICE_INFO) (P: Port.OUTPUT_PORT) : LEGO_WEDO_TILT_SENSOR
+module LegoWedoTiltSensor (DI : DEVICE_INFO) (P : OUTPUT_PORT)
+      : LEGO_WEDO_TILT_SENSOR
 (** Implementation of Lego Wedo Tilt Sensor. *)
 
 (*

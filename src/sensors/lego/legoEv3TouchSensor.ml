@@ -31,26 +31,25 @@ open Port
 open Sensor
 
 module type LEGO_EV3_TOUCH_SENSOR = sig
-  
+  type lego_ev3_touch_sensor_commands = unit
   type lego_ev3_touch_sensor_modes = 
     | TOUCH
   
   include Sensor.AbstractSensor
-    with type commands := unit
+    with type commands := lego_ev3_touch_sensor_commands
      and type modes    := lego_ev3_touch_sensor_modes
   
   val button_state : int ufun
 end
 
-
 module LegoEv3TouchSensor (DI : DEVICE_INFO)
-  (P : OUTPUT_PORT) = struct
+    (P : OUTPUT_PORT) = struct
+  type lego_ev3_touch_sensor_commands = unit
   type lego_ev3_touch_sensor_modes = 
     | TOUCH
   
-  
   module LegoEv3TouchSensorCommands = struct
-    type commands = unit
+    type commands = lego_ev3_touch_sensor_commands
     let string_of_commands = function
       | _ -> failwith "commands are not available for this sensor."
     
@@ -64,26 +63,25 @@ module LegoEv3TouchSensor (DI : DEVICE_INFO)
     
     let string_of_modes = function
       | TOUCH -> "touch"
+    
     let default_mode = TOUCH
   end
   
-  
   module LegoEv3TouchSensorPathFinder = Path_finder.Make(struct
-    let prefix = "/sys/class/lego-sensor"
-    let conditions = [
-      ("name", "lego-ev3-touch");
-      ("port", string_of_output_port P.output_port)
-    ]
-  end)
+      let prefix = "/sys/class/lego-sensor"
+      let conditions = [
+        ("name", "lego-ev3-touch");
+        ("port", string_of_output_port P.output_port)
+      ]
+    end)
   
   include Make_abstract_sensor(LegoEv3TouchSensorCommands)
-    (LegoEv3TouchSensorModes)(DI)
-    (LegoEv3TouchSensorPathFinder)
-    
-    let button_state = checked_read read1 TOUCH
-  end
+      (LegoEv3TouchSensorModes)(DI)(LegoEv3TouchSensorPathFinder)
   
-  
+  let button_state = checked_read read1 TOUCH
+end
+
+
 (*
 Local Variables:
 compile-command: "make -C ../.."

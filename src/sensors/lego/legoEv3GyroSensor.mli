@@ -33,7 +33,7 @@ open Port
 open Sensor
 
 module type LEGO_EV3_GYRO_SENSOR = sig
-  
+  type lego_ev3_gyro_sensor_commands = unit
   type lego_ev3_gyro_sensor_modes = 
     | GYRO_ANG (** Constructor for GYRO_ANG mode. *)
     | GYRO_RATE (** Constructor for GYRO_RATE mode. *)
@@ -43,7 +43,7 @@ module type LEGO_EV3_GYRO_SENSOR = sig
   (** Type for modes of the sensor lego_ev3_gyro_sensor_modes. *)
   
   include Sensor.AbstractSensor
-    with type commands := unit
+    with type commands := lego_ev3_gyro_sensor_commands
      and type modes    := lego_ev3_gyro_sensor_modes
   
   val angle : int ufun
@@ -63,7 +63,8 @@ module type LEGO_EV3_GYRO_SENSOR = sig
   
 end
 
-module LegoEv3GyroSensor (DI : Device.DEVICE_INFO) (P: Port.OUTPUT_PORT) : LEGO_EV3_GYRO_SENSOR
+module LegoEv3GyroSensor (DI : DEVICE_INFO) (P : OUTPUT_PORT)
+      : LEGO_EV3_GYRO_SENSOR
 (** Implementation of Lego Ev3 Gyro Sensor. *)
 
 (*

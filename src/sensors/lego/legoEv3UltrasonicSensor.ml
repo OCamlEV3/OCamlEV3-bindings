@@ -31,7 +31,7 @@ open Port
 open Sensor
 
 module type LEGO_EV3_ULTRASONIC_SENSOR = sig
-  
+  type lego_ev3_ultrasonic_sensor_commands = unit
   type lego_ev3_ultrasonic_sensor_modes = 
     | US_DIST_CM
     | US_DIST_IN
@@ -42,7 +42,7 @@ module type LEGO_EV3_ULTRASONIC_SENSOR = sig
     | US_DC_IN
   
   include Sensor.AbstractSensor
-    with type commands := unit
+    with type commands := lego_ev3_ultrasonic_sensor_commands
      and type modes    := lego_ev3_ultrasonic_sensor_modes
   
   val continuous_dist_cm : int ufun
@@ -54,9 +54,9 @@ module type LEGO_EV3_ULTRASONIC_SENSOR = sig
   val us_dc_in : int ufun
 end
 
-
 module LegoEv3UltrasonicSensor (DI : DEVICE_INFO)
-  (P : OUTPUT_PORT) = struct
+    (P : OUTPUT_PORT) = struct
+  type lego_ev3_ultrasonic_sensor_commands = unit
   type lego_ev3_ultrasonic_sensor_modes = 
     | US_DIST_CM
     | US_DIST_IN
@@ -66,9 +66,8 @@ module LegoEv3UltrasonicSensor (DI : DEVICE_INFO)
     | US_DC_CM
     | US_DC_IN
   
-  
   module LegoEv3UltrasonicSensorCommands = struct
-    type commands = unit
+    type commands = lego_ev3_ultrasonic_sensor_commands
     let string_of_commands = function
       | _ -> failwith "commands are not available for this sensor."
     
@@ -94,32 +93,31 @@ module LegoEv3UltrasonicSensor (DI : DEVICE_INFO)
       | US_SI_IN -> "us-si-in"
       | US_DC_CM -> "us-dc-cm"
       | US_DC_IN -> "us-dc-in"
+    
     let default_mode = US_DIST_CM
   end
   
-  
   module LegoEv3UltrasonicSensorPathFinder = Path_finder.Make(struct
-    let prefix = "/sys/class/lego-sensor"
-    let conditions = [
-      ("name", "lego-ev3-us");
-      ("port", string_of_output_port P.output_port)
-    ]
-  end)
+      let prefix = "/sys/class/lego-sensor"
+      let conditions = [
+        ("name", "lego-ev3-us");
+        ("port", string_of_output_port P.output_port)
+      ]
+    end)
   
   include Make_abstract_sensor(LegoEv3UltrasonicSensorCommands)
-    (LegoEv3UltrasonicSensorModes)(DI)
-    (LegoEv3UltrasonicSensorPathFinder)
-    
-    let continuous_dist_cm = checked_read read1 US_DIST_CM
-    let continuous_dist_in = checked_read read1 US_DIST_IN
-    let listen = checked_read read1 US_LISTEN
-    let single_dist_cm = checked_read read1 US_SI_CM
-    let single_dist_in = checked_read read1 US_SI_IN
-    let us_dc_cm = checked_read read1 US_DC_CM
-    let us_dc_in = checked_read read1 US_DC_IN
-  end
+      (LegoEv3UltrasonicSensorModes)(DI)(LegoEv3UltrasonicSensorPathFinder)
   
-  
+  let continuous_dist_cm = checked_read read1 US_DIST_CM
+  let continuous_dist_in = checked_read read1 US_DIST_IN
+  let listen = checked_read read1 US_LISTEN
+  let single_dist_cm = checked_read read1 US_SI_CM
+  let single_dist_in = checked_read read1 US_SI_IN
+  let us_dc_cm = checked_read read1 US_DC_CM
+  let us_dc_in = checked_read read1 US_DC_IN
+end
+
+
 (*
 Local Variables:
 compile-command: "make -C ../.."

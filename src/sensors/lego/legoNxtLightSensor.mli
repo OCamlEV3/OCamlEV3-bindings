@@ -33,14 +33,14 @@ open Port
 open Sensor
 
 module type LEGO_NXT_LIGHT_SENSOR = sig
-  
+  type lego_nxt_light_sensor_commands = unit
   type lego_nxt_light_sensor_modes = 
     | REFLECT (** Constructor for REFLECT mode. *)
     | AMBIANT (** Constructor for AMBIANT mode. *)
   (** Type for modes of the sensor lego_nxt_light_sensor_modes. *)
   
   include Sensor.AbstractSensor
-    with type commands := unit
+    with type commands := lego_nxt_light_sensor_commands
      and type modes    := lego_nxt_light_sensor_modes
   
   val reflected_light : int ufun
@@ -51,7 +51,8 @@ module type LEGO_NXT_LIGHT_SENSOR = sig
   
 end
 
-module LegoNxtLightSensor (DI : Device.DEVICE_INFO) (P: Port.OUTPUT_PORT) : LEGO_NXT_LIGHT_SENSOR
+module LegoNxtLightSensor (DI : DEVICE_INFO) (P : OUTPUT_PORT)
+      : LEGO_NXT_LIGHT_SENSOR
 (** Implementation of Lego Nxt Light Sensor. *)
 
 (*

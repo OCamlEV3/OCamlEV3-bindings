@@ -33,14 +33,14 @@ open Port
 open Sensor
 
 module type LEGO_WEDO_MOTION_SENSOR = sig
-  
+  type lego_wedo_motion_sensor_commands = unit
   type lego_wedo_motion_sensor_modes = 
     | PROX (** Constructor for PROX mode. *)
     | RAW (** Constructor for RAW mode. *)
   (** Type for modes of the sensor lego_wedo_motion_sensor_modes. *)
   
   include Sensor.AbstractSensor
-    with type commands := unit
+    with type commands := lego_wedo_motion_sensor_commands
      and type modes    := lego_wedo_motion_sensor_modes
   
   val proximity : int ufun
@@ -51,7 +51,8 @@ module type LEGO_WEDO_MOTION_SENSOR = sig
   
 end
 
-module LegoWedoMotionSensor (DI : Device.DEVICE_INFO) (P: Port.OUTPUT_PORT) : LEGO_WEDO_MOTION_SENSOR
+module LegoWedoMotionSensor (DI : DEVICE_INFO) (P : OUTPUT_PORT)
+      : LEGO_WEDO_MOTION_SENSOR
 (** Implementation of Lego Wedo Motion Sensor. *)
 
 (*

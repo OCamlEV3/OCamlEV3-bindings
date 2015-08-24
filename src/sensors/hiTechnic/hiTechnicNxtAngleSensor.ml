@@ -31,14 +31,14 @@ open Port
 open Sensor
 
 module type HI_TECHNIC_NXT_ANGLE_SENSOR = sig
-  
+  type hi_technic_nxt_angle_sensor_commands = unit
   type hi_technic_nxt_angle_sensor_modes = 
     | ANGLE
     | ANGLE_ACC
     | SPEED
   
   include Sensor.AbstractSensor
-    with type commands := unit
+    with type commands := hi_technic_nxt_angle_sensor_commands
      and type modes    := hi_technic_nxt_angle_sensor_modes
   
   val angle : int ufun
@@ -46,17 +46,16 @@ module type HI_TECHNIC_NXT_ANGLE_SENSOR = sig
   val rotational_speed : int ufun
 end
 
-
 module HiTechnicNxtAngleSensor (DI : DEVICE_INFO)
-  (P : OUTPUT_PORT) = struct
+    (P : OUTPUT_PORT) = struct
+  type hi_technic_nxt_angle_sensor_commands = unit
   type hi_technic_nxt_angle_sensor_modes = 
     | ANGLE
     | ANGLE_ACC
     | SPEED
   
-  
   module HiTechnicNxtAngleSensorCommands = struct
-    type commands = unit
+    type commands = hi_technic_nxt_angle_sensor_commands
     let string_of_commands = function
       | _ -> failwith "commands are not available for this sensor."
     
@@ -74,28 +73,27 @@ module HiTechnicNxtAngleSensor (DI : DEVICE_INFO)
       | ANGLE -> "angle"
       | ANGLE_ACC -> "angle-acc"
       | SPEED -> "speed"
+    
     let default_mode = ANGLE
   end
   
-  
   module HiTechnicNxtAngleSensorPathFinder = Path_finder.Make(struct
-    let prefix = "/sys/class/lego-sensor"
-    let conditions = [
-      ("name", "ht-nxt-angle");
-      ("port", string_of_output_port P.output_port)
-    ]
-  end)
+      let prefix = "/sys/class/lego-sensor"
+      let conditions = [
+        ("name", "ht-nxt-angle");
+        ("port", string_of_output_port P.output_port)
+      ]
+    end)
   
   include Make_abstract_sensor(HiTechnicNxtAngleSensorCommands)
-    (HiTechnicNxtAngleSensorModes)(DI)
-    (HiTechnicNxtAngleSensorPathFinder)
-    
-    let angle = checked_read read1 ANGLE
-    let accumulated_angle = checked_read read1 ANGLE_ACC
-    let rotational_speed = checked_read read1 SPEED
-  end
+      (HiTechnicNxtAngleSensorModes)(DI)(HiTechnicNxtAngleSensorPathFinder)
   
-  
+  let angle = checked_read read1 ANGLE
+  let accumulated_angle = checked_read read1 ANGLE_ACC
+  let rotational_speed = checked_read read1 SPEED
+end
+
+
 (*
 Local Variables:
 compile-command: "make -C ../.."

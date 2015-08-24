@@ -33,13 +33,13 @@ open Port
 open Sensor
 
 module type LEGO_NXT_TOUCH_SENSOR = sig
-  
+  type lego_nxt_touch_sensor_commands = unit
   type lego_nxt_touch_sensor_modes = 
     | TOUCH (** Constructor for TOUCH mode. *)
   (** Type for modes of the sensor lego_nxt_touch_sensor_modes. *)
   
   include Sensor.AbstractSensor
-    with type commands := unit
+    with type commands := lego_nxt_touch_sensor_commands
      and type modes    := lego_nxt_touch_sensor_modes
   
   val touch_state : int ufun
@@ -47,7 +47,8 @@ module type LEGO_NXT_TOUCH_SENSOR = sig
   
 end
 
-module LegoNxtTouchSensor (DI : Device.DEVICE_INFO) (P: Port.OUTPUT_PORT) : LEGO_NXT_TOUCH_SENSOR
+module LegoNxtTouchSensor (DI : DEVICE_INFO) (P : OUTPUT_PORT)
+      : LEGO_NXT_TOUCH_SENSOR
 (** Implementation of Lego Nxt Touch Sensor. *)
 
 (*

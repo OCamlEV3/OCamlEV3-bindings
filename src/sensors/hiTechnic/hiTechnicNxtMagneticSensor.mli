@@ -33,13 +33,13 @@ open Port
 open Sensor
 
 module type HI_TECHNIC_NXT_MAGNETIC_SENSOR = sig
-  
+  type hi_technic_nxt_magnetic_sensor_commands = unit
   type hi_technic_nxt_magnetic_sensor_modes = 
     | MAG (** Constructor for MAG mode. *)
   (** Type for modes of the sensor hi_technic_nxt_magnetic_sensor_modes. *)
   
   include Sensor.AbstractSensor
-    with type commands := unit
+    with type commands := hi_technic_nxt_magnetic_sensor_commands
      and type modes    := hi_technic_nxt_magnetic_sensor_modes
   
   val magnetic_field : int ufun
@@ -47,7 +47,8 @@ module type HI_TECHNIC_NXT_MAGNETIC_SENSOR = sig
   
 end
 
-module HiTechnicNxtMagneticSensor (DI : Device.DEVICE_INFO) (P: Port.OUTPUT_PORT) : HI_TECHNIC_NXT_MAGNETIC_SENSOR
+module HiTechnicNxtMagneticSensor (DI : DEVICE_INFO) (P : OUTPUT_PORT)
+      : HI_TECHNIC_NXT_MAGNETIC_SENSOR
 (** Implementation of Hi Technic Nxt Magnetic Sensor. *)
 
 (*

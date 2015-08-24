@@ -31,6 +31,8 @@ open Port
 open Sensor
 
 module type MINDSENSORS_GLIDE_WHEEL_A_S = sig
+  type mindsensors_glide_wheel_a_s_commands = 
+    | RESET
   
   type mindsensors_glide_wheel_a_s_modes = 
     | ANGLE
@@ -39,7 +41,7 @@ module type MINDSENSORS_GLIDE_WHEEL_A_S = sig
     | ALL
   
   include Sensor.AbstractSensor
-    with type commands := unit
+    with type commands := mindsensors_glide_wheel_a_s_commands
      and type modes    := mindsensors_glide_wheel_a_s_modes
   
   val angle : int ufun
@@ -48,20 +50,21 @@ module type MINDSENSORS_GLIDE_WHEEL_A_S = sig
   val all_values : int_tuple3 ufun
 end
 
-
 module MindsensorsGlideWheelAS (DI : DEVICE_INFO)
-  (P : OUTPUT_PORT) = struct
+    (P : OUTPUT_PORT) = struct
+  type mindsensors_glide_wheel_a_s_commands = 
+    | RESET
+  
   type mindsensors_glide_wheel_a_s_modes = 
     | ANGLE
     | ANGLETWO
     | SPEED
     | ALL
   
-  
   module MindsensorsGlideWheelASCommands = struct
-    type commands = unit
+    type commands = mindsensors_glide_wheel_a_s_commands
     let string_of_commands = function
-      | _ -> failwith "commands are not available for this sensor."
+      | RESET -> "reset"
     
   end
   
@@ -79,29 +82,28 @@ module MindsensorsGlideWheelAS (DI : DEVICE_INFO)
       | ANGLETWO -> "angle2"
       | SPEED -> "speed"
       | ALL -> "all"
+    
     let default_mode = ANGLE
   end
   
-  
   module MindsensorsGlideWheelASPathFinder = Path_finder.Make(struct
-    let prefix = "/sys/class/lego-sensor"
-    let conditions = [
-      ("name", "ms-angle");
-      ("port", string_of_output_port P.output_port)
-    ]
-  end)
+      let prefix = "/sys/class/lego-sensor"
+      let conditions = [
+        ("name", "ms-angle");
+        ("port", string_of_output_port P.output_port)
+      ]
+    end)
   
   include Make_abstract_sensor(MindsensorsGlideWheelASCommands)
-    (MindsensorsGlideWheelASModes)(DI)
-    (MindsensorsGlideWheelASPathFinder)
-    
-    let angle = checked_read read1 ANGLE
-    let high_precision_angle = checked_read read1 ANGLETWO
-    let speed = checked_read read1 SPEED
-    let all_values = checked_read read3 ALL
-  end
+      (MindsensorsGlideWheelASModes)(DI)(MindsensorsGlideWheelASPathFinder)
   
-  
+  let angle = checked_read read1 ANGLE
+  let high_precision_angle = checked_read read1 ANGLETWO
+  let speed = checked_read read1 SPEED
+  let all_values = checked_read read3 ALL
+end
+
+
 (*
 Local Variables:
 compile-command: "make -C ../.."

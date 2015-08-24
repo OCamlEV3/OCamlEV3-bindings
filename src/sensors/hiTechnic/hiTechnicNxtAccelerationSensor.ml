@@ -31,29 +31,28 @@ open Port
 open Sensor
 
 module type HI_TECHNIC_NXT_ACCELERATION_SENSOR = sig
-  
+  type hi_technic_nxt_acceleration_sensor_commands = unit
   type hi_technic_nxt_acceleration_sensor_modes = 
     | ACCEL
     | ALL
   
   include Sensor.AbstractSensor
-    with type commands := unit
+    with type commands := hi_technic_nxt_acceleration_sensor_commands
      and type modes    := hi_technic_nxt_acceleration_sensor_modes
   
   val acceleration : int ufun
   val three_axis_acceleration : int_tuple6 ufun
 end
 
-
 module HiTechnicNxtAccelerationSensor (DI : DEVICE_INFO)
-  (P : OUTPUT_PORT) = struct
+    (P : OUTPUT_PORT) = struct
+  type hi_technic_nxt_acceleration_sensor_commands = unit
   type hi_technic_nxt_acceleration_sensor_modes = 
     | ACCEL
     | ALL
   
-  
   module HiTechnicNxtAccelerationSensorCommands = struct
-    type commands = unit
+    type commands = hi_technic_nxt_acceleration_sensor_commands
     let string_of_commands = function
       | _ -> failwith "commands are not available for this sensor."
     
@@ -69,27 +68,27 @@ module HiTechnicNxtAccelerationSensor (DI : DEVICE_INFO)
     let string_of_modes = function
       | ACCEL -> "accel"
       | ALL -> "all"
+    
     let default_mode = ACCEL
   end
   
-  
   module HiTechnicNxtAccelerationSensorPathFinder = Path_finder.Make(struct
-    let prefix = "/sys/class/lego-sensor"
-    let conditions = [
-      ("name", "ht-nxt-accel");
-      ("port", string_of_output_port P.output_port)
-    ]
-  end)
+      let prefix = "/sys/class/lego-sensor"
+      let conditions = [
+        ("name", "ht-nxt-accel");
+        ("port", string_of_output_port P.output_port)
+      ]
+    end)
   
   include Make_abstract_sensor(HiTechnicNxtAccelerationSensorCommands)
-    (HiTechnicNxtAccelerationSensorModes)(DI)
-    (HiTechnicNxtAccelerationSensorPathFinder)
-    
-    let acceleration = checked_read read1 ACCEL
-    let three_axis_acceleration = checked_read read6 ALL
-  end
+      (HiTechnicNxtAccelerationSensorModes)(DI)
+      (HiTechnicNxtAccelerationSensorPathFinder)
   
-  
+  let acceleration = checked_read read1 ACCEL
+  let three_axis_acceleration = checked_read read6 ALL
+end
+
+
 (*
 Local Variables:
 compile-command: "make -C ../.."

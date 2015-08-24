@@ -33,13 +33,13 @@ open Port
 open Sensor
 
 module type HI_TECHNIC_NXT_P_I_R_SENSOR = sig
-  
+  type hi_technic_nxt_p_i_r_sensor_commands = unit
   type hi_technic_nxt_p_i_r_sensor_modes = 
     | PROX (** Constructor for PROX mode. *)
   (** Type for modes of the sensor hi_technic_nxt_p_i_r_sensor_modes. *)
   
   include Sensor.AbstractSensor
-    with type commands := unit
+    with type commands := hi_technic_nxt_p_i_r_sensor_commands
      and type modes    := hi_technic_nxt_p_i_r_sensor_modes
   
   val ir_proximity : int ufun
@@ -47,7 +47,8 @@ module type HI_TECHNIC_NXT_P_I_R_SENSOR = sig
   
 end
 
-module HiTechnicNxtPIRSensor (DI : Device.DEVICE_INFO) (P: Port.OUTPUT_PORT) : HI_TECHNIC_NXT_P_I_R_SENSOR
+module HiTechnicNxtPIRSensor (DI : DEVICE_INFO) (P : OUTPUT_PORT)
+      : HI_TECHNIC_NXT_P_I_R_SENSOR
 (** Implementation of Hi Technic Nxt P I R Sensor. *)
 
 (*

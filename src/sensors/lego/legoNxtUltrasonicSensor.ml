@@ -31,7 +31,7 @@ open Port
 open Sensor
 
 module type LEGO_NXT_ULTRASONIC_SENSOR = sig
-  
+  type lego_nxt_ultrasonic_sensor_commands = unit
   type lego_nxt_ultrasonic_sensor_modes = 
     | US_DIST_CM
     | US_DIST_IN
@@ -40,7 +40,7 @@ module type LEGO_NXT_ULTRASONIC_SENSOR = sig
     | LISTEN
   
   include Sensor.AbstractSensor
-    with type commands := unit
+    with type commands := lego_nxt_ultrasonic_sensor_commands
      and type modes    := lego_nxt_ultrasonic_sensor_modes
   
   val continuous_dist_cm : int ufun
@@ -50,9 +50,9 @@ module type LEGO_NXT_ULTRASONIC_SENSOR = sig
   val listen : int ufun
 end
 
-
 module LegoNxtUltrasonicSensor (DI : DEVICE_INFO)
-  (P : OUTPUT_PORT) = struct
+    (P : OUTPUT_PORT) = struct
+  type lego_nxt_ultrasonic_sensor_commands = unit
   type lego_nxt_ultrasonic_sensor_modes = 
     | US_DIST_CM
     | US_DIST_IN
@@ -60,9 +60,8 @@ module LegoNxtUltrasonicSensor (DI : DEVICE_INFO)
     | US_SI_IN
     | LISTEN
   
-  
   module LegoNxtUltrasonicSensorCommands = struct
-    type commands = unit
+    type commands = lego_nxt_ultrasonic_sensor_commands
     let string_of_commands = function
       | _ -> failwith "commands are not available for this sensor."
     
@@ -84,30 +83,29 @@ module LegoNxtUltrasonicSensor (DI : DEVICE_INFO)
       | US_SI_CM -> "us-si-cm"
       | US_SI_IN -> "us-si-in"
       | LISTEN -> "listen"
+    
     let default_mode = US_DIST_CM
   end
   
-  
   module LegoNxtUltrasonicSensorPathFinder = Path_finder.Make(struct
-    let prefix = "/sys/class/lego-sensor"
-    let conditions = [
-      ("name", "lego-nxt-us");
-      ("port", string_of_output_port P.output_port)
-    ]
-  end)
+      let prefix = "/sys/class/lego-sensor"
+      let conditions = [
+        ("name", "lego-nxt-us");
+        ("port", string_of_output_port P.output_port)
+      ]
+    end)
   
   include Make_abstract_sensor(LegoNxtUltrasonicSensorCommands)
-    (LegoNxtUltrasonicSensorModes)(DI)
-    (LegoNxtUltrasonicSensorPathFinder)
-    
-    let continuous_dist_cm = checked_read read1 US_DIST_CM
-    let continuous_dist_in = checked_read read1 US_DIST_IN
-    let single_dist_cm = checked_read read1 US_SI_CM
-    let single_dist_in = checked_read read1 US_SI_IN
-    let listen = checked_read read1 LISTEN
-  end
+      (LegoNxtUltrasonicSensorModes)(DI)(LegoNxtUltrasonicSensorPathFinder)
   
-  
+  let continuous_dist_cm = checked_read read1 US_DIST_CM
+  let continuous_dist_in = checked_read read1 US_DIST_IN
+  let single_dist_cm = checked_read read1 US_SI_CM
+  let single_dist_in = checked_read read1 US_SI_IN
+  let listen = checked_read read1 LISTEN
+end
+
+
 (*
 Local Variables:
 compile-command: "make -C ../.."

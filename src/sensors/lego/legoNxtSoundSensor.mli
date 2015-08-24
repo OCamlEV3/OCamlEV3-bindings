@@ -33,14 +33,14 @@ open Port
 open Sensor
 
 module type LEGO_NXT_SOUND_SENSOR = sig
-  
+  type lego_nxt_sound_sensor_commands = unit
   type lego_nxt_sound_sensor_modes = 
     | DB (** Constructor for DB mode. *)
     | DBA (** Constructor for DBA mode. *)
   (** Type for modes of the sensor lego_nxt_sound_sensor_modes. *)
   
   include Sensor.AbstractSensor
-    with type commands := unit
+    with type commands := lego_nxt_sound_sensor_commands
      and type modes    := lego_nxt_sound_sensor_modes
   
   val sound_pressure_level_flat_weighting : int ufun
@@ -51,7 +51,8 @@ module type LEGO_NXT_SOUND_SENSOR = sig
   
 end
 
-module LegoNxtSoundSensor (DI : Device.DEVICE_INFO) (P: Port.OUTPUT_PORT) : LEGO_NXT_SOUND_SENSOR
+module LegoNxtSoundSensor (DI : DEVICE_INFO) (P : OUTPUT_PORT)
+      : LEGO_NXT_SOUND_SENSOR
 (** Implementation of Lego Nxt Sound Sensor. *)
 
 (*

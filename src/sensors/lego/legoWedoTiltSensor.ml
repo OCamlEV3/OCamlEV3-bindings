@@ -31,14 +31,14 @@ open Port
 open Sensor
 
 module type LEGO_WEDO_TILT_SENSOR = sig
-  
+  type lego_wedo_tilt_sensor_commands = unit
   type lego_wedo_tilt_sensor_modes = 
     | TILT
     | TILT_AXIS
     | RAW
   
   include Sensor.AbstractSensor
-    with type commands := unit
+    with type commands := lego_wedo_tilt_sensor_commands
      and type modes    := lego_wedo_tilt_sensor_modes
   
   val tilt_status : int ufun
@@ -46,17 +46,16 @@ module type LEGO_WEDO_TILT_SENSOR = sig
   val tilt_raw_analog_value : int ufun
 end
 
-
 module LegoWedoTiltSensor (DI : DEVICE_INFO)
-  (P : OUTPUT_PORT) = struct
+    (P : OUTPUT_PORT) = struct
+  type lego_wedo_tilt_sensor_commands = unit
   type lego_wedo_tilt_sensor_modes = 
     | TILT
     | TILT_AXIS
     | RAW
   
-  
   module LegoWedoTiltSensorCommands = struct
-    type commands = unit
+    type commands = lego_wedo_tilt_sensor_commands
     let string_of_commands = function
       | _ -> failwith "commands are not available for this sensor."
     
@@ -74,28 +73,27 @@ module LegoWedoTiltSensor (DI : DEVICE_INFO)
       | TILT -> "tilt"
       | TILT_AXIS -> "tilt-axis"
       | RAW -> "raw"
+    
     let default_mode = TILT
   end
   
-  
   module LegoWedoTiltSensorPathFinder = Path_finder.Make(struct
-    let prefix = "/sys/class/lego-sensor"
-    let conditions = [
-      ("name", "wedo-tilt");
-      ("port", string_of_output_port P.output_port)
-    ]
-  end)
+      let prefix = "/sys/class/lego-sensor"
+      let conditions = [
+        ("name", "wedo-tilt");
+        ("port", string_of_output_port P.output_port)
+      ]
+    end)
   
   include Make_abstract_sensor(LegoWedoTiltSensorCommands)
-    (LegoWedoTiltSensorModes)(DI)
-    (LegoWedoTiltSensorPathFinder)
-    
-    let tilt_status = checked_read read1 TILT
-    let tilt_status_axis = checked_read read3 TILT_AXIS
-    let tilt_raw_analog_value = checked_read read1 RAW
-  end
+      (LegoWedoTiltSensorModes)(DI)(LegoWedoTiltSensorPathFinder)
   
-  
+  let tilt_status = checked_read read1 TILT
+  let tilt_status_axis = checked_read read3 TILT_AXIS
+  let tilt_raw_analog_value = checked_read read1 RAW
+end
+
+
 (*
 Local Variables:
 compile-command: "make -C ../.."

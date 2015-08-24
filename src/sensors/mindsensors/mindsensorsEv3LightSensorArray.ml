@@ -31,31 +31,52 @@ open Port
 open Sensor
 
 module type MINDSENSORS_EV3_LIGHT_SENSOR_ARRAY = sig
+  type mindsensors_ev3_light_sensor_array_commands = 
+    | CAL_WHITE
+    | CAL_BLACK
+    | SLEEP
+    | WAKE
+    | SIXZEROHZ
+    | FIVEZEROHZ
+    | UNIVERSAL
   
   type mindsensors_ev3_light_sensor_array_modes = 
     | CAL
     | RAW
   
   include Sensor.AbstractSensor
-    with type commands := unit
+    with type commands := mindsensors_ev3_light_sensor_array_commands
      and type modes    := mindsensors_ev3_light_sensor_array_modes
   
   val calibrated_values : int_tuple3 ufun
   val raw_values : int_tuple3 ufun
 end
 
-
 module MindsensorsEv3LightSensorArray (DI : DEVICE_INFO)
-  (P : OUTPUT_PORT) = struct
+    (P : OUTPUT_PORT) = struct
+  type mindsensors_ev3_light_sensor_array_commands = 
+    | CAL_WHITE
+    | CAL_BLACK
+    | SLEEP
+    | WAKE
+    | SIXZEROHZ
+    | FIVEZEROHZ
+    | UNIVERSAL
+  
   type mindsensors_ev3_light_sensor_array_modes = 
     | CAL
     | RAW
   
-  
   module MindsensorsEv3LightSensorArrayCommands = struct
-    type commands = unit
+    type commands = mindsensors_ev3_light_sensor_array_commands
     let string_of_commands = function
-      | _ -> failwith "commands are not available for this sensor."
+      | CAL_WHITE -> "cal-white"
+      | CAL_BLACK -> "cal-black"
+      | SLEEP -> "sleep"
+      | WAKE -> "wake"
+      | SIXZEROHZ -> "60hz"
+      | FIVEZEROHZ -> "50hz"
+      | UNIVERSAL -> "universal"
     
   end
   
@@ -69,27 +90,27 @@ module MindsensorsEv3LightSensorArray (DI : DEVICE_INFO)
     let string_of_modes = function
       | CAL -> "cal"
       | RAW -> "raw"
+    
     let default_mode = CAL
   end
   
-  
   module MindsensorsEv3LightSensorArrayPathFinder = Path_finder.Make(struct
-    let prefix = "/sys/class/lego-sensor"
-    let conditions = [
-      ("name", "ms-light-array");
-      ("port", string_of_output_port P.output_port)
-    ]
-  end)
+      let prefix = "/sys/class/lego-sensor"
+      let conditions = [
+        ("name", "ms-light-array");
+        ("port", string_of_output_port P.output_port)
+      ]
+    end)
   
   include Make_abstract_sensor(MindsensorsEv3LightSensorArrayCommands)
-    (MindsensorsEv3LightSensorArrayModes)(DI)
-    (MindsensorsEv3LightSensorArrayPathFinder)
-    
-    let calibrated_values = checked_read read3 CAL
-    let raw_values = checked_read read3 RAW
-  end
+      (MindsensorsEv3LightSensorArrayModes)(DI)
+      (MindsensorsEv3LightSensorArrayPathFinder)
   
-  
+  let calibrated_values = checked_read read3 CAL
+  let raw_values = checked_read read3 RAW
+end
+
+
 (*
 Local Variables:
 compile-command: "make -C ../.."

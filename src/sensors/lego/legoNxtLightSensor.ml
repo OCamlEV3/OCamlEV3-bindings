@@ -31,29 +31,28 @@ open Port
 open Sensor
 
 module type LEGO_NXT_LIGHT_SENSOR = sig
-  
+  type lego_nxt_light_sensor_commands = unit
   type lego_nxt_light_sensor_modes = 
     | REFLECT
     | AMBIANT
   
   include Sensor.AbstractSensor
-    with type commands := unit
+    with type commands := lego_nxt_light_sensor_commands
      and type modes    := lego_nxt_light_sensor_modes
   
   val reflected_light : int ufun
   val ambiant_light : int ufun
 end
 
-
 module LegoNxtLightSensor (DI : DEVICE_INFO)
-  (P : OUTPUT_PORT) = struct
+    (P : OUTPUT_PORT) = struct
+  type lego_nxt_light_sensor_commands = unit
   type lego_nxt_light_sensor_modes = 
     | REFLECT
     | AMBIANT
   
-  
   module LegoNxtLightSensorCommands = struct
-    type commands = unit
+    type commands = lego_nxt_light_sensor_commands
     let string_of_commands = function
       | _ -> failwith "commands are not available for this sensor."
     
@@ -69,27 +68,26 @@ module LegoNxtLightSensor (DI : DEVICE_INFO)
     let string_of_modes = function
       | REFLECT -> "reflect"
       | AMBIANT -> "ambiant"
+    
     let default_mode = REFLECT
   end
   
-  
   module LegoNxtLightSensorPathFinder = Path_finder.Make(struct
-    let prefix = "/sys/class/lego-sensor"
-    let conditions = [
-      ("name", "lego-nxt-light");
-      ("port", string_of_output_port P.output_port)
-    ]
-  end)
+      let prefix = "/sys/class/lego-sensor"
+      let conditions = [
+        ("name", "lego-nxt-light");
+        ("port", string_of_output_port P.output_port)
+      ]
+    end)
   
   include Make_abstract_sensor(LegoNxtLightSensorCommands)
-    (LegoNxtLightSensorModes)(DI)
-    (LegoNxtLightSensorPathFinder)
-    
-    let reflected_light = checked_read read1 REFLECT
-    let ambiant_light = checked_read read1 AMBIANT
-  end
+      (LegoNxtLightSensorModes)(DI)(LegoNxtLightSensorPathFinder)
   
-  
+  let reflected_light = checked_read read1 REFLECT
+  let ambiant_light = checked_read read1 AMBIANT
+end
+
+
 (*
 Local Variables:
 compile-command: "make -C ../.."

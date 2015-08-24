@@ -31,6 +31,17 @@ open Port
 open Sensor
 
 module type MINDSENSORS_LINE_FOLLOWER_SENSOR = sig
+  type mindsensors_line_follower_sensor_commands = 
+    | CAL_WHITE
+    | CAL_BLACK
+    | SLEEP
+    | WAKE
+    | INV_COL
+    | RST_COL
+    | SNAP
+    | SIXZEROHZ
+    | FIVEZEROHZ
+    | UNIVERSAL
   
   type mindsensors_line_follower_sensor_modes = 
     | PID
@@ -39,7 +50,7 @@ module type MINDSENSORS_LINE_FOLLOWER_SENSOR = sig
     | RAW
   
   include Sensor.AbstractSensor
-    with type commands := unit
+    with type commands := mindsensors_line_follower_sensor_commands
      and type modes    := mindsensors_line_follower_sensor_modes
   
   val line_follower : int ufun
@@ -48,20 +59,39 @@ module type MINDSENSORS_LINE_FOLLOWER_SENSOR = sig
   val raw_values : int_tuple8 ufun
 end
 
-
 module MindsensorsLineFollowerSensor (DI : DEVICE_INFO)
-  (P : OUTPUT_PORT) = struct
+    (P : OUTPUT_PORT) = struct
+  type mindsensors_line_follower_sensor_commands = 
+    | CAL_WHITE
+    | CAL_BLACK
+    | SLEEP
+    | WAKE
+    | INV_COL
+    | RST_COL
+    | SNAP
+    | SIXZEROHZ
+    | FIVEZEROHZ
+    | UNIVERSAL
+  
   type mindsensors_line_follower_sensor_modes = 
     | PID
     | PID_ALL
     | CAL
     | RAW
   
-  
   module MindsensorsLineFollowerSensorCommands = struct
-    type commands = unit
+    type commands = mindsensors_line_follower_sensor_commands
     let string_of_commands = function
-      | _ -> failwith "commands are not available for this sensor."
+      | CAL_WHITE -> "cal-white"
+      | CAL_BLACK -> "cal-black"
+      | SLEEP -> "sleep"
+      | WAKE -> "wake"
+      | INV_COL -> "inv-col"
+      | RST_COL -> "rst-col"
+      | SNAP -> "snap"
+      | SIXZEROHZ -> "60hz"
+      | FIVEZEROHZ -> "50hz"
+      | UNIVERSAL -> "universal"
     
   end
   
@@ -79,29 +109,29 @@ module MindsensorsLineFollowerSensor (DI : DEVICE_INFO)
       | PID_ALL -> "pid-all"
       | CAL -> "cal"
       | RAW -> "raw"
+    
     let default_mode = PID
   end
   
-  
   module MindsensorsLineFollowerSensorPathFinder = Path_finder.Make(struct
-    let prefix = "/sys/class/lego-sensor"
-    let conditions = [
-      ("name", "ms-line-leader");
-      ("port", string_of_output_port P.output_port)
-    ]
-  end)
+      let prefix = "/sys/class/lego-sensor"
+      let conditions = [
+        ("name", "ms-line-leader");
+        ("port", string_of_output_port P.output_port)
+      ]
+    end)
   
   include Make_abstract_sensor(MindsensorsLineFollowerSensorCommands)
-    (MindsensorsLineFollowerSensorModes)(DI)
-    (MindsensorsLineFollowerSensorPathFinder)
-    
-    let line_follower = checked_read read1 PID
-    let line_follower_all_values = checked_read read3 PID_ALL
-    let calibrated_values = checked_read read8 CAL
-    let raw_values = checked_read read8 RAW
-  end
+      (MindsensorsLineFollowerSensorModes)(DI)
+      (MindsensorsLineFollowerSensorPathFinder)
   
-  
+  let line_follower = checked_read read1 PID
+  let line_follower_all_values = checked_read read3 PID_ALL
+  let calibrated_values = checked_read read8 CAL
+  let raw_values = checked_read read8 RAW
+end
+
+
 (*
 Local Variables:
 compile-command: "make -C ../.."

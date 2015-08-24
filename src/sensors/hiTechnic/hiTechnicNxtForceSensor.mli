@@ -33,13 +33,13 @@ open Port
 open Sensor
 
 module type HI_TECHNIC_NXT_FORCE_SENSOR = sig
-  
+  type hi_technic_nxt_force_sensor_commands = unit
   type hi_technic_nxt_force_sensor_modes = 
     | FORCE (** Constructor for FORCE mode. *)
   (** Type for modes of the sensor hi_technic_nxt_force_sensor_modes. *)
   
   include Sensor.AbstractSensor
-    with type commands := unit
+    with type commands := hi_technic_nxt_force_sensor_commands
      and type modes    := hi_technic_nxt_force_sensor_modes
   
   val force : int ufun
@@ -47,7 +47,8 @@ module type HI_TECHNIC_NXT_FORCE_SENSOR = sig
   
 end
 
-module HiTechnicNxtForceSensor (DI : Device.DEVICE_INFO) (P: Port.OUTPUT_PORT) : HI_TECHNIC_NXT_FORCE_SENSOR
+module HiTechnicNxtForceSensor (DI : DEVICE_INFO) (P : OUTPUT_PORT)
+      : HI_TECHNIC_NXT_FORCE_SENSOR
 (** Implementation of Hi Technic Nxt Force Sensor. *)
 
 (*

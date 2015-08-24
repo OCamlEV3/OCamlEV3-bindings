@@ -33,13 +33,13 @@ open Port
 open Sensor
 
 module type LEGO_EV3_TOUCH_SENSOR = sig
-  
+  type lego_ev3_touch_sensor_commands = unit
   type lego_ev3_touch_sensor_modes = 
     | TOUCH (** Constructor for TOUCH mode. *)
   (** Type for modes of the sensor lego_ev3_touch_sensor_modes. *)
   
   include Sensor.AbstractSensor
-    with type commands := unit
+    with type commands := lego_ev3_touch_sensor_commands
      and type modes    := lego_ev3_touch_sensor_modes
   
   val button_state : int ufun
@@ -47,7 +47,8 @@ module type LEGO_EV3_TOUCH_SENSOR = sig
   
 end
 
-module LegoEv3TouchSensor (DI : Device.DEVICE_INFO) (P: Port.OUTPUT_PORT) : LEGO_EV3_TOUCH_SENSOR
+module LegoEv3TouchSensor (DI : DEVICE_INFO) (P : OUTPUT_PORT)
+      : LEGO_EV3_TOUCH_SENSOR
 (** Implementation of Lego Ev3 Touch Sensor. *)
 
 (*

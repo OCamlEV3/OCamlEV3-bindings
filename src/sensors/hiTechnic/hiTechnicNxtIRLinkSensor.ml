@@ -31,26 +31,25 @@ open Port
 open Sensor
 
 module type HI_TECHNIC_NXT_I_R_LINK_SENSOR = sig
-  
+  type hi_technic_nxt_i_r_link_sensor_commands = unit
   type hi_technic_nxt_i_r_link_sensor_modes = 
     | IRLINK
   
   include Sensor.AbstractSensor
-    with type commands := unit
+    with type commands := hi_technic_nxt_i_r_link_sensor_commands
      and type modes    := hi_technic_nxt_i_r_link_sensor_modes
   
   val irlink : int ufun
 end
 
-
 module HiTechnicNxtIRLinkSensor (DI : DEVICE_INFO)
-  (P : OUTPUT_PORT) = struct
+    (P : OUTPUT_PORT) = struct
+  type hi_technic_nxt_i_r_link_sensor_commands = unit
   type hi_technic_nxt_i_r_link_sensor_modes = 
     | IRLINK
   
-  
   module HiTechnicNxtIRLinkSensorCommands = struct
-    type commands = unit
+    type commands = hi_technic_nxt_i_r_link_sensor_commands
     let string_of_commands = function
       | _ -> failwith "commands are not available for this sensor."
     
@@ -64,26 +63,25 @@ module HiTechnicNxtIRLinkSensor (DI : DEVICE_INFO)
     
     let string_of_modes = function
       | IRLINK -> "irlink"
+    
     let default_mode = IRLINK
   end
   
-  
   module HiTechnicNxtIRLinkSensorPathFinder = Path_finder.Make(struct
-    let prefix = "/sys/class/lego-sensor"
-    let conditions = [
-      ("name", "ht-nxt-ir-link");
-      ("port", string_of_output_port P.output_port)
-    ]
-  end)
+      let prefix = "/sys/class/lego-sensor"
+      let conditions = [
+        ("name", "ht-nxt-ir-link");
+        ("port", string_of_output_port P.output_port)
+      ]
+    end)
   
   include Make_abstract_sensor(HiTechnicNxtIRLinkSensorCommands)
-    (HiTechnicNxtIRLinkSensorModes)(DI)
-    (HiTechnicNxtIRLinkSensorPathFinder)
-    
-    let irlink = checked_read read1 IRLINK
-  end
+      (HiTechnicNxtIRLinkSensorModes)(DI)(HiTechnicNxtIRLinkSensorPathFinder)
   
-  
+  let irlink = checked_read read1 IRLINK
+end
+
+
 (*
 Local Variables:
 compile-command: "make -C ../.."

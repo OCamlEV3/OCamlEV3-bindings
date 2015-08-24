@@ -33,6 +33,10 @@ open Port
 open Sensor
 
 module type HI_TECHNIC_NXT_COLOR_SENSOR = sig
+  type hi_technic_nxt_color_sensor_commands = 
+    | RESET (** Constructor for RESET mode. *)
+    | CAL (** Constructor for CAL mode. *)
+  (** Type for commands of the sensor hi_technic_nxt_color_sensor_commands. *)
   
   type hi_technic_nxt_color_sensor_modes = 
     | COLOR (** Constructor for COLOR mode. *)
@@ -45,7 +49,7 @@ module type HI_TECHNIC_NXT_COLOR_SENSOR = sig
   (** Type for modes of the sensor hi_technic_nxt_color_sensor_modes. *)
   
   include Sensor.AbstractSensor
-    with type commands := unit
+    with type commands := hi_technic_nxt_color_sensor_commands
      and type modes    := hi_technic_nxt_color_sensor_modes
   
   val color : int ufun
@@ -71,7 +75,8 @@ module type HI_TECHNIC_NXT_COLOR_SENSOR = sig
   
 end
 
-module HiTechnicNxtColorSensor (DI : Device.DEVICE_INFO) (P: Port.OUTPUT_PORT) : HI_TECHNIC_NXT_COLOR_SENSOR
+module HiTechnicNxtColorSensor (DI : DEVICE_INFO) (P : OUTPUT_PORT)
+      : HI_TECHNIC_NXT_COLOR_SENSOR
 (** Implementation of Hi Technic Nxt Color Sensor. *)
 
 (*

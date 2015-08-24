@@ -33,7 +33,6 @@ open Port
 open Sensor
 
 module type HI_TECHNIC_NXT_SENSOR_MULTIPLEXER = sig
-  
   type hi_technic_nxt_sensor_multiplexer_commands = 
     | HALT (** Constructor for HALT mode. *)
     | DETECT (** Constructor for DETECT mode. *)
@@ -53,7 +52,8 @@ module type HI_TECHNIC_NXT_SENSOR_MULTIPLEXER = sig
   
 end
 
-module HiTechnicNxtSensorMultiplexer (DI : Device.DEVICE_INFO) (P: Port.OUTPUT_PORT) : HI_TECHNIC_NXT_SENSOR_MULTIPLEXER
+module HiTechnicNxtSensorMultiplexer (DI : DEVICE_INFO) (P : OUTPUT_PORT)
+      : HI_TECHNIC_NXT_SENSOR_MULTIPLEXER
 (** Implementation of Hi Technic Nxt Sensor Multiplexer. *)
 
 (*

@@ -31,26 +31,25 @@ open Port
 open Sensor
 
 module type HI_TECHNIC_NXT_FORCE_SENSOR = sig
-  
+  type hi_technic_nxt_force_sensor_commands = unit
   type hi_technic_nxt_force_sensor_modes = 
     | FORCE
   
   include Sensor.AbstractSensor
-    with type commands := unit
+    with type commands := hi_technic_nxt_force_sensor_commands
      and type modes    := hi_technic_nxt_force_sensor_modes
   
   val force : int ufun
 end
 
-
 module HiTechnicNxtForceSensor (DI : DEVICE_INFO)
-  (P : OUTPUT_PORT) = struct
+    (P : OUTPUT_PORT) = struct
+  type hi_technic_nxt_force_sensor_commands = unit
   type hi_technic_nxt_force_sensor_modes = 
     | FORCE
   
-  
   module HiTechnicNxtForceSensorCommands = struct
-    type commands = unit
+    type commands = hi_technic_nxt_force_sensor_commands
     let string_of_commands = function
       | _ -> failwith "commands are not available for this sensor."
     
@@ -64,26 +63,25 @@ module HiTechnicNxtForceSensor (DI : DEVICE_INFO)
     
     let string_of_modes = function
       | FORCE -> "force"
+    
     let default_mode = FORCE
   end
   
-  
   module HiTechnicNxtForceSensorPathFinder = Path_finder.Make(struct
-    let prefix = "/sys/class/lego-sensor"
-    let conditions = [
-      ("name", "ht-nxt-force");
-      ("port", string_of_output_port P.output_port)
-    ]
-  end)
+      let prefix = "/sys/class/lego-sensor"
+      let conditions = [
+        ("name", "ht-nxt-force");
+        ("port", string_of_output_port P.output_port)
+      ]
+    end)
   
   include Make_abstract_sensor(HiTechnicNxtForceSensorCommands)
-    (HiTechnicNxtForceSensorModes)(DI)
-    (HiTechnicNxtForceSensorPathFinder)
-    
-    let force = checked_read read1 FORCE
-  end
+      (HiTechnicNxtForceSensorModes)(DI)(HiTechnicNxtForceSensorPathFinder)
   
-  
+  let force = checked_read read1 FORCE
+end
+
+
 (*
 Local Variables:
 compile-command: "make -C ../.."

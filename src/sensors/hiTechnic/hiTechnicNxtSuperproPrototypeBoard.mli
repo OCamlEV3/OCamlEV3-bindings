@@ -33,7 +33,7 @@ open Port
 open Sensor
 
 module type HI_TECHNIC_NXT_SUPERPRO_PROTOTYPE_BOARD = sig
-  
+  type hi_technic_nxt_superpro_prototype_board_commands = unit
   type hi_technic_nxt_superpro_prototype_board_modes = 
     | AIN (** Constructor for AIN mode. *)
     | DIN (** Constructor for DIN mode. *)
@@ -46,7 +46,7 @@ module type HI_TECHNIC_NXT_SUPERPRO_PROTOTYPE_BOARD = sig
   (** Type for modes of the sensor hi_technic_nxt_superpro_prototype_board_modes. *)
   
   include Sensor.AbstractSensor
-    with type commands := unit
+    with type commands := hi_technic_nxt_superpro_prototype_board_commands
      and type modes    := hi_technic_nxt_superpro_prototype_board_modes
   
   val analog_inputs : int_tuple4 ufun
@@ -75,7 +75,8 @@ module type HI_TECHNIC_NXT_SUPERPRO_PROTOTYPE_BOARD = sig
   
 end
 
-module HiTechnicNxtSuperproPrototypeBoard (DI : Device.DEVICE_INFO) (P: Port.OUTPUT_PORT) : HI_TECHNIC_NXT_SUPERPRO_PROTOTYPE_BOARD
+module HiTechnicNxtSuperproPrototypeBoard (DI : DEVICE_INFO)
+    (P : OUTPUT_PORT) : HI_TECHNIC_NXT_SUPERPRO_PROTOTYPE_BOARD
 (** Implementation of Hi Technic Nxt Superpro Prototype Board. *)
 
 (*

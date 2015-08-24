@@ -31,26 +31,25 @@ open Port
 open Sensor
 
 module type HI_TECHNIC_NXT_COMPASS_SENSOR = sig
-  
+  type hi_technic_nxt_compass_sensor_commands = unit
   type hi_technic_nxt_compass_sensor_modes = 
     | COMPASS
   
   include Sensor.AbstractSensor
-    with type commands := unit
+    with type commands := hi_technic_nxt_compass_sensor_commands
      and type modes    := hi_technic_nxt_compass_sensor_modes
   
   val compass_direction : int ufun
 end
 
-
 module HiTechnicNxtCompassSensor (DI : DEVICE_INFO)
-  (P : OUTPUT_PORT) = struct
+    (P : OUTPUT_PORT) = struct
+  type hi_technic_nxt_compass_sensor_commands = unit
   type hi_technic_nxt_compass_sensor_modes = 
     | COMPASS
   
-  
   module HiTechnicNxtCompassSensorCommands = struct
-    type commands = unit
+    type commands = hi_technic_nxt_compass_sensor_commands
     let string_of_commands = function
       | _ -> failwith "commands are not available for this sensor."
     
@@ -64,26 +63,26 @@ module HiTechnicNxtCompassSensor (DI : DEVICE_INFO)
     
     let string_of_modes = function
       | COMPASS -> "compass"
+    
     let default_mode = COMPASS
   end
   
-  
   module HiTechnicNxtCompassSensorPathFinder = Path_finder.Make(struct
-    let prefix = "/sys/class/lego-sensor"
-    let conditions = [
-      ("name", "ht-nxt-compass");
-      ("port", string_of_output_port P.output_port)
-    ]
-  end)
+      let prefix = "/sys/class/lego-sensor"
+      let conditions = [
+        ("name", "ht-nxt-compass");
+        ("port", string_of_output_port P.output_port)
+      ]
+    end)
   
   include Make_abstract_sensor(HiTechnicNxtCompassSensorCommands)
-    (HiTechnicNxtCompassSensorModes)(DI)
-    (HiTechnicNxtCompassSensorPathFinder)
-    
-    let compass_direction = checked_read read1 COMPASS
-  end
+      (HiTechnicNxtCompassSensorModes)(DI)
+      (HiTechnicNxtCompassSensorPathFinder)
   
-  
+  let compass_direction = checked_read read1 COMPASS
+end
+
+
 (*
 Local Variables:
 compile-command: "make -C ../.."

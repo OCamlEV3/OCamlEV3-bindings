@@ -33,7 +33,7 @@ open Port
 open Sensor
 
 module type LEGO_EV3_INFRARED_SENSOR = sig
-  
+  type lego_ev3_infrared_sensor_commands = unit
   type lego_ev3_infrared_sensor_modes = 
     | IR_PROX (** Constructor for IR_PROX mode. *)
     | IR_SEEKER (** Constructor for IR_SEEKER mode. *)
@@ -44,7 +44,7 @@ module type LEGO_EV3_INFRARED_SENSOR = sig
   (** Type for modes of the sensor lego_ev3_infrared_sensor_modes. *)
   
   include Sensor.AbstractSensor
-    with type commands := unit
+    with type commands := lego_ev3_infrared_sensor_commands
      and type modes    := lego_ev3_infrared_sensor_modes
   
   val proximity : int ufun
@@ -67,7 +67,8 @@ module type LEGO_EV3_INFRARED_SENSOR = sig
   
 end
 
-module LegoEv3InfraredSensor (DI : Device.DEVICE_INFO) (P: Port.OUTPUT_PORT) : LEGO_EV3_INFRARED_SENSOR
+module LegoEv3InfraredSensor (DI : DEVICE_INFO) (P : OUTPUT_PORT)
+      : LEGO_EV3_INFRARED_SENSOR
 (** Implementation of Lego Ev3 Infrared Sensor. *)
 
 (*

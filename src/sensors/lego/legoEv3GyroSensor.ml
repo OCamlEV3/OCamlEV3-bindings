@@ -31,7 +31,7 @@ open Port
 open Sensor
 
 module type LEGO_EV3_GYRO_SENSOR = sig
-  
+  type lego_ev3_gyro_sensor_commands = unit
   type lego_ev3_gyro_sensor_modes = 
     | GYRO_ANG
     | GYRO_RATE
@@ -40,7 +40,7 @@ module type LEGO_EV3_GYRO_SENSOR = sig
     | GYRO_CAL
   
   include Sensor.AbstractSensor
-    with type commands := unit
+    with type commands := lego_ev3_gyro_sensor_commands
      and type modes    := lego_ev3_gyro_sensor_modes
   
   val angle : int ufun
@@ -50,9 +50,9 @@ module type LEGO_EV3_GYRO_SENSOR = sig
   val calibration : int_tuple4 ufun
 end
 
-
 module LegoEv3GyroSensor (DI : DEVICE_INFO)
-  (P : OUTPUT_PORT) = struct
+    (P : OUTPUT_PORT) = struct
+  type lego_ev3_gyro_sensor_commands = unit
   type lego_ev3_gyro_sensor_modes = 
     | GYRO_ANG
     | GYRO_RATE
@@ -60,9 +60,8 @@ module LegoEv3GyroSensor (DI : DEVICE_INFO)
     | GYRO_G_AND_A
     | GYRO_CAL
   
-  
   module LegoEv3GyroSensorCommands = struct
-    type commands = unit
+    type commands = lego_ev3_gyro_sensor_commands
     let string_of_commands = function
       | _ -> failwith "commands are not available for this sensor."
     
@@ -84,30 +83,29 @@ module LegoEv3GyroSensor (DI : DEVICE_INFO)
       | GYRO_FAS -> "gyro-fas"
       | GYRO_G_AND_A -> "gyro-g&a"
       | GYRO_CAL -> "gyro-cal"
+    
     let default_mode = GYRO_ANG
   end
   
-  
   module LegoEv3GyroSensorPathFinder = Path_finder.Make(struct
-    let prefix = "/sys/class/lego-sensor"
-    let conditions = [
-      ("name", "lego-ev3-gyro");
-      ("port", string_of_output_port P.output_port)
-    ]
-  end)
+      let prefix = "/sys/class/lego-sensor"
+      let conditions = [
+        ("name", "lego-ev3-gyro");
+        ("port", string_of_output_port P.output_port)
+      ]
+    end)
   
   include Make_abstract_sensor(LegoEv3GyroSensorCommands)
-    (LegoEv3GyroSensorModes)(DI)
-    (LegoEv3GyroSensorPathFinder)
-    
-    let angle = checked_read read1 GYRO_ANG
-    let rotational_speed = checked_read read1 GYRO_RATE
-    let raw_values = checked_read read1 GYRO_FAS
-    let angle_and_rotational_speed = checked_read read2 GYRO_G_AND_A
-    let calibration = checked_read read4 GYRO_CAL
-  end
+      (LegoEv3GyroSensorModes)(DI)(LegoEv3GyroSensorPathFinder)
   
-  
+  let angle = checked_read read1 GYRO_ANG
+  let rotational_speed = checked_read read1 GYRO_RATE
+  let raw_values = checked_read read1 GYRO_FAS
+  let angle_and_rotational_speed = checked_read read2 GYRO_G_AND_A
+  let calibration = checked_read read4 GYRO_CAL
+end
+
+
 (*
 Local Variables:
 compile-command: "make -C ../.."

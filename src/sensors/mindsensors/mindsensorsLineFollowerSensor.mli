@@ -33,6 +33,18 @@ open Port
 open Sensor
 
 module type MINDSENSORS_LINE_FOLLOWER_SENSOR = sig
+  type mindsensors_line_follower_sensor_commands = 
+    | CAL_WHITE (** Constructor for CAL_WHITE mode. *)
+    | CAL_BLACK (** Constructor for CAL_BLACK mode. *)
+    | SLEEP (** Constructor for SLEEP mode. *)
+    | WAKE (** Constructor for WAKE mode. *)
+    | INV_COL (** Constructor for INV_COL mode. *)
+    | RST_COL (** Constructor for RST_COL mode. *)
+    | SNAP (** Constructor for SNAP mode. *)
+    | SIXZEROHZ (** Constructor for SIXZEROHZ mode. *)
+    | FIVEZEROHZ (** Constructor for FIVEZEROHZ mode. *)
+    | UNIVERSAL (** Constructor for UNIVERSAL mode. *)
+  (** Type for commands of the sensor mindsensors_line_follower_sensor_commands. *)
   
   type mindsensors_line_follower_sensor_modes = 
     | PID (** Constructor for PID mode. *)
@@ -42,7 +54,7 @@ module type MINDSENSORS_LINE_FOLLOWER_SENSOR = sig
   (** Type for modes of the sensor mindsensors_line_follower_sensor_modes. *)
   
   include Sensor.AbstractSensor
-    with type commands := unit
+    with type commands := mindsensors_line_follower_sensor_commands
      and type modes    := mindsensors_line_follower_sensor_modes
   
   val line_follower : int ufun
@@ -59,7 +71,8 @@ module type MINDSENSORS_LINE_FOLLOWER_SENSOR = sig
   
 end
 
-module MindsensorsLineFollowerSensor (DI : Device.DEVICE_INFO) (P: Port.OUTPUT_PORT) : MINDSENSORS_LINE_FOLLOWER_SENSOR
+module MindsensorsLineFollowerSensor (DI : DEVICE_INFO) (P : OUTPUT_PORT)
+      : MINDSENSORS_LINE_FOLLOWER_SENSOR
 (** Implementation of Mindsensors Line Follower Sensor. *)
 
 (*

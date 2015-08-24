@@ -33,7 +33,7 @@ open Port
 open Sensor
 
 module type LEGO_EV3_ULTRASONIC_SENSOR = sig
-  
+  type lego_ev3_ultrasonic_sensor_commands = unit
   type lego_ev3_ultrasonic_sensor_modes = 
     | US_DIST_CM (** Constructor for US_DIST_CM mode. *)
     | US_DIST_IN (** Constructor for US_DIST_IN mode. *)
@@ -45,7 +45,7 @@ module type LEGO_EV3_ULTRASONIC_SENSOR = sig
   (** Type for modes of the sensor lego_ev3_ultrasonic_sensor_modes. *)
   
   include Sensor.AbstractSensor
-    with type commands := unit
+    with type commands := lego_ev3_ultrasonic_sensor_commands
      and type modes    := lego_ev3_ultrasonic_sensor_modes
   
   val continuous_dist_cm : int ufun
@@ -71,7 +71,8 @@ module type LEGO_EV3_ULTRASONIC_SENSOR = sig
   
 end
 
-module LegoEv3UltrasonicSensor (DI : Device.DEVICE_INFO) (P: Port.OUTPUT_PORT) : LEGO_EV3_ULTRASONIC_SENSOR
+module LegoEv3UltrasonicSensor (DI : DEVICE_INFO) (P : OUTPUT_PORT)
+      : LEGO_EV3_ULTRASONIC_SENSOR
 (** Implementation of Lego Ev3 Ultrasonic Sensor. *)
 
 (*

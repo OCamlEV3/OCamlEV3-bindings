@@ -31,26 +31,25 @@ open Port
 open Sensor
 
 module type MINDSENSORS_EV3_SENSOR_MULTIPLEXER = sig
-  
+  type mindsensors_ev3_sensor_multiplexer_commands = unit
   type mindsensors_ev3_sensor_multiplexer_modes = 
     | MUX
   
   include Sensor.AbstractSensor
-    with type commands := unit
+    with type commands := mindsensors_ev3_sensor_multiplexer_commands
      and type modes    := mindsensors_ev3_sensor_multiplexer_modes
   
   val sensor_multiplexer : int ufun
 end
 
-
 module MindsensorsEv3SensorMultiplexer (DI : DEVICE_INFO)
-  (P : OUTPUT_PORT) = struct
+    (P : OUTPUT_PORT) = struct
+  type mindsensors_ev3_sensor_multiplexer_commands = unit
   type mindsensors_ev3_sensor_multiplexer_modes = 
     | MUX
   
-  
   module MindsensorsEv3SensorMultiplexerCommands = struct
-    type commands = unit
+    type commands = mindsensors_ev3_sensor_multiplexer_commands
     let string_of_commands = function
       | _ -> failwith "commands are not available for this sensor."
     
@@ -64,26 +63,26 @@ module MindsensorsEv3SensorMultiplexer (DI : DEVICE_INFO)
     
     let string_of_modes = function
       | MUX -> "mux"
+    
     let default_mode = MUX
   end
   
-  
   module MindsensorsEv3SensorMultiplexerPathFinder = Path_finder.Make(struct
-    let prefix = "/sys/class/lego-sensor"
-    let conditions = [
-      ("name", "ms-ev3-smux");
-      ("port", string_of_output_port P.output_port)
-    ]
-  end)
+      let prefix = "/sys/class/lego-sensor"
+      let conditions = [
+        ("name", "ms-ev3-smux");
+        ("port", string_of_output_port P.output_port)
+      ]
+    end)
   
   include Make_abstract_sensor(MindsensorsEv3SensorMultiplexerCommands)
-    (MindsensorsEv3SensorMultiplexerModes)(DI)
-    (MindsensorsEv3SensorMultiplexerPathFinder)
-    
-    let sensor_multiplexer = checked_read read1 MUX
-  end
+      (MindsensorsEv3SensorMultiplexerModes)(DI)
+      (MindsensorsEv3SensorMultiplexerPathFinder)
   
-  
+  let sensor_multiplexer = checked_read read1 MUX
+end
+
+
 (*
 Local Variables:
 compile-command: "make -C ../.."

@@ -31,7 +31,7 @@ open Port
 open Sensor
 
 module type HI_TECHNIC_NXT_COLORSENSOR_V2 = sig
-  
+  type hi_technic_nxt_colorsensor_v2_commands = unit
   type hi_technic_nxt_colorsensor_v2_modes = 
     | COLOR
     | RED
@@ -43,7 +43,7 @@ module type HI_TECHNIC_NXT_COLORSENSOR_V2 = sig
     | RAW
   
   include Sensor.AbstractSensor
-    with type commands := unit
+    with type commands := hi_technic_nxt_colorsensor_v2_commands
      and type modes    := hi_technic_nxt_colorsensor_v2_modes
   
   val color : int ufun
@@ -56,9 +56,9 @@ module type HI_TECHNIC_NXT_COLORSENSOR_V2 = sig
   val raw_values : int_tuple4 ufun
 end
 
-
 module HiTechnicNxtColorsensorV2 (DI : DEVICE_INFO)
-  (P : OUTPUT_PORT) = struct
+    (P : OUTPUT_PORT) = struct
+  type hi_technic_nxt_colorsensor_v2_commands = unit
   type hi_technic_nxt_colorsensor_v2_modes = 
     | COLOR
     | RED
@@ -69,9 +69,8 @@ module HiTechnicNxtColorsensorV2 (DI : DEVICE_INFO)
     | ALL
     | RAW
   
-  
   module HiTechnicNxtColorsensorV2Commands = struct
-    type commands = unit
+    type commands = hi_technic_nxt_colorsensor_v2_commands
     let string_of_commands = function
       | _ -> failwith "commands are not available for this sensor."
     
@@ -99,33 +98,33 @@ module HiTechnicNxtColorsensorV2 (DI : DEVICE_INFO)
       | NORM -> "norm"
       | ALL -> "all"
       | RAW -> "raw"
+    
     let default_mode = COLOR
   end
   
-  
   module HiTechnicNxtColorsensorV2PathFinder = Path_finder.Make(struct
-    let prefix = "/sys/class/lego-sensor"
-    let conditions = [
-      ("name", "ht-nxt-color-v2");
-      ("port", string_of_output_port P.output_port)
-    ]
-  end)
+      let prefix = "/sys/class/lego-sensor"
+      let conditions = [
+        ("name", "ht-nxt-color-v2");
+        ("port", string_of_output_port P.output_port)
+      ]
+    end)
   
   include Make_abstract_sensor(HiTechnicNxtColorsensorV2Commands)
-    (HiTechnicNxtColorsensorV2Modes)(DI)
-    (HiTechnicNxtColorsensorV2PathFinder)
-    
-    let color = checked_read read1 COLOR
-    let red_value = checked_read read1 RED
-    let green_value = checked_read read1 GREEN
-    let blue_value = checked_read read1 BLUE
-    let white_value = checked_read read1 WHITE
-    let normalized_values = checked_read read4 NORM
-    let all_values = checked_read read5 ALL
-    let raw_values = checked_read read4 RAW
-  end
+      (HiTechnicNxtColorsensorV2Modes)(DI)
+      (HiTechnicNxtColorsensorV2PathFinder)
   
-  
+  let color = checked_read read1 COLOR
+  let red_value = checked_read read1 RED
+  let green_value = checked_read read1 GREEN
+  let blue_value = checked_read read1 BLUE
+  let white_value = checked_read read1 WHITE
+  let normalized_values = checked_read read4 NORM
+  let all_values = checked_read read5 ALL
+  let raw_values = checked_read read4 RAW
+end
+
+
 (*
 Local Variables:
 compile-command: "make -C ../.."

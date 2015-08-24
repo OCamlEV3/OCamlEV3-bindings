@@ -33,13 +33,13 @@ open Port
 open Sensor
 
 module type MINDSENSORS_EV3_SENSOR_MULTIPLEXER = sig
-  
+  type mindsensors_ev3_sensor_multiplexer_commands = unit
   type mindsensors_ev3_sensor_multiplexer_modes = 
     | MUX (** Constructor for MUX mode. *)
   (** Type for modes of the sensor mindsensors_ev3_sensor_multiplexer_modes. *)
   
   include Sensor.AbstractSensor
-    with type commands := unit
+    with type commands := mindsensors_ev3_sensor_multiplexer_commands
      and type modes    := mindsensors_ev3_sensor_multiplexer_modes
   
   val sensor_multiplexer : int ufun
@@ -47,7 +47,8 @@ module type MINDSENSORS_EV3_SENSOR_MULTIPLEXER = sig
   
 end
 
-module MindsensorsEv3SensorMultiplexer (DI : Device.DEVICE_INFO) (P: Port.OUTPUT_PORT) : MINDSENSORS_EV3_SENSOR_MULTIPLEXER
+module MindsensorsEv3SensorMultiplexer (DI : DEVICE_INFO) (P : OUTPUT_PORT)
+      : MINDSENSORS_EV3_SENSOR_MULTIPLEXER
 (** Implementation of Mindsensors Ev3 Sensor Multiplexer. *)
 
 (*

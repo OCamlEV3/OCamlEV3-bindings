@@ -31,6 +31,11 @@ open Port
 open Sensor
 
 module type MICROINFINITY_DIGITAL_GYROSCOPE_AND_ACCELEROMETER = sig
+  type microinfinity_digital_gyroscope_and_accelerometer_commands = 
+    | RESET
+    | ACCEL_TWOG
+    | ACCEL_FOURG
+    | ACCEL_EIGHTG
   
   type microinfinity_digital_gyroscope_and_accelerometer_modes = 
     | ANGLE
@@ -39,7 +44,7 @@ module type MICROINFINITY_DIGITAL_GYROSCOPE_AND_ACCELEROMETER = sig
     | ALL
   
   include Sensor.AbstractSensor
-    with type commands := unit
+    with type commands := microinfinity_digital_gyroscope_and_accelerometer_commands
      and type modes    := microinfinity_digital_gyroscope_and_accelerometer_modes
   
   val angle : int ufun
@@ -48,20 +53,27 @@ module type MICROINFINITY_DIGITAL_GYROSCOPE_AND_ACCELEROMETER = sig
   val all_values : int_tuple5 ufun
 end
 
-
 module MicroinfinityDigitalGyroscopeAndAccelerometer (DI : DEVICE_INFO)
-  (P : OUTPUT_PORT) = struct
+    (P : OUTPUT_PORT) = struct
+  type microinfinity_digital_gyroscope_and_accelerometer_commands = 
+    | RESET
+    | ACCEL_TWOG
+    | ACCEL_FOURG
+    | ACCEL_EIGHTG
+  
   type microinfinity_digital_gyroscope_and_accelerometer_modes = 
     | ANGLE
     | SPEED
     | ACCEL
     | ALL
   
-  
   module MicroinfinityDigitalGyroscopeAndAccelerometerCommands = struct
-    type commands = unit
+    type commands = microinfinity_digital_gyroscope_and_accelerometer_commands
     let string_of_commands = function
-      | _ -> failwith "commands are not available for this sensor."
+      | RESET -> "reset"
+      | ACCEL_TWOG -> "accel-2g"
+      | ACCEL_FOURG -> "accel-4g"
+      | ACCEL_EIGHTG -> "accel-8g"
     
   end
   
@@ -79,29 +91,29 @@ module MicroinfinityDigitalGyroscopeAndAccelerometer (DI : DEVICE_INFO)
       | SPEED -> "speed"
       | ACCEL -> "accel"
       | ALL -> "all"
+    
     let default_mode = ANGLE
   end
   
-  
   module MicroinfinityDigitalGyroscopeAndAccelerometerPathFinder = Path_finder.Make(struct
-    let prefix = "/sys/class/lego-sensor"
-    let conditions = [
-      ("name", "mi-xg1300l");
-      ("port", string_of_output_port P.output_port)
-    ]
-  end)
+      let prefix = "/sys/class/lego-sensor"
+      let conditions = [
+        ("name", "mi-xg1300l");
+        ("port", string_of_output_port P.output_port)
+      ]
+    end)
   
   include Make_abstract_sensor(MicroinfinityDigitalGyroscopeAndAccelerometerCommands)
-    (MicroinfinityDigitalGyroscopeAndAccelerometerModes)(DI)
-    (MicroinfinityDigitalGyroscopeAndAccelerometerPathFinder)
-    
-    let angle = checked_read read1 ANGLE
-    let rotational_speed = checked_read read1 SPEED
-    let acceleration = checked_read read3 ACCEL
-    let all_values = checked_read read5 ALL
-  end
+      (MicroinfinityDigitalGyroscopeAndAccelerometerModes)(DI)
+      (MicroinfinityDigitalGyroscopeAndAccelerometerPathFinder)
   
-  
+  let angle = checked_read read1 ANGLE
+  let rotational_speed = checked_read read1 SPEED
+  let acceleration = checked_read read3 ACCEL
+  let all_values = checked_read read5 ALL
+end
+
+
 (*
 Local Variables:
 compile-command: "make -C ../.."

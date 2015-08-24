@@ -33,6 +33,15 @@ open Port
 open Sensor
 
 module type MINDSENSORS_GYRO_MULTI_SENSIVITY_ACCELEROMETER_AND_COMPASS = sig
+  type mindsensors_gyro_multi_sensivity_accelerometer_and_compass_commands = 
+    | BEGIN_COMP_CAL
+    (** Constructor for BEGIN_COMP_CAL mode. *)
+    | END_COMP_CAL (** Constructor for END_COMP_CAL mode. *)
+    | ACCEL_TWOG (** Constructor for ACCEL_TWOG mode. *)
+    | ACCEL_FOURG (** Constructor for ACCEL_FOURG mode. *)
+    | ACCEL_EIGHTG (** Constructor for ACCEL_EIGHTG mode. *)
+    | ACCEL_ONESIXG (** Constructor for ACCEL_ONESIXG mode. *)
+  (** Type for commands of the sensor mindsensors_gyro_multi_sensivity_accelerometer_and_compass_commands. *)
   
   type mindsensors_gyro_multi_sensivity_accelerometer_and_compass_modes = 
     | TILT (** Constructor for TILT mode. *)
@@ -43,7 +52,7 @@ module type MINDSENSORS_GYRO_MULTI_SENSIVITY_ACCELEROMETER_AND_COMPASS = sig
   (** Type for modes of the sensor mindsensors_gyro_multi_sensivity_accelerometer_and_compass_modes. *)
   
   include Sensor.AbstractSensor
-    with type commands := unit
+    with type commands := mindsensors_gyro_multi_sensivity_accelerometer_and_compass_commands
      and type modes    := mindsensors_gyro_multi_sensivity_accelerometer_and_compass_modes
   
   val tilt : int_tuple3 ufun
@@ -63,7 +72,9 @@ module type MINDSENSORS_GYRO_MULTI_SENSIVITY_ACCELEROMETER_AND_COMPASS = sig
   
 end
 
-module MindsensorsGyroMultiSensivityAccelerometerAndCompass (DI : Device.DEVICE_INFO) (P: Port.OUTPUT_PORT) : MINDSENSORS_GYRO_MULTI_SENSIVITY_ACCELEROMETER_AND_COMPASS
+module MindsensorsGyroMultiSensivityAccelerometerAndCompass
+    (DI : DEVICE_INFO) (P : OUTPUT_PORT)
+      : MINDSENSORS_GYRO_MULTI_SENSIVITY_ACCELEROMETER_AND_COMPASS
 (** Implementation of Mindsensors Gyro Multi Sensivity Accelerometer And Compass. *)
 
 (*

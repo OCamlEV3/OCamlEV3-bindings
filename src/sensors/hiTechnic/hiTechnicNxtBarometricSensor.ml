@@ -31,29 +31,28 @@ open Port
 open Sensor
 
 module type HI_TECHNIC_NXT_BAROMETRIC_SENSOR = sig
-  
+  type hi_technic_nxt_barometric_sensor_commands = unit
   type hi_technic_nxt_barometric_sensor_modes = 
     | PRESS
     | TEMP
   
   include Sensor.AbstractSensor
-    with type commands := unit
+    with type commands := hi_technic_nxt_barometric_sensor_commands
      and type modes    := hi_technic_nxt_barometric_sensor_modes
   
   val pressure : int ufun
   val temperature : int ufun
 end
 
-
 module HiTechnicNxtBarometricSensor (DI : DEVICE_INFO)
-  (P : OUTPUT_PORT) = struct
+    (P : OUTPUT_PORT) = struct
+  type hi_technic_nxt_barometric_sensor_commands = unit
   type hi_technic_nxt_barometric_sensor_modes = 
     | PRESS
     | TEMP
   
-  
   module HiTechnicNxtBarometricSensorCommands = struct
-    type commands = unit
+    type commands = hi_technic_nxt_barometric_sensor_commands
     let string_of_commands = function
       | _ -> failwith "commands are not available for this sensor."
     
@@ -69,27 +68,27 @@ module HiTechnicNxtBarometricSensor (DI : DEVICE_INFO)
     let string_of_modes = function
       | PRESS -> "press"
       | TEMP -> "temp"
+    
     let default_mode = PRESS
   end
   
-  
   module HiTechnicNxtBarometricSensorPathFinder = Path_finder.Make(struct
-    let prefix = "/sys/class/lego-sensor"
-    let conditions = [
-      ("name", "ht-nxt-barometric");
-      ("port", string_of_output_port P.output_port)
-    ]
-  end)
+      let prefix = "/sys/class/lego-sensor"
+      let conditions = [
+        ("name", "ht-nxt-barometric");
+        ("port", string_of_output_port P.output_port)
+      ]
+    end)
   
   include Make_abstract_sensor(HiTechnicNxtBarometricSensorCommands)
-    (HiTechnicNxtBarometricSensorModes)(DI)
-    (HiTechnicNxtBarometricSensorPathFinder)
-    
-    let pressure = checked_read read1 PRESS
-    let temperature = checked_read read1 TEMP
-  end
+      (HiTechnicNxtBarometricSensorModes)(DI)
+      (HiTechnicNxtBarometricSensorPathFinder)
   
-  
+  let pressure = checked_read read1 PRESS
+  let temperature = checked_read read1 TEMP
+end
+
+
 (*
 Local Variables:
 compile-command: "make -C ../.."

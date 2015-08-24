@@ -31,26 +31,25 @@ open Port
 open Sensor
 
 module type HI_TECHNIC_NXT_P_I_R_SENSOR = sig
-  
+  type hi_technic_nxt_p_i_r_sensor_commands = unit
   type hi_technic_nxt_p_i_r_sensor_modes = 
     | PROX
   
   include Sensor.AbstractSensor
-    with type commands := unit
+    with type commands := hi_technic_nxt_p_i_r_sensor_commands
      and type modes    := hi_technic_nxt_p_i_r_sensor_modes
   
   val ir_proximity : int ufun
 end
 
-
 module HiTechnicNxtPIRSensor (DI : DEVICE_INFO)
-  (P : OUTPUT_PORT) = struct
+    (P : OUTPUT_PORT) = struct
+  type hi_technic_nxt_p_i_r_sensor_commands = unit
   type hi_technic_nxt_p_i_r_sensor_modes = 
     | PROX
   
-  
   module HiTechnicNxtPIRSensorCommands = struct
-    type commands = unit
+    type commands = hi_technic_nxt_p_i_r_sensor_commands
     let string_of_commands = function
       | _ -> failwith "commands are not available for this sensor."
     
@@ -64,26 +63,25 @@ module HiTechnicNxtPIRSensor (DI : DEVICE_INFO)
     
     let string_of_modes = function
       | PROX -> "prox"
+    
     let default_mode = PROX
   end
   
-  
   module HiTechnicNxtPIRSensorPathFinder = Path_finder.Make(struct
-    let prefix = "/sys/class/lego-sensor"
-    let conditions = [
-      ("name", "ht-nxt-pir");
-      ("port", string_of_output_port P.output_port)
-    ]
-  end)
+      let prefix = "/sys/class/lego-sensor"
+      let conditions = [
+        ("name", "ht-nxt-pir");
+        ("port", string_of_output_port P.output_port)
+      ]
+    end)
   
   include Make_abstract_sensor(HiTechnicNxtPIRSensorCommands)
-    (HiTechnicNxtPIRSensorModes)(DI)
-    (HiTechnicNxtPIRSensorPathFinder)
-    
-    let ir_proximity = checked_read read1 PROX
-  end
+      (HiTechnicNxtPIRSensorModes)(DI)(HiTechnicNxtPIRSensorPathFinder)
   
-  
+  let ir_proximity = checked_read read1 PROX
+end
+
+
 (*
 Local Variables:
 compile-command: "make -C ../.."

@@ -31,26 +31,25 @@ open Port
 open Sensor
 
 module type MINDSENSORS_TOUCH_SENSOR_MULTIPLEXER = sig
-  
+  type mindsensors_touch_sensor_multiplexer_commands = unit
   type mindsensors_touch_sensor_multiplexer_modes = 
     | TOUCH_MUX
   
   include Sensor.AbstractSensor
-    with type commands := unit
+    with type commands := mindsensors_touch_sensor_multiplexer_commands
      and type modes    := mindsensors_touch_sensor_multiplexer_modes
   
   val touch_sensors : int_tuple3 ufun
 end
 
-
 module MindsensorsTouchSensorMultiplexer (DI : DEVICE_INFO)
-  (P : OUTPUT_PORT) = struct
+    (P : OUTPUT_PORT) = struct
+  type mindsensors_touch_sensor_multiplexer_commands = unit
   type mindsensors_touch_sensor_multiplexer_modes = 
     | TOUCH_MUX
   
-  
   module MindsensorsTouchSensorMultiplexerCommands = struct
-    type commands = unit
+    type commands = mindsensors_touch_sensor_multiplexer_commands
     let string_of_commands = function
       | _ -> failwith "commands are not available for this sensor."
     
@@ -64,26 +63,26 @@ module MindsensorsTouchSensorMultiplexer (DI : DEVICE_INFO)
     
     let string_of_modes = function
       | TOUCH_MUX -> "touch-mux"
+    
     let default_mode = TOUCH_MUX
   end
   
-  
   module MindsensorsTouchSensorMultiplexerPathFinder = Path_finder.Make(struct
-    let prefix = "/sys/class/lego-sensor"
-    let conditions = [
-      ("name", "ms-nxt-touch-mux");
-      ("port", string_of_output_port P.output_port)
-    ]
-  end)
+      let prefix = "/sys/class/lego-sensor"
+      let conditions = [
+        ("name", "ms-nxt-touch-mux");
+        ("port", string_of_output_port P.output_port)
+      ]
+    end)
   
   include Make_abstract_sensor(MindsensorsTouchSensorMultiplexerCommands)
-    (MindsensorsTouchSensorMultiplexerModes)(DI)
-    (MindsensorsTouchSensorMultiplexerPathFinder)
-    
-    let touch_sensors = checked_read read3 TOUCH_MUX
-  end
+      (MindsensorsTouchSensorMultiplexerModes)(DI)
+      (MindsensorsTouchSensorMultiplexerPathFinder)
   
-  
+  let touch_sensors = checked_read read3 TOUCH_MUX
+end
+
+
 (*
 Local Variables:
 compile-command: "make -C ../.."

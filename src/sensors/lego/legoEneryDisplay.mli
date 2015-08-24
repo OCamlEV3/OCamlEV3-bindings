@@ -33,7 +33,7 @@ open Port
 open Sensor
 
 module type LEGO_ENERY_DISPLAY = sig
-  
+  type lego_enery_display_commands = unit
   type lego_enery_display_modes = 
     | IN_VOLT (** Constructor for IN_VOLT mode. *)
     | IN_AMP (** Constructor for IN_AMP mode. *)
@@ -46,7 +46,7 @@ module type LEGO_ENERY_DISPLAY = sig
   (** Type for modes of the sensor lego_enery_display_modes. *)
   
   include Sensor.AbstractSensor
-    with type commands := unit
+    with type commands := lego_enery_display_commands
      and type modes    := lego_enery_display_modes
   
   val input_voltage : int ufun
@@ -75,7 +75,8 @@ module type LEGO_ENERY_DISPLAY = sig
   
 end
 
-module LegoEneryDisplay (DI : Device.DEVICE_INFO) (P: Port.OUTPUT_PORT) : LEGO_ENERY_DISPLAY
+module LegoEneryDisplay (DI : DEVICE_INFO) (P : OUTPUT_PORT)
+      : LEGO_ENERY_DISPLAY
 (** Implementation of Lego Enery Display. *)
 
 (*

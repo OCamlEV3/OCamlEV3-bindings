@@ -31,7 +31,7 @@ open Port
 open Sensor
 
 module type HI_TECHNIC_NXT_I_R_SEEKER_V2 = sig
-  
+  type hi_technic_nxt_i_r_seeker_v2_commands = unit
   type hi_technic_nxt_i_r_seeker_v2_modes = 
     | DC
     | AC
@@ -39,7 +39,7 @@ module type HI_TECHNIC_NXT_I_R_SEEKER_V2 = sig
     | AC_ALL
   
   include Sensor.AbstractSensor
-    with type commands := unit
+    with type commands := hi_technic_nxt_i_r_seeker_v2_commands
      and type modes    := hi_technic_nxt_i_r_seeker_v2_modes
   
   val unmodulated_direction : int ufun
@@ -48,18 +48,17 @@ module type HI_TECHNIC_NXT_I_R_SEEKER_V2 = sig
   val modulated_all_values : int_tuple6 ufun
 end
 
-
 module HiTechnicNxtIRSeekerV2 (DI : DEVICE_INFO)
-  (P : OUTPUT_PORT) = struct
+    (P : OUTPUT_PORT) = struct
+  type hi_technic_nxt_i_r_seeker_v2_commands = unit
   type hi_technic_nxt_i_r_seeker_v2_modes = 
     | DC
     | AC
     | DC_ALL
     | AC_ALL
   
-  
   module HiTechnicNxtIRSeekerV2Commands = struct
-    type commands = unit
+    type commands = hi_technic_nxt_i_r_seeker_v2_commands
     let string_of_commands = function
       | _ -> failwith "commands are not available for this sensor."
     
@@ -79,29 +78,28 @@ module HiTechnicNxtIRSeekerV2 (DI : DEVICE_INFO)
       | AC -> "ac"
       | DC_ALL -> "dc-all"
       | AC_ALL -> "ac-all"
+    
     let default_mode = DC
   end
   
-  
   module HiTechnicNxtIRSeekerV2PathFinder = Path_finder.Make(struct
-    let prefix = "/sys/class/lego-sensor"
-    let conditions = [
-      ("name", "ht-nxt-ir-seek-v2");
-      ("port", string_of_output_port P.output_port)
-    ]
-  end)
+      let prefix = "/sys/class/lego-sensor"
+      let conditions = [
+        ("name", "ht-nxt-ir-seek-v2");
+        ("port", string_of_output_port P.output_port)
+      ]
+    end)
   
   include Make_abstract_sensor(HiTechnicNxtIRSeekerV2Commands)
-    (HiTechnicNxtIRSeekerV2Modes)(DI)
-    (HiTechnicNxtIRSeekerV2PathFinder)
-    
-    let unmodulated_direction = checked_read read1 DC
-    let modulated_direction = checked_read read1 AC
-    let unmodulated_all_values = checked_read read7 DC_ALL
-    let modulated_all_values = checked_read read6 AC_ALL
-  end
+      (HiTechnicNxtIRSeekerV2Modes)(DI)(HiTechnicNxtIRSeekerV2PathFinder)
   
-  
+  let unmodulated_direction = checked_read read1 DC
+  let modulated_direction = checked_read read1 AC
+  let unmodulated_all_values = checked_read read7 DC_ALL
+  let modulated_all_values = checked_read read6 AC_ALL
+end
+
+
 (*
 Local Variables:
 compile-command: "make -C ../.."

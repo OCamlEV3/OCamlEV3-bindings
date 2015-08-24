@@ -33,14 +33,14 @@ open Port
 open Sensor
 
 module type HI_TECHNIC_NXT_I_R_RECEIVER_SENSOR = sig
-  
+  type hi_technic_nxt_i_r_receiver_sensor_commands = unit
   type hi_technic_nxt_i_r_receiver_sensor_modes = 
     | ONE_MOTOR (** Constructor for ONE_MOTOR mode. *)
     | EIGHT_MOTOR (** Constructor for EIGHT_MOTOR mode. *)
   (** Type for modes of the sensor hi_technic_nxt_i_r_receiver_sensor_modes. *)
   
   include Sensor.AbstractSensor
-    with type commands := unit
+    with type commands := hi_technic_nxt_i_r_receiver_sensor_commands
      and type modes    := hi_technic_nxt_i_r_receiver_sensor_modes
   
   val single_motor_control : int ufun
@@ -51,7 +51,8 @@ module type HI_TECHNIC_NXT_I_R_RECEIVER_SENSOR = sig
   
 end
 
-module HiTechnicNxtIRReceiverSensor (DI : Device.DEVICE_INFO) (P: Port.OUTPUT_PORT) : HI_TECHNIC_NXT_I_R_RECEIVER_SENSOR
+module HiTechnicNxtIRReceiverSensor (DI : DEVICE_INFO) (P : OUTPUT_PORT)
+      : HI_TECHNIC_NXT_I_R_RECEIVER_SENSOR
 (** Implementation of Hi Technic Nxt I R Receiver Sensor. *)
 
 (*

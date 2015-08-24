@@ -31,29 +31,28 @@ open Port
 open Sensor
 
 module type MINDSENSORS_CHANNEL_SERVO_MOTOR = sig
-  
+  type mindsensors_channel_servo_motor_commands = unit
   type mindsensors_channel_servo_motor_modes = 
     | VTHREE
     | OLD
   
   include Sensor.AbstractSensor
-    with type commands := unit
+    with type commands := mindsensors_channel_servo_motor_commands
      and type modes    := mindsensors_channel_servo_motor_modes
   
   val ev3_compatible_value : int ufun
   val old_compatible_value : int ufun
 end
 
-
 module MindsensorsChannelServoMotor (DI : DEVICE_INFO)
-  (P : OUTPUT_PORT) = struct
+    (P : OUTPUT_PORT) = struct
+  type mindsensors_channel_servo_motor_commands = unit
   type mindsensors_channel_servo_motor_modes = 
     | VTHREE
     | OLD
   
-  
   module MindsensorsChannelServoMotorCommands = struct
-    type commands = unit
+    type commands = mindsensors_channel_servo_motor_commands
     let string_of_commands = function
       | _ -> failwith "commands are not available for this sensor."
     
@@ -69,27 +68,27 @@ module MindsensorsChannelServoMotor (DI : DEVICE_INFO)
     let string_of_modes = function
       | VTHREE -> "v3"
       | OLD -> "old"
+    
     let default_mode = VTHREE
   end
   
-  
   module MindsensorsChannelServoMotorPathFinder = Path_finder.Make(struct
-    let prefix = "/sys/class/lego-sensor"
-    let conditions = [
-      ("name", "ms-8ch-servo");
-      ("port", string_of_output_port P.output_port)
-    ]
-  end)
+      let prefix = "/sys/class/lego-sensor"
+      let conditions = [
+        ("name", "ms-8ch-servo");
+        ("port", string_of_output_port P.output_port)
+      ]
+    end)
   
   include Make_abstract_sensor(MindsensorsChannelServoMotorCommands)
-    (MindsensorsChannelServoMotorModes)(DI)
-    (MindsensorsChannelServoMotorPathFinder)
-    
-    let ev3_compatible_value = checked_read read1 VTHREE
-    let old_compatible_value = checked_read read1 OLD
-  end
+      (MindsensorsChannelServoMotorModes)(DI)
+      (MindsensorsChannelServoMotorPathFinder)
   
-  
+  let ev3_compatible_value = checked_read read1 VTHREE
+  let old_compatible_value = checked_read read1 OLD
+end
+
+
 (*
 Local Variables:
 compile-command: "make -C ../.."

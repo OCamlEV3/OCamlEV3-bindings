@@ -31,26 +31,25 @@ open Port
 open Sensor
 
 module type HI_TECHNIC_NXT_GYRO_SENSOR = sig
-  
+  type hi_technic_nxt_gyro_sensor_commands = unit
   type hi_technic_nxt_gyro_sensor_modes = 
     | GYRO
   
   include Sensor.AbstractSensor
-    with type commands := unit
+    with type commands := hi_technic_nxt_gyro_sensor_commands
      and type modes    := hi_technic_nxt_gyro_sensor_modes
   
   val gyro : int ufun
 end
 
-
 module HiTechnicNxtGyroSensor (DI : DEVICE_INFO)
-  (P : OUTPUT_PORT) = struct
+    (P : OUTPUT_PORT) = struct
+  type hi_technic_nxt_gyro_sensor_commands = unit
   type hi_technic_nxt_gyro_sensor_modes = 
     | GYRO
   
-  
   module HiTechnicNxtGyroSensorCommands = struct
-    type commands = unit
+    type commands = hi_technic_nxt_gyro_sensor_commands
     let string_of_commands = function
       | _ -> failwith "commands are not available for this sensor."
     
@@ -64,26 +63,25 @@ module HiTechnicNxtGyroSensor (DI : DEVICE_INFO)
     
     let string_of_modes = function
       | GYRO -> "gyro"
+    
     let default_mode = GYRO
   end
   
-  
   module HiTechnicNxtGyroSensorPathFinder = Path_finder.Make(struct
-    let prefix = "/sys/class/lego-sensor"
-    let conditions = [
-      ("name", "ht-nxt-gyro");
-      ("port", string_of_output_port P.output_port)
-    ]
-  end)
+      let prefix = "/sys/class/lego-sensor"
+      let conditions = [
+        ("name", "ht-nxt-gyro");
+        ("port", string_of_output_port P.output_port)
+      ]
+    end)
   
   include Make_abstract_sensor(HiTechnicNxtGyroSensorCommands)
-    (HiTechnicNxtGyroSensorModes)(DI)
-    (HiTechnicNxtGyroSensorPathFinder)
-    
-    let gyro = checked_read read1 GYRO
-  end
+      (HiTechnicNxtGyroSensorModes)(DI)(HiTechnicNxtGyroSensorPathFinder)
   
-  
+  let gyro = checked_read read1 GYRO
+end
+
+
 (*
 Local Variables:
 compile-command: "make -C ../.."

@@ -31,29 +31,28 @@ open Port
 open Sensor
 
 module type MINDSENSORS_MULTIPLEXER_NXT_EV3_MOTOR = sig
-  
+  type mindsensors_multiplexer_nxt_ev3_motor_commands = unit
   type mindsensors_multiplexer_nxt_ev3_motor_modes = 
     | STATUS
     | STATUS_OLD
   
   include Sensor.AbstractSensor
-    with type commands := unit
+    with type commands := mindsensors_multiplexer_nxt_ev3_motor_commands
      and type modes    := mindsensors_multiplexer_nxt_ev3_motor_modes
   
   val status : int ufun
   val old_firmware_status : int ufun
 end
 
-
 module MindsensorsMultiplexerNxtEv3Motor (DI : DEVICE_INFO)
-  (P : OUTPUT_PORT) = struct
+    (P : OUTPUT_PORT) = struct
+  type mindsensors_multiplexer_nxt_ev3_motor_commands = unit
   type mindsensors_multiplexer_nxt_ev3_motor_modes = 
     | STATUS
     | STATUS_OLD
   
-  
   module MindsensorsMultiplexerNxtEv3MotorCommands = struct
-    type commands = unit
+    type commands = mindsensors_multiplexer_nxt_ev3_motor_commands
     let string_of_commands = function
       | _ -> failwith "commands are not available for this sensor."
     
@@ -69,27 +68,27 @@ module MindsensorsMultiplexerNxtEv3Motor (DI : DEVICE_INFO)
     let string_of_modes = function
       | STATUS -> "status"
       | STATUS_OLD -> "status-old"
+    
     let default_mode = STATUS
   end
   
-  
   module MindsensorsMultiplexerNxtEv3MotorPathFinder = Path_finder.Make(struct
-    let prefix = "/sys/class/lego-sensor"
-    let conditions = [
-      ("name", "ms-nxtmmx");
-      ("port", string_of_output_port P.output_port)
-    ]
-  end)
+      let prefix = "/sys/class/lego-sensor"
+      let conditions = [
+        ("name", "ms-nxtmmx");
+        ("port", string_of_output_port P.output_port)
+      ]
+    end)
   
   include Make_abstract_sensor(MindsensorsMultiplexerNxtEv3MotorCommands)
-    (MindsensorsMultiplexerNxtEv3MotorModes)(DI)
-    (MindsensorsMultiplexerNxtEv3MotorPathFinder)
-    
-    let status = checked_read read1 STATUS
-    let old_firmware_status = checked_read read1 STATUS_OLD
-  end
+      (MindsensorsMultiplexerNxtEv3MotorModes)(DI)
+      (MindsensorsMultiplexerNxtEv3MotorPathFinder)
   
-  
+  let status = checked_read read1 STATUS
+  let old_firmware_status = checked_read read1 STATUS_OLD
+end
+
+
 (*
 Local Variables:
 compile-command: "make -C ../.."

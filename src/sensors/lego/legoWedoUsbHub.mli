@@ -33,13 +33,18 @@ open Port
 open Sensor
 
 module type LEGO_WEDO_USB_HUB = sig
+  type lego_wedo_usb_hub_commands = 
+    | OUT_OFF (** Constructor for OUT_OFF mode. *)
+    | OUT_ON (** Constructor for OUT_ON mode. *)
+    | CLEAR_ERR (** Constructor for CLEAR_ERR mode. *)
+  (** Type for commands of the sensor lego_wedo_usb_hub_commands. *)
   
   type lego_wedo_usb_hub_modes = 
     | HUB (** Constructor for HUB mode. *)
   (** Type for modes of the sensor lego_wedo_usb_hub_modes. *)
   
   include Sensor.AbstractSensor
-    with type commands := unit
+    with type commands := lego_wedo_usb_hub_commands
      and type modes    := lego_wedo_usb_hub_modes
   
   val hub_status : int_tuple2 ufun
@@ -47,7 +52,8 @@ module type LEGO_WEDO_USB_HUB = sig
   
 end
 
-module LegoWedoUsbHub (DI : Device.DEVICE_INFO) (P: Port.OUTPUT_PORT) : LEGO_WEDO_USB_HUB
+module LegoWedoUsbHub (DI : DEVICE_INFO) (P : OUTPUT_PORT)
+      : LEGO_WEDO_USB_HUB
 (** Implementation of Lego Wedo Usb Hub. *)
 
 (*

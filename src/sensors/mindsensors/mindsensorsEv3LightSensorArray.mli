@@ -33,6 +33,15 @@ open Port
 open Sensor
 
 module type MINDSENSORS_EV3_LIGHT_SENSOR_ARRAY = sig
+  type mindsensors_ev3_light_sensor_array_commands = 
+    | CAL_WHITE (** Constructor for CAL_WHITE mode. *)
+    | CAL_BLACK (** Constructor for CAL_BLACK mode. *)
+    | SLEEP (** Constructor for SLEEP mode. *)
+    | WAKE (** Constructor for WAKE mode. *)
+    | SIXZEROHZ (** Constructor for SIXZEROHZ mode. *)
+    | FIVEZEROHZ (** Constructor for FIVEZEROHZ mode. *)
+    | UNIVERSAL (** Constructor for UNIVERSAL mode. *)
+  (** Type for commands of the sensor mindsensors_ev3_light_sensor_array_commands. *)
   
   type mindsensors_ev3_light_sensor_array_modes = 
     | CAL (** Constructor for CAL mode. *)
@@ -40,7 +49,7 @@ module type MINDSENSORS_EV3_LIGHT_SENSOR_ARRAY = sig
   (** Type for modes of the sensor mindsensors_ev3_light_sensor_array_modes. *)
   
   include Sensor.AbstractSensor
-    with type commands := unit
+    with type commands := mindsensors_ev3_light_sensor_array_commands
      and type modes    := mindsensors_ev3_light_sensor_array_modes
   
   val calibrated_values : int_tuple3 ufun
@@ -51,7 +60,8 @@ module type MINDSENSORS_EV3_LIGHT_SENSOR_ARRAY = sig
   
 end
 
-module MindsensorsEv3LightSensorArray (DI : Device.DEVICE_INFO) (P: Port.OUTPUT_PORT) : MINDSENSORS_EV3_LIGHT_SENSOR_ARRAY
+module MindsensorsEv3LightSensorArray (DI : DEVICE_INFO) (P : OUTPUT_PORT)
+      : MINDSENSORS_EV3_LIGHT_SENSOR_ARRAY
 (** Implementation of Mindsensors Ev3 Light Sensor Array. *)
 
 (*

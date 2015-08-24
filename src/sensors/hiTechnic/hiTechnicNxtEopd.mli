@@ -33,14 +33,14 @@ open Port
 open Sensor
 
 module type HI_TECHNIC_NXT_EOPD = sig
-  
+  type hi_technic_nxt_eopd_commands = unit
   type hi_technic_nxt_eopd_modes = 
     | LONG (** Constructor for LONG mode. *)
     | SHORT (** Constructor for SHORT mode. *)
   (** Type for modes of the sensor hi_technic_nxt_eopd_modes. *)
   
   include Sensor.AbstractSensor
-    with type commands := unit
+    with type commands := hi_technic_nxt_eopd_commands
      and type modes    := hi_technic_nxt_eopd_modes
   
   val long_proximity : int ufun
@@ -51,7 +51,8 @@ module type HI_TECHNIC_NXT_EOPD = sig
   
 end
 
-module HiTechnicNxtEopd (DI : Device.DEVICE_INFO) (P: Port.OUTPUT_PORT) : HI_TECHNIC_NXT_EOPD
+module HiTechnicNxtEopd (DI : DEVICE_INFO) (P : OUTPUT_PORT)
+      : HI_TECHNIC_NXT_EOPD
 (** Implementation of Hi Technic Nxt Eopd. *)
 
 (*
