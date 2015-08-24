@@ -67,9 +67,10 @@ module type COMMANDS = sig
     
   val string_of_commands : commands -> string
   (** [string_of_commands c] returns the string value of the commands [c]. 
-      Raise an assertion for sensors. *)
+      Fails for sensor that doesn't implements a command system. *)
 end
-(** Commands module type used by sensors. It has no effect yet. *)
+(** Commands module type used by sensors. Should fail for sensor that doesn't
+    have a command system. *)
 
 module type MODES = sig
   type modes

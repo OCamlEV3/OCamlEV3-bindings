@@ -30,6 +30,7 @@ open String
 open Yojson
 
 type sensor = {
+  path : string;
   name : string option;
   driver_name : string option;
   modes : (string * string * int) list;
@@ -38,6 +39,7 @@ type sensor = {
 }
 
 let empty_sensor = {
+  path = "";
   name = None;
   driver_name = None;
   modes = [];
@@ -59,7 +61,7 @@ let extract_string key = function
   | `String s -> (s : string)
   | _ -> failwith ("Expect a string for key '" ^ key ^ "'")
 
-let sensor_of_association assocs =
+let sensor_of_association assocs sensor =
   let rec aux sensor = function
     | [] -> sensor
     | (left, right) :: xs ->
@@ -106,17 +108,38 @@ let sensor_of_association assocs =
 
       | x -> failwith ("Unknown key '" ^ x ^ "'")
   in
-  aux empty_sensor assocs
+  aux sensor assocs
+
+let sensor_of_json = function
+  | [("folder", `String path); ("sensors", sensors)] ->
+    let sensor = { empty_sensor with path } in
+    begin match sensors with
+    | `Assoc assocs ->
+      [sensor_of_association assocs sensor]
+    | `List l ->
+      List.map (fun s ->
+          match s with
+          | `Assoc assocs ->
+            sensor_of_association assocs sensor
+          | _ ->
+            failwith "Expect Assoc"
+        ) l
+    | _ ->
+      failwith "Expect Assoc or List."
+    end
+  | _ ->
+    failwith "Malformed"
 
 let parse path =
   let json = Safe.from_file path in
   match json with
-  | `Assoc assocs -> [sensor_of_association assocs]
-  | `List l -> List.map (fun x ->
+  | `Assoc assocs ->
+    sensor_of_json assocs
+  | `List l -> List.(flatten (map (fun x ->
       match x with
-      | `Assoc assocs -> sensor_of_association assocs
+      | `Assoc assocs -> sensor_of_json assocs
       | _ -> failwith "On top-level list, expects only associations."
-    ) l
+    ) l))
   | _ -> failwith "On top-level, expects list or association."
 
 
@@ -432,8 +455,8 @@ let generate_sensor sensor where =
   (Buffer.to_bytes mlbuffer, Buffer.to_bytes mlibuffer)
 
 let generate sensors where =
-  let write_buffer name ext buffer =
-    let chan = open_out (Filename.concat where (name ^ ext)) in
+  let write_buffer path name ext buffer =
+    let chan = open_out (Filename.concat path (name ^ ext)) in
     output_string chan buffer;
     close_out chan
   in
@@ -441,8 +464,14 @@ let generate sensors where =
   List.iter (fun x ->
       let (ml, mli) = generate_sensor x where in
       let name = the x.name in
-      write_buffer name ".ml" ml;
-      write_buffer name ".mli" mli
+
+      let path = Filename.concat where x.path in
+      if not (Sys.file_exists path) then begin
+        Unix.mkdir path 0o766
+      end;
+      
+      write_buffer path name ".ml" ml;
+      write_buffer path name ".mli" mli
     ) sensors
 
 let () =

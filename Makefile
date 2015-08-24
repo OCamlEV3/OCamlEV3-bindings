@@ -3,7 +3,11 @@ OCAMLDOC	= ocamldoc
 OCAMLOPT        = ocamlopt
 OCAMLMKLIB      = ocamlmklib
 OCAMLFIND       = ocamlfind
-FOLDERS_OPT     = -I $(SOURCES_FOLDER) -I $(SOURCES_FOLDER)/sensors
+FOLDERS_OPT     = -I $(SOURCES_FOLDER) -I $(SOURCES_FOLDER)/sensors \
+		-I $(SOURCES_FOLDER)/sensors/hiTechnic \
+		-I $(SOURCES_FOLDER)/sensors/lego \
+		-I $(SOURCES_FOLDER)/sensors/microinfinity \
+		-I $(SOURCES_FOLDER)/sensors/mindsensors
 OCAMLC_FLAGS    = $(FOLDERS_OPT) -w @1..8 -w @10..26 -w @28..31 -w @39..49 -annot
 OCAMLFIND_FLAGS =
 

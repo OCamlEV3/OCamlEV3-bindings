@@ -1,427 +1,495 @@
 [
-    {
-        "name": "hiTechnicNxtColorSensor",
-        "driver_name" : "ht-nxt-color",
-        "modes" : [
-            { "mode" : "color", "name" : "color", "nb" : 1 },
-            { "mode" : "red", "name" : "red value", "nb" : 1 },
-            { "mode" : "green", "name" : "green value", "nb" : 1 },
-            { "mode" : "blue", "name" : "blue value", "nb" : 1 },
-            { "mode" : "raw", "name" : "raw values", "nb" : 3 },
-            { "mode" : "norm", "name" : "normalized values", "nb" : 4 },
-            { "mode" : "all", "name" : "all values", "nb" : 4 }
-        ],
-        "link" : "http://www.ev3dev.org/docs/sensors/hitechnic-nxt-color-sensor/"
-    },
-    
-    {
-        "name": "hiTechnicNxtAngleSensor",
-        "driver_name" : "ht-nxt-angle",
-        "modes" : [
-            { "mode" : "angle", "name" : "angle", "nb" : 1 },
-            { "mode" : "angle-acc", "name" : "accumulated angle", "nb" : 1 },
-            { "mode" : "speed", "name" : "rotational speed", "nb" : 1 }
-        ],
-        "link" : "http://www.ev3dev.org/docs/sensors/hitechnic-nxt-angle-sensor/"
-    },
-    
-    {
-        "name": "hiTechnicNxtAccelerationSensor",
-        "driver_name" : "ht-nxt-accel",
-        "modes" : [
-            { "mode" : "accel", "name" : "acceleration", "nb" : 1 },
-            { "mode" : "all", "name" : "three axis acceleration", "nb" : 6 }
-        ],
-        "link" : "http://www.ev3dev.org/docs/sensors/hitechnic-nxt-acceleration-tilt-sensor/"
-    },
-    
-    {
-        "name" : "hiTechnicNxtColorsensorV2",
-        "driver_name" : "ht-nxt-color-v2",
-        "modes" : [
-            { "mode" : "color", "name" : "color", "nb" : 1 },
-            { "mode" : "red", "name" : "red value", "nb" : 1 },
-            { "mode" : "green", "name" : "green value", "nb" : 1 },
-            { "mode" : "blue", "name" : "blue value", "nb" : 1 },
-            { "mode" : "white", "name" : "white value", "nb" : 1 },
-            { "mode" : "norm", "name" : "normalized values", "nb" : 4 },
-            { "mode" : "all", "name" : "all values", "nb" : 5 },
-            { "mode" : "raw", "name" : "raw values", "nb" : 4 }
-        ],
-        "link" : "http://www.ev3dev.org/docs/sensors/hitechnic-nxt-color-sensor-v2/"
-    },
-    
-    {
-        "name": "hiTechnicNxtBarometricSensor",
-        "driver_name" : "ht-nxt-barometric",
-        "modes" : [
-            { "mode" : "press", "name" : "pressure", "nb" : 1 },
-            { "mode" : "temp", "name" : "temperature", "nb" : 1 }
-        ],
-        "link" : "http://www.ev3dev.org/docs/sensors/hitechnic-nxt-barometric-sensor/"
-    },
-    
-    {
-        "name": "hiTechnicNxtEopd",
-        "driver_name" : "ht-nxt-eopd",
-        "modes" : [
-            { "mode" : "long", "name" : "long_proximity", "nb" : 1 },
-            { "mode" : "short", "name" : "short_proximity", "nb" : 1 }
-        ],
-        "link" : "http://www.ev3dev.org/docs/sensors/hitechnic-nxt-eopd/"
-    },
 
+    // folder hiTechnic
     {
-        "name": "hiTechnicNxtForceSensor",
-        "driver_name" : "ht-nxt-force",
-        "modes" : [
-            { "mode" : "force", "name" : "force", "nb" : 1 }
-        ],
-        "link" : "http://www.ev3dev.org/docs/sensors/hitechnic-nxt-force-sensor/"
-    },
+        "folder"  : "hiTechnic",
+        "sensors" :
+        [
+            {
+                "name": "hiTechnicNxtColorSensor",
+                "driver_name" : "ht-nxt-color",
+                "modes" : [
+                    { "mode" : "color", "name" : "color", "nb" : 1 },
+                    { "mode" : "red", "name" : "red value", "nb" : 1 },
+                    { "mode" : "green", "name" : "green value", "nb" : 1 },
+                    { "mode" : "blue", "name" : "blue value", "nb" : 1 },
+                    { "mode" : "raw", "name" : "raw values", "nb" : 3 },
+                    { "mode" : "norm", "name" : "normalized values", "nb" : 4 },
+                    { "mode" : "all", "name" : "all values", "nb" : 4 }
+                ],
+                "link" : "http://www.ev3dev.org/docs/sensors/hitechnic-nxt-color-sensor/"
+            },
+            
+            {
+                "name": "hiTechnicNxtAngleSensor",
+                "driver_name" : "ht-nxt-angle",
+                "modes" : [
+                    { "mode" : "angle", "name" : "angle", "nb" : 1 },
+                    { "mode" : "angle-acc", "name" : "accumulated angle",
+                      "nb" : 1 },
+                    { "mode" : "speed", "name" : "rotational speed", "nb" : 1 }
+                ],
+                "link" : "http://www.ev3dev.org/docs/sensors/hitechnic-nxt-angle-sensor/"
+            },
+            
+            {
+                "name": "hiTechnicNxtAccelerationSensor",
+                "driver_name" : "ht-nxt-accel",
+                "modes" : [
+                    { "mode" : "accel", "name" : "acceleration", "nb" : 1 },
+                    { "mode" : "all", "name" : "three axis acceleration",
+                      "nb" : 6 }
+                ],
+                "link" : "http://www.ev3dev.org/docs/sensors/hitechnic-nxt-acceleration-tilt-sensor/"
+            },
+            
+            {
+                "name" : "hiTechnicNxtColorsensorV2",
+                "driver_name" : "ht-nxt-color-v2",
+                "modes" : [
+                    { "mode" : "color", "name" : "color", "nb" : 1 },
+                    { "mode" : "red", "name" : "red value", "nb" : 1 },
+                    { "mode" : "green", "name" : "green value", "nb" : 1 },
+                    { "mode" : "blue", "name" : "blue value", "nb" : 1 },
+                    { "mode" : "white", "name" : "white value", "nb" : 1 },
+                    { "mode" : "norm", "name" : "normalized values", "nb" : 4 },
+                    { "mode" : "all", "name" : "all values", "nb" : 5 },
+                    { "mode" : "raw", "name" : "raw values", "nb" : 4 }
+                ],
+                "link" : "http://www.ev3dev.org/docs/sensors/hitechnic-nxt-color-sensor-v2/"
+            },
+            
+            {
+                "name": "hiTechnicNxtBarometricSensor",
+                "driver_name" : "ht-nxt-barometric",
+                "modes" : [
+                    { "mode" : "press", "name" : "pressure", "nb" : 1 },
+                    { "mode" : "temp", "name" : "temperature", "nb" : 1 }
+                ],
+                "link" : "http://www.ev3dev.org/docs/sensors/hitechnic-nxt-barometric-sensor/"
+            },
+            
+            {
+                "name": "hiTechnicNxtEopd",
+                "driver_name" : "ht-nxt-eopd",
+                "modes" : [
+                    { "mode" : "long", "name" : "long_proximity", "nb" : 1 },
+                    { "mode" : "short", "name" : "short_proximity", "nb" : 1 }
+                ],
+                "link" : "http://www.ev3dev.org/docs/sensors/hitechnic-nxt-eopd/"
+            },
 
-    {
-        "name": "hiTechnicNxtGyroSensor",
-        "driver_name" : "ht-nxt-gyro",
-        "modes" : [
-            { "mode" : "gyro", "name" : "gyro", "nb" : 1 }
-        ],
-        "link" : "http://www.ev3dev.org/docs/sensors/hitechnic-nxt-gyro-sensor/"
-    },
+            {
+                "name": "hiTechnicNxtForceSensor",
+                "driver_name" : "ht-nxt-force",
+                "modes" : [
+                    { "mode" : "force", "name" : "force", "nb" : 1 }
+                ],
+                "link" : "http://www.ev3dev.org/docs/sensors/hitechnic-nxt-force-sensor/"
+            },
 
-    {
-        "name": "hiTechnicNxtIRLinkSensor",
-        "driver_name" : "ht-nxt-ir-link",
-        "modes" : [
-            { "mode" : "irlink", "name" : "irlink", "nb" : 1 }
-        ],
-        "link" : "http://www.ev3dev.org/docs/sensors/hitechnic-nxt-irlink-sensor/"
-    },
-    
-    {
-        "name": "hiTechnicNxtIRReceiverSensor",
-        "driver_name" : "ht-nxt-ir-receiver",
-        "modes" : [
-            { "mode" : "1-motor",
-              "name" : "single motor control", "nb" : 1 },
-            { "mode" : "8-motor",
-              "name" : "eight motor control", "nb" : 8 }
-        ],
-        "link" : "http://www.ev3dev.org/docs/sensors/hitechnic-nxt-irreceiver-sensor/"
-    },
+            {
+                "name": "hiTechnicNxtGyroSensor",
+                "driver_name" : "ht-nxt-gyro",
+                "modes" : [
+                    { "mode" : "gyro", "name" : "gyro", "nb" : 1 }
+                ],
+                "link" : "http://www.ev3dev.org/docs/sensors/hitechnic-nxt-gyro-sensor/"
+            },
 
-    {
-        "name": "hiTechnicNxtPIRSensor",
-        "driver_name" : "ht-nxt-pir",
-        "modes" : [
-            { "mode" : "prox", "name" : "ir proximity", "nb" : 1 }
-        ],
-        "link" : "http://www.ev3dev.org/docs/sensors/hitechnic-nxt-pir-sensor/"
-    },
-    
-    {
-        "name": "hiTechnicNxtCompassSensor",
-        "driver_name" : "ht-nxt-compass",
-        "modes" : [
-            { "mode" : "compass", "name" : "compass direction", "nb" : 1 }
-        ],
-        "link" : "http://www.ev3dev.org/docs/sensors/hitechnic-nxt-compass-sensor/"
-    },
-    
-    {
-        "name": "hiTechnicNxtMagneticSensor",
-        "driver_name" : "ht-nxt-mag",
-        "modes" : [
-            { "mode" : "mag", "name" : "magnetic field", "nb" : 1 }
-        ],
-        "link" : "http://www.ev3dev.org/docs/sensors/hitechnic-nxt-magnetic-sensor/"
-    },
-    
-    {
-        "name": "hiTechnicNxtIRSeekerV2",
-        "driver_name" : "ht-nxt-ir-seek-v2",
-        "modes" : [
-            { "mode" : "dc", "name" : "unmodulated direction", "nb" : 1 },
-            { "mode" : "ac", "name" : "modulated direction", "nb" : 1 },
-            { "mode" : "dc-all", "name" : "unmodulated all values", "nb" : 7 },
-            { "mode" : "ac-all", "name" : "modulated all values", "nb" : 6 }
-        ],
-        "link" : "http://www.ev3dev.org/docs/sensors/hitechnic-nxt-irseeker-v2/"
-    },
-    
-    {
-        "name": "hiTechnicNxtSensorMultiplexer",
-        "driver_name" : "ht-nxt-smux",
-        "modes" : [
-            { "mode" : "MUX", "name" : "status", "nb" : 2 }
-        ],
-        "link" : "http://www.ev3dev.org/docs/sensors/hitechnic-nxt-sensor-multiplexer/"
-    },
-    
-    {
-        "name": "hiTechnicNxtSuperproPrototypeBoard",
-        "driver_name" : "ht-super-pro",
-        "modes" : [
-            { "mode" : "ain", "name" : "analog inputs", "nb" : 4 },
-            { "mode" : "din", "name" : "digital inputs", "nb" : 1 },
-            { "mode" : "dout", "name" : "digital outputs", "nb" : 1 },
-            { "mode" : "dctrl", "name" : "digital controls", "nb" : 1 },
-            { "mode" : "strobe", "name" : "strobe output", "nb" : 1 },
-            { "mode" : "led", "name" : "led control", "nb" : 1 },
-            { "mode" : "aout-0", "name" : "analog output o0", "nb" : 5 },
-            { "mode" : "aout-1", "name" : "analog output o1", "nb" : 5 }
-        ],
-        "link" : "http://www.ev3dev.org/docs/sensors/hitechnic-nxt-superpro-prototype-board/"
-    },
+            {
+                "name": "hiTechnicNxtIRLinkSensor",
+                "driver_name" : "ht-nxt-ir-link",
+                "modes" : [
+                    { "mode" : "irlink", "name" : "irlink", "nb" : 1 }
+                ],
+                "link" : "http://www.ev3dev.org/docs/sensors/hitechnic-nxt-irlink-sensor/"
+            },
+            
+            {
+                "name": "hiTechnicNxtIRReceiverSensor",
+                "driver_name" : "ht-nxt-ir-receiver",
+                "modes" : [
+                    { "mode" : "1-motor",
+                      "name" : "single motor control", "nb" : 1 },
+                    { "mode" : "8-motor",
+                      "name" : "eight motor control", "nb" : 8 }
+                ],
+                "link" : "http://www.ev3dev.org/docs/sensors/hitechnic-nxt-irreceiver-sensor/"
+            },
 
-    {
-        "name": "legoEv3UltrasonicSensor",
-        "driver_name" : "lego-ev3-us",
-        "modes" : [
-            { "mode" : "us-dist-cm", "name" : "continuous dist cm", "nb" : 1 },
-            { "mode" : "us-dist-in", "name" : "continuous dist in", "nb" : 1 },
-            { "mode" : "us-listen", "name" : "listen", "nb" : 1 },
-            { "mode" : "us-si-cm", "name" : "single dist cm", "nb" : 1 },
-            { "mode" : "us-si-in", "name" : "single dist in", "nb" : 1 },
-            { "mode" : "us-dc-cm", "name" : "us dc cm", "nb" : 1 },
-            { "mode" : "us-dc-in", "name" : "us dc in", "nb" : 1 }
-        ],
-        "link" : "http://www.ev3dev.org/docs/sensors/lego-ev3-ultrasonic-sensor/"
+            {
+                "name": "hiTechnicNxtPIRSensor",
+                "driver_name" : "ht-nxt-pir",
+                "modes" : [
+                    { "mode" : "prox", "name" : "ir proximity", "nb" : 1 }
+                ],
+                "link" : "http://www.ev3dev.org/docs/sensors/hitechnic-nxt-pir-sensor/"
+            },
+            
+            {
+                "name": "hiTechnicNxtCompassSensor",
+                "driver_name" : "ht-nxt-compass",
+                "modes" : [
+                    { "mode" : "compass", "name" : "compass direction",
+                      "nb" : 1 }
+                ],
+                "link" : "http://www.ev3dev.org/docs/sensors/hitechnic-nxt-compass-sensor/"
+            },
+            
+            {
+                "name": "hiTechnicNxtMagneticSensor",
+                "driver_name" : "ht-nxt-mag",
+                "modes" : [
+                    { "mode" : "mag", "name" : "magnetic field", "nb" : 1 }
+                ],
+                "link" : "http://www.ev3dev.org/docs/sensors/hitechnic-nxt-magnetic-sensor/"
+            },
+            
+            {
+                "name": "hiTechnicNxtIRSeekerV2",
+                "driver_name" : "ht-nxt-ir-seek-v2",
+                "modes" : [
+                    { "mode" : "dc", "name" : "unmodulated direction",
+                      "nb" : 1 },
+                    { "mode" : "ac", "name" : "modulated direction", "nb" : 1 },
+                    { "mode" : "dc-all", "name" : "unmodulated all values",
+                      "nb" : 7 },
+                    { "mode" : "ac-all", "name" : "modulated all values",
+                      "nb" : 6 }
+                ],
+                "link" : "http://www.ev3dev.org/docs/sensors/hitechnic-nxt-irseeker-v2/"
+            },
+            
+            {
+                "name": "hiTechnicNxtSensorMultiplexer",
+                "driver_name" : "ht-nxt-smux",
+                "modes" : [
+                    { "mode" : "mux", "name" : "status", "nb" : 2 }
+                ],
+                "commands" : [ "halt", "detect", "run" ],
+                "link" : "http://www.ev3dev.org/docs/sensors/hitechnic-nxt-sensor-multiplexer/"
+            },
+            
+            {
+                "name": "hiTechnicNxtSuperproPrototypeBoard",
+                "driver_name" : "ht-super-pro",
+                "modes" : [
+                    { "mode" : "ain", "name" : "analog inputs", "nb" : 4 },
+                    { "mode" : "din", "name" : "digital inputs", "nb" : 1 },
+                    { "mode" : "dout", "name" : "digital outputs", "nb" : 1 },
+                    { "mode" : "dctrl", "name" : "digital controls", "nb" : 1 },
+                    { "mode" : "strobe", "name" : "strobe output", "nb" : 1 },
+                    { "mode" : "led", "name" : "led control", "nb" : 1 },
+                    { "mode" : "aout-0", "name" : "analog output o0", "nb" : 5 },
+                    { "mode" : "aout-1", "name" : "analog output o1", "nb" : 5 }
+                ],
+                "link" : "http://www.ev3dev.org/docs/sensors/hitechnic-nxt-superpro-prototype-board/"
+            }
+        ]
     },
+    // end of folder hiTechnic
+    
 
+    // folder lego
     {
-        "name": "legoEv3GyroSensor",
-        "driver_name" : "lego-ev3-gyro",
-        "modes" : [
-            { "mode" : "gyro-ang", "name" : "angle", "nb" : 1 },
-            { "mode" : "gyro-rate", "name" : "rotational speed", "nb" : 1 },
-            { "mode" : "gyro-fas", "name" : "raw values", "nb" : 1 },
-            { "mode" : "gyro-g&a", "name" : "angle and rotational speed", "nb" : 2 },
-            { "mode" : "gyro-cal", "name" : "calibration", "nb" : 4 }
-        ],
-        "link" : "http://www.ev3dev.org/docs/sensors/lego-ev3-gyro-sensor/"
-    },
+        "folder" : "lego",
+        "sensors" :
+        [
+            {
+                "name": "legoEv3UltrasonicSensor",
+                "driver_name" : "lego-ev3-us",
+                "modes" : [
+                    { "mode" : "us-dist-cm", "name" : "continuous dist cm",
+                      "nb" : 1 },
+                    { "mode" : "us-dist-in", "name" : "continuous dist in",
+                      "nb" : 1 },
+                    { "mode" : "us-listen", "name" : "listen", "nb" : 1 },
+                    { "mode" : "us-si-cm", "name" : "single dist cm", "nb" : 1 },
+                    { "mode" : "us-si-in", "name" : "single dist in", "nb" : 1 },
+                    { "mode" : "us-dc-cm", "name" : "us dc cm", "nb" : 1 },
+                    { "mode" : "us-dc-in", "name" : "us dc in", "nb" : 1 }
+                ],
+                "link" : "http://www.ev3dev.org/docs/sensors/lego-ev3-ultrasonic-sensor/"
+            },
 
-    {
-        "name": "legoEv3ColorSensor",
-        "driver_name" : "lego-ev3-color",
-        "modes" : [
-            { "mode" : "col-reflect", "name" : "reflected light", "nb" : 1 },
-            { "mode" : "col-ambiant", "name" : "ambiant light", "nb" : 1 },
-            { "mode" : "col-color", "name" : "color", "nb" : 1 },
-            { "mode" : "ref-raw", "name" : "raw reflected", "nb" : 2 },
-            { "mode" : "rgb-raw", "name" : "raw color components", "nb" : 3 },
-            { "mode" : "col-cal", "name" : "color calibration", "nb" : 4 }
-        ],
-        "link" : "http://www.ev3dev.org/docs/sensors/lego-ev3-color-sensor/"
-    },
+            {
+                "name": "legoEv3GyroSensor",
+                "driver_name" : "lego-ev3-gyro",
+                "modes" : [
+                    { "mode" : "gyro-ang", "name" : "angle", "nb" : 1 },
+                    { "mode" : "gyro-rate", "name" : "rotational speed",
+                      "nb" : 1 },
+                    { "mode" : "gyro-fas", "name" : "raw values", "nb" : 1 },
+                    { "mode" : "gyro-g&a",
+                      "name" : "angle and rotational speed", "nb" : 2 },
+                    { "mode" : "gyro-cal", "name" : "calibration", "nb" : 4 }
+                ],
+                "link" : "http://www.ev3dev.org/docs/sensors/lego-ev3-gyro-sensor/"
+            },
 
-    {
-        "name": "legoEv3TouchSensor",
-        "driver_name" : "lego-ev3-touch",
-        "modes" : [
-            { "mode" : "touch", "name" : "button state", "nb" : 1 }
-        ],
-        "link" : "http://www.ev3dev.org/docs/sensors/lego-ev3-touch-sensor/"
-    },
-    
-    {
-        "name": "legoEv3InfraredSensor",
-        "driver_name": "lego-ev3-ir",
-        "modes" : [
-            { "mode" : "ir-prox", "name" : "proximity", "nb" : 1 },
-            { "mode" : "ir-seeker", "name" : "ir seeker", "nb" : 8 },
-            { "mode" : "ir-remote", "name" : "ir remote control", "nb" : 4 },
-            { "mode" : "ir-rem-a", "name" : "ir remote control a", "nb" : 1 },
-            { "mode" : "ir-s-alt", "name" : "alternate ir seeker", "nb" : 4 },
-            { "mode" : "ir-cal", "name" : "calibration", "nb" : 2 }
-        ],
-        "link" : "http://www.ev3dev.org/docs/sensors/lego-ev3-infrared-sensor/"
-    },
-    
-    {
-        "name": "legoWedoUsbHub",
-        "driver_name" : "wedo-hub",
-        "modes" : [
-            { "mode" : "hub", "name" : "hub status", "nb" : 2 }
-        ],
-        "link" : "http://www.ev3dev.org/docs/sensors/lego-wedo-usb-hub/"
-    },
+            {
+                "name": "legoEv3ColorSensor",
+                "driver_name" : "lego-ev3-color",
+                "modes" : [
+                    { "mode" : "col-reflect", "name" : "reflected light",
+                      "nb" : 1 },
+                    { "mode" : "col-ambiant", "name" : "ambiant light",
+                      "nb" : 1 },
+                    { "mode" : "col-color", "name" : "color", "nb" : 1 },
+                    { "mode" : "ref-raw", "name" : "raw reflected", "nb" : 2 },
+                    { "mode" : "rgb-raw", "name" : "raw color components",
+                      "nb" : 3 },
+                    { "mode" : "col-cal", "name" : "color calibration",
+                      "nb" : 4 }
+                ],
+                "link" : "http://www.ev3dev.org/docs/sensors/lego-ev3-color-sensor/"
+            },
 
-    {
-        "name": "legoWedoMotionSensor",
-        "driver_name" : "wedo-motion",
-        "modes" : [
-            { "mode" : "prox", "name" : "proximity", "nb" : 1 },
-            { "mode" : "raw", "name" : "raw analog value", "nb" : 1 }
-        ],
-        "link" : "http://www.ev3dev.org/docs/sensors/lego-wedo-motion-sensor/"
-    },
+            {
+                "name": "legoEv3TouchSensor",
+                "driver_name" : "lego-ev3-touch",
+                "modes" : [
+                    { "mode" : "touch", "name" : "button state", "nb" : 1 }
+                ],
+                "link" : "http://www.ev3dev.org/docs/sensors/lego-ev3-touch-sensor/"
+            },
+            
+            {
+                "name": "legoEv3InfraredSensor",
+                "driver_name": "lego-ev3-ir",
+                "modes" : [
+                    { "mode" : "ir-prox", "name" : "proximity", "nb" : 1 },
+                    { "mode" : "ir-seeker", "name" : "ir seeker", "nb" : 8 },
+                    { "mode" : "ir-remote", "name" : "ir remote control",
+                      "nb" : 4 },
+                    { "mode" : "ir-rem-a", "name" : "ir remote control a",
+                      "nb" : 1 },
+                    { "mode" : "ir-s-alt", "name" : "alternate ir seeker",
+                      "nb" : 4 },
+                    { "mode" : "ir-cal", "name" : "calibration", "nb" : 2 }
+                ],
+                "link" : "http://www.ev3dev.org/docs/sensors/lego-ev3-infrared-sensor/"
+            },
+            
+            {
+                "name": "legoWedoUsbHub",
+                "driver_name" : "wedo-hub",
+                "modes" : [
+                    { "mode" : "hub", "name" : "hub status", "nb" : 2 }
+                ],
+                "link" : "http://www.ev3dev.org/docs/sensors/lego-wedo-usb-hub/"
+            },
 
-    {
-        "name": "legoWedoTiltSensor",
-        "driver_name" : "wedo-tilt",
-        "modes" : [
-            { "mode" : "tilt", "name" : "tilt status", "nb" : 1 },
-            { "mode" : "tilt-axis", "name" : "tilt status axis", "nb" : 3 },
-            { "mode" : "raw", "name" : "tilt raw analog value", "nb" : 1 }
-        ],
-        "link" : "http://www.ev3dev.org/docs/sensors/lego-wedo-tilt-sensor/"
-    },
+            {
+                "name": "legoWedoMotionSensor",
+                "driver_name" : "wedo-motion",
+                "modes" : [
+                    { "mode" : "prox", "name" : "proximity", "nb" : 1 },
+                    { "mode" : "raw", "name" : "raw analog value", "nb" : 1 }
+                ],
+                "link" : "http://www.ev3dev.org/docs/sensors/lego-wedo-motion-sensor/"
+            },
 
-    {
-        "name": "legoEneryDisplay",
-        "driver_name" : "lego-power-storage",
-        "modes" : [
-            { "mode" : "in-volt", "name" : "input voltage", "nb" : 1 },
-            { "mode" : "in-amp", "name" : "input current", "nb" : 1 },
-            { "mode" : "out-volt", "name" : "output voltage", "nb" : 1 },
-            { "mode" : "out-amp", "name" : "output current", "nb" : 1 },
-            { "mode" : "joul", "name" : "energy", "nb" : 1 },
-            { "mode" : "in-watt", "name" : "input power", "nb" : 1 },
-            { "mode" : "out-watt", "name" : "output power", "nb" : 1 },
-            { "mode" : "all", "name" : "energy all values", "nb" : 7 }
-        ],
-        "link" : "http://www.ev3dev.org/docs/sensors/lego-energy-display/"
-    },
+            {
+                "name": "legoWedoTiltSensor",
+                "driver_name" : "wedo-tilt",
+                "modes" : [
+                    { "mode" : "tilt", "name" : "tilt status", "nb" : 1 },
+                    { "mode" : "tilt-axis", "name" : "tilt status axis",
+                      "nb" : 3 },
+                    { "mode" : "raw", "name" : "tilt raw analog value",
+                      "nb" : 1 }
+                ],
+                "link" : "http://www.ev3dev.org/docs/sensors/lego-wedo-tilt-sensor/"
+            },
 
-    {
-        "name": "legoNxtTouchSensor",
-        "driver_name" : "lego-nxt-touch",
-        "modes" : [
-            { "mode" : "touch", "name" : "touch state", "nb" : 1 }
-        ],
-        "link" : "http://www.ev3dev.org/docs/sensors/lego-nxt-touch-sensor/"
-    },
+            {
+                "name": "legoEneryDisplay",
+                "driver_name" : "lego-power-storage",
+                "modes" : [
+                    { "mode" : "in-volt", "name" : "input voltage", "nb" : 1 },
+                    { "mode" : "in-amp", "name" : "input current", "nb" : 1 },
+                    { "mode" : "out-volt", "name" : "output voltage", "nb" : 1 },
+                    { "mode" : "out-amp", "name" : "output current", "nb" : 1 },
+                    { "mode" : "joul", "name" : "energy", "nb" : 1 },
+                    { "mode" : "in-watt", "name" : "input power", "nb" : 1 },
+                    { "mode" : "out-watt", "name" : "output power", "nb" : 1 },
+                    { "mode" : "all", "name" : "energy all values", "nb" : 7 }
+                ],
+                "link" : "http://www.ev3dev.org/docs/sensors/lego-energy-display/"
+            },
 
-    {
-        "name": "legoNxtLightSensor",
-        "driver_name" : "lego-nxt-light",
-        "modes" : [
-            { "mode" : "reflect", "name" : "reflected light", "nb" : 1 },
-            { "mode" : "ambiant", "name" : "ambiant light", "nb" : 1 }
-        ],
-        "link" : "http://www.ev3dev.org/docs/sensors/lego-nxt-light-sensor/"
-    },
+            {
+                "name": "legoNxtTouchSensor",
+                "driver_name" : "lego-nxt-touch",
+                "modes" : [
+                    { "mode" : "touch", "name" : "touch state", "nb" : 1 }
+                ],
+                "link" : "http://www.ev3dev.org/docs/sensors/lego-nxt-touch-sensor/"
+            },
 
-    {
-        "name": "legoNxtSoundSensor",
-        "driver_name" : "lego-nxt-sound",
-        "modes" : [
-            { "mode" : "db", "name" : "sound pressure level flat weighting", "nb" : 1 },
-            { "mode" : "dba", "name" : "sound pressure level a weighting", "nb" : 1 }
-        ],
-        "link" : "http://www.ev3dev.org/docs/sensors/lego-nxt-sound-sensor/"
-    },
+            {
+                "name": "legoNxtLightSensor",
+                "driver_name" : "lego-nxt-light",
+                "modes" : [
+                    { "mode" : "reflect", "name" : "reflected light", "nb" : 1 },
+                    { "mode" : "ambiant", "name" : "ambiant light", "nb" : 1 }
+                ],
+                "link" : "http://www.ev3dev.org/docs/sensors/lego-nxt-light-sensor/"
+            },
 
-    {
-        "name": "legoNxtUltrasonicSensor",
-        "driver_name" : "lego-nxt-us",
-        "modes" : [
-            { "mode" : "us-dist-cm", "name" : "continuous dist cm", "nb" : 1 },
-            { "mode" : "us-dist-in", "name" : "continuous dist in", "nb" : 1 },
-            { "mode" : "us-si-cm", "name" : "single dist cm", "nb" : 1 },
-            { "mode" : "us-si-in", "name" : "single dist in", "nb" : 1 },
-            { "mode" : "listen", "name" : "listen", "nb" : 1 }
-        ],
-        "link" : "http://www.ev3dev.org/docs/sensors/lego-nxt-ultrasonic-sensor/"
+            {
+                "name": "legoNxtSoundSensor",
+                "driver_name" : "lego-nxt-sound",
+                "modes" : [
+                    { "mode" : "db",
+                      "name" : "sound pressure level flat weighting",
+                      "nb" : 1 },
+                    { "mode" : "dba",
+                      "name" : "sound pressure level a weighting", "nb" : 1 }
+                ],
+                "link" : "http://www.ev3dev.org/docs/sensors/lego-nxt-sound-sensor/"
+            },
+
+            {
+                "name": "legoNxtUltrasonicSensor",
+                "driver_name" : "lego-nxt-us",
+                "modes" : [
+                    { "mode" : "us-dist-cm", "name" : "continuous dist cm",
+                      "nb" : 1 },
+                    { "mode" : "us-dist-in", "name" : "continuous dist in",
+                      "nb" : 1 },
+                    { "mode" : "us-si-cm", "name" : "single dist cm", "nb" : 1 },
+                    { "mode" : "us-si-in", "name" : "single dist in", "nb" : 1 },
+                    { "mode" : "listen", "name" : "listen", "nb" : 1 }
+                ],
+                "link" : "http://www.ev3dev.org/docs/sensors/lego-nxt-ultrasonic-sensor/"
+            }
+        ]
     },
-    
+    // end of lego folder
+
+
+    // folder microinfinity
     {
-        "name": "microinfinityDigitalGyroscopeAndAccelerometer",
-        "driver_name" : "mi-xg1300l",
-        "modes" : [
-            { "mode" : "angle", "name" : "angle", "nb" : 1 },
-            { "mode" : "speed", "name" : "rotational speed", "nb" : 1 },
-            { "mode" : "accel", "name" : "acceleration", "nb" : 3 },
-            { "mode" : "all", "name" : "all values", "nb" : 5 }
-        ],
-        "link" : "http://www.ev3dev.org/docs/sensors/microinfinity-digital-gyroscope-and-accelerometer/"
+        "folder"  : "microinfinity",
+        "sensors" :
+        [
+            {
+                "name": "microinfinityDigitalGyroscopeAndAccelerometer",
+                "driver_name" : "mi-xg1300l",
+                "modes" : [
+                    { "mode" : "angle", "name" : "angle", "nb" : 1 },
+                    { "mode" : "speed", "name" : "rotational speed", "nb" : 1 },
+                    { "mode" : "accel", "name" : "acceleration", "nb" : 3 },
+                    { "mode" : "all", "name" : "all values", "nb" : 5 }
+                ],
+                "link" : "http://www.ev3dev.org/docs/sensors/microinfinity-digital-gyroscope-and-accelerometer/"
+            }
+        ]
     },
-    
+    // end of folder microinfinity
+
+
+    // folder mindsensors
     {
-        "name": "mindsensorsGyroMultiSensivityAccelerometerAndCompass",
-        "driver_name" : "ms-absolute-imu",
-        "modes" : [
-            { "mode" : "tilt", "name" : "tilt", "nb" : 3 },
-            { "mode" : "access", "name" : "acceleration", "nb" : 3 },
-            { "mode" : "compass", "name" : "compass", "nb" : 1 },
-            { "mode" : "mag", "name" : "magnetic field", "nb" : 3 },
-            { "mode" : "gyro", "name" : "gyroscope", "nb" : 3 }
-            //          { "mode" : "all", "name" : "all values", "nb" : 1 }
-        ],
-        "link" : "http://www.ev3dev.org/docs/sensors/mindsensors.com-gyro-multisensitivity-accelerometer-and-compass/"
-    },
-    
-    {
-        "name": "mindsensorsGlideWheelAS",
-        "driver_name" : "ms-angle",
-        "modes" : [
-            { "mode" : "angle", "name" : "angle", "nb" : 1 },
-            { "mode" : "angle2", "name" : "high precision angle", "nb" : 1 },
-            { "mode" : "speed", "name" : "speed", "nb" : 1 },
-            { "mode" : "all", "name" : "all values", "nb" : 3 }
-        ],
-        "link" : "http://www.ev3dev.org/docs/sensors/mindsensors.com-glidewheel-as/"
-    },
-    
-    {
-        "name": "mindsensorsEv3SensorMultiplexer",
-        "driver_name" : "ms-ev3-smux",
-        "modes" : [
-            { "mode" : "mux", "name" : "sensor multiplexer", "nb" : 1 }
-        ],
-        "link" : "http://www.ev3dev.org/docs/sensors/mindsensors.com-ev3-sensor-multiplexer/"
-    },
-    
-    {
-        "name": "mindsensorsEv3LightSensorArray",
-        "driver_name" : "ms-light-array",
-        "modes" : [
-            { "mode" : "cal", "name" : "calibrated values", "nb" : 3 },
-            { "mode" : "raw", "name" : "raw values", "nb" : 3 }
-        ],
-        "link" : "http://www.ev3dev.org/docs/sensors/mindsensors.com-light-sensor-array/"
-    },
-    
-    {
-        "name": "mindsensorsLineFollowerSensor",
-        "driver_name" : "ms-line-leader",
-        "modes" : [
-            { "mode" : "pid", "name" : "line follower", "nb" : 1 },
-            { "mode" : "pid-all", "name" : "line follower all values", "nb" : 3 },
-            { "mode" : "cal", "name" : "calibrated values", "nb" : 8 },
-            { "mode" : "raw", "name" : "raw values", "nb" : 8 }
-        ],
-        "link" : "http://www.ev3dev.org/docs/sensors/mindsensors.com-line-follower-sensor/"
-    },
-    
-    {
-        "name": "mindsensorMultiplexerNxtEv3Motor",
-        "driver_name" : "ms-nxtmmx",
-        "modes" : [
-            { "mode" : "status", "name" : "status", "nb" : 1 },
-            { "mode" : "status-old", "name" : "old firmware status", "nb" : 1 }
-        ],
-        "link" : "http://www.ev3dev.org/docs/sensors/mindsensors.com-multiplexer-for-nxt-ev3-motors/"
-    },
-    
-    {
-        "name": "mindsensorChannelServoMotor",
-        "driver_name" : "ms-8ch-servo",
-        "modes" : [
-            { "mode" : "v3", "name" : "ev3 compatible value", "nb" : 1 },
-            { "mode" : "old", "name" : "old compatible value", "nb" : 1 }
-        ],
-        "link" : "http://www.ev3dev.org/docs/sensors/mindsensors.com-8-channel-servo-controller/"
-    },
-    
-    {
-        "name": "mindsensorsTouchSensorMultiplexer",
-        "driver_name" : "ms-nxt-touch-mux",
-        "modes" : [
-            { "mode" : "touch-mux", "name" : "touch sensors", "nb" : 3 }
-        ],
-        "link" : "http://www.ev3dev.org/docs/sensors/mindsensors.com-touch-sensor-multiplexer-for-nxt-ev3/"
+        "folder"  : "mindsensors",
+        "sensors" :
+        [
+            
+            
+            {
+                "name": "mindsensorsGyroMultiSensivityAccelerometerAndCompass",
+                "driver_name" : "ms-absolute-imu",
+                "modes" : [
+                    { "mode" : "tilt", "name" : "tilt", "nb" : 3 },
+                    { "mode" : "access", "name" : "acceleration", "nb" : 3 },
+                    { "mode" : "compass", "name" : "compass", "nb" : 1 },
+                    { "mode" : "mag", "name" : "magnetic field", "nb" : 3 },
+                    { "mode" : "gyro", "name" : "gyroscope", "nb" : 3 }
+                    //          { "mode" : "all", "name" : "all values", "nb" : 1 }
+                ],
+                "link" : "http://www.ev3dev.org/docs/sensors/mindsensors.com-gyro-multisensitivity-accelerometer-and-compass/"
+            },
+            
+            {
+                "name": "mindsensorsGlideWheelAS",
+                "driver_name" : "ms-angle",
+                "modes" : [
+                    { "mode" : "angle", "name" : "angle", "nb" : 1 },
+                    { "mode" : "angle2", "name" : "high precision angle",
+                      "nb" : 1 },
+                    { "mode" : "speed", "name" : "speed", "nb" : 1 },
+                    { "mode" : "all", "name" : "all values", "nb" : 3 }
+                ],
+                "link" : "http://www.ev3dev.org/docs/sensors/mindsensors.com-glidewheel-as/"
+            },
+            
+            {
+                "name": "mindsensorsEv3SensorMultiplexer",
+                "driver_name" : "ms-ev3-smux",
+                "modes" : [
+                    { "mode" : "mux", "name" : "sensor multiplexer", "nb" : 1 }
+                ],
+                "link" : "http://www.ev3dev.org/docs/sensors/mindsensors.com-ev3-sensor-multiplexer/"
+            },
+            
+            {
+                "name": "mindsensorsEv3LightSensorArray",
+                "driver_name" : "ms-light-array",
+                "modes" : [
+                    { "mode" : "cal", "name" : "calibrated values", "nb" : 3 },
+                    { "mode" : "raw", "name" : "raw values", "nb" : 3 }
+                ],
+                "link" : "http://www.ev3dev.org/docs/sensors/mindsensors.com-light-sensor-array/"
+            },
+            
+            {
+                "name": "mindsensorsLineFollowerSensor",
+                "driver_name" : "ms-line-leader",
+                "modes" : [
+                    { "mode" : "pid", "name" : "line follower", "nb" : 1 },
+                    { "mode" : "pid-all", "name" : "line follower all values",
+                      "nb" : 3 },
+                    { "mode" : "cal", "name" : "calibrated values", "nb" : 8 },
+                    { "mode" : "raw", "name" : "raw values", "nb" : 8 }
+                ],
+                "link" : "http://www.ev3dev.org/docs/sensors/mindsensors.com-line-follower-sensor/"
+            },
+            
+            {
+                "name": "mindsensorsMultiplexerNxtEv3Motor",
+                "driver_name" : "ms-nxtmmx",
+                "modes" : [
+                    { "mode" : "status", "name" : "status", "nb" : 1 },
+                    { "mode" : "status-old", "name" : "old firmware status",
+                      "nb" : 1 }
+                ],
+                "link" : "http://www.ev3dev.org/docs/sensors/mindsensors.com-multiplexer-for-nxt-ev3-motors/"
+            },
+            
+            {
+                "name": "mindsensorsChannelServoMotor",
+                "driver_name" : "ms-8ch-servo",
+                "modes" : [
+                    { "mode" : "v3", "name" : "ev3 compatible value", "nb" : 1 },
+                    { "mode" : "old", "name" : "old compatible value",
+                      "nb" : 1 }
+                ],
+                "link" : "http://www.ev3dev.org/docs/sensors/mindsensors.com-8-channel-servo-controller/"
+            },
+            
+            {
+                "name": "mindsensorsTouchSensorMultiplexer",
+                "driver_name" : "ms-nxt-touch-mux",
+                "modes" : [
+                    { "mode" : "touch-mux", "name" : "touch sensors", "nb" : 3 }
+                ],
+                "link" : "http://www.ev3dev.org/docs/sensors/mindsensors.com-touch-sensor-multiplexer-for-nxt-ev3/"
+            }
+        ]
     }
+    // end of folder mindsensors
+
 ]

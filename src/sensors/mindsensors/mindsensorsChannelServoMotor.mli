@@ -26,90 +26,33 @@
 (* THE USE OR OTHER DEALINGS IN THE SOFTWARE.                                *)
 (*****************************************************************************)
 
+(** Implementation of the sensor mindsensorsChannelServoMotor.
+    Documentation {{:http://www.ev3dev.org/docs/sensors/mindsensors.com-8-channel-servo-controller/} page} *)
 open Device
 open Port
 open Sensor
 
-module type LEGO_EV3_INFRARED_SENSOR = sig
+module type MINDSENSORS_CHANNEL_SERVO_MOTOR = sig
   
-  type lego_ev3_infrared_sensor_modes = 
-    | IR_PROX
-    | IR_SEEKER
-    | IR_REMOTE
-    | IR_REM_A
-    | IR_S_ALT
-    | IR_CAL
+  type mindsensors_channel_servo_motor_modes = 
+    | VTHREE (** Constructor for VTHREE mode. *)
+    | OLD (** Constructor for OLD mode. *)
+  (** Type for modes of the sensor mindsensors_channel_servo_motor_modes. *)
   
   include Sensor.AbstractSensor
     with type commands := unit
-     and type modes    := lego_ev3_infrared_sensor_modes
+     and type modes    := mindsensors_channel_servo_motor_modes
   
-  val proximity : int ufun
-  val ir_seeker : int_tuple8 ufun
-  val ir_remote_control : int_tuple4 ufun
-  val ir_remote_control_a : int ufun
-  val alternate_ir_seeker : int_tuple4 ufun
-  val calibration : int_tuple2 ufun
+  val ev3_compatible_value : int ufun
+  (** [ev3_compatible_value ()] returns the current value of the mode ev3_compatible_value *)
+  
+  val old_compatible_value : int ufun
+  (** [old_compatible_value ()] returns the current value of the mode old_compatible_value *)
+  
 end
 
-
-module LegoEv3InfraredSensor (DI : DEVICE_INFO)
-  (P : OUTPUT_PORT) = struct
-  
-  type lego_ev3_infrared_sensor_modes = 
-    | IR_PROX
-    | IR_SEEKER
-    | IR_REMOTE
-    | IR_REM_A
-    | IR_S_ALT
-    | IR_CAL
-  
-  
-  
-  module LegoEv3InfraredSensorModes = struct
-    type modes = lego_ev3_infrared_sensor_modes
-    
-    let modes_of_string = function
-      | "ir-prox" -> IR_PROX
-      | "ir-seeker" -> IR_SEEKER
-      | "ir-remote" -> IR_REMOTE
-      | "ir-rem-a" -> IR_REM_A
-      | "ir-s-alt" -> IR_S_ALT
-      | "ir-cal" -> IR_CAL
-      | _ -> assert false
-    
-    let string_of_modes = function
-      | IR_PROX -> "ir-prox"
-      | IR_SEEKER -> "ir-seeker"
-      | IR_REMOTE -> "ir-remote"
-      | IR_REM_A -> "ir-rem-a"
-      | IR_S_ALT -> "ir-s-alt"
-      | IR_CAL -> "ir-cal"
-    
-    let default_mode = IR_PROX
-  end
-  
-  module LegoEv3InfraredSensorPathFinder = Path_finder.Make(struct
-    let prefix = "/sys/class/lego-sensor"
-    let conditions = [
-      ("name", "lego-ev3-ir");
-      ("port", string_of_output_port P.output_port)
-    ]
-  end)
-  
-  include Make_abstract_sensor(struct
-    type commands = unit
-    let string_of_commands () = assert false
-  end)(LegoEv3InfraredSensorModes)(DI)(LegoEv3InfraredSensorPathFinder)
-  
-  let proximity = checked_read read1 IR_PROX
-  let ir_seeker = checked_read read8 IR_SEEKER
-  let ir_remote_control = checked_read read4 IR_REMOTE
-  let ir_remote_control_a = checked_read read1 IR_REM_A
-  let alternate_ir_seeker = checked_read read4 IR_S_ALT
-  let calibration = checked_read read2 IR_CAL
-end
-
+module MindsensorsChannelServoMotor (DI : Device.DEVICE_INFO) (P: Port.OUTPUT_PORT) : MINDSENSORS_CHANNEL_SERVO_MOTOR
+(** Implementation of Mindsensors Channel Servo Motor. *)
 
 (*
 Local Variables:
