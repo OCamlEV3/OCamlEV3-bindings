@@ -149,6 +149,32 @@ let parse path =
 
 *)
 
+
+type generator_informations = {
+  sensor_name : string;           (* The written name in json file *)
+  pretty_name : string;           (* Pretty name for comments *)
+  driver_name : string;           (* The driver name *)
+  link        : string;           (* Link to the official doc *)
+
+  functors    : (string * string) list; (* Functors of the module impl *)
+  
+  (* ALL MODULES INFO *)
+  module_name : string;           (* Main module of the sensor *)
+  module_type_name : string;      (* Module type associated to the main module *)
+  module_commands : string;       (* Commands module *)
+  module_modes    : string;       (* Modes module *)
+  module_path_finder : string;    (* Path finder module *)
+
+  (* COMMANDS *)
+  type_commands : string; (* The name of the commands type *)
+  commands_info : (string * string) list; (* String value, Ctor *)
+  
+  (* MODES *)
+  type_modes : string; (* The name of the modes type *)
+  modes_info : (string * string * string * int) list;
+  (* String value, Constructor, Function name, Nb of param *)
+}
+
 (* Generation helper *)
 let modifier stringf regex modifier what =
   stringf (Str.(global_replace (regexp regex) modifier) what)
@@ -175,10 +201,25 @@ let type_of_nb = function
 let function_of_nb nb =
   Printf.sprintf "checked_read read%d" nb
 
+module List = struct
+  include List
+  let split4 l =
+    let rec aux (a1, a2, a3, a4) = function
+      | [] ->
+        List.rev a1, List.rev a2, List.rev a3, List.rev a4
+      | (a, b, c, d) :: xs ->
+        aux (a :: a1, b :: a2, c :: a3, d :: a4) xs
+    in aux ([], [], [], []) l
+end
+
 let fp = Format.fprintf
 (* * *)
            
 
+(*
+   Write all the opens
+*)
+           
 let write_opens fmt opens =
   List.iter (fp fmt "@[open %s@]@\n") opens
 
@@ -194,50 +235,35 @@ let write_constructor fmt (constructor, doc) =
 let write_constructors fmt (constructors, doc) =
   List.iter (fun x -> write_constructor fmt (x, doc)) constructors
 
+let write_type_equal fmt (type_name, type_eq) =
+  fp fmt "@\n@[<hov 2>type %s = %s@]" type_name type_eq
+
 let write_type fmt (type_name, ctors, kind, doc) = 
-  fp fmt "@[<hov 2>type %s = %a@]"
+  fp fmt "@\n@[<hov 2>type %s = %a@]"
     type_name write_constructors (ctors, doc);
   if doc then
-    fp fmt "@\n(** Type for %s of the sensor %s. *)@\n@\n"
+    fp fmt "@\n(** Type for %s of the sensor %s. *)@\n"
       kind type_name
   else
-    fp fmt "@\n@\n"
+    fp fmt "@\n"
 
-let write_type_modes fmt (type_modes, ctors, doc) =
-  write_type fmt (type_modes, ctors, "modes", doc)
+let write_type_modes fmt (ginfo, doc) =
+  write_type fmt
+    (ginfo.type_modes,
+     List.map (fun (_, x, _, _) -> x) ginfo.modes_info, "modes", doc)
 
-let write_type_commands fmt (type_commands, ctors, doc) =
-  if ctors <> [] then
-    write_type fmt (type_commands, ctors, "commands", doc)
-
-let write_type_equal fmt (type_name, type_eq) =
-  fp fmt "@[<hov 2>type %s = %s@]" type_name type_eq
-
-
-(*
-   module helper
-*)
-
-let write_helper_module fmt (name, type_infos, other) =
-  fp fmt
-    "@\n@[<hov 2>module %s = struct@\n%a%t@]@\nend@\n"
-    name write_type_equal type_infos other
-
-
-(*
-   val writer
-*)
-let write_vals fmt (vals, doc) =
-  List.iter (fun (fname, nb) ->
-      fp fmt "@\nval %s : %s" fname (type_of_nb nb);
-      if doc then
-        fp fmt "@\n(** [%s ()] returns the \
-                current value of the mode %s *)@\n" fname fname
-    ) vals
+let write_type_commands fmt (ginfo, doc) =
+  if ginfo.commands_info <> [] then
+    write_type fmt
+      (ginfo.type_commands, List.map snd ginfo.commands_info,
+       "commands", doc)
+  else
+    write_type_equal fmt (ginfo.type_commands, "unit")
 
 (*
    to/of_string functions
 *)
+    
 let write_pattern_matching fmt (left, right) =
   List.iter2 (fp fmt "@\n| %s -> %s") left right
 
@@ -257,102 +283,119 @@ let write_to_string fmt (name, left, right, default) =
 
 
 (*
+   module helper
+*)
+
+let write_helper_module fmt (name, type_infos, other) =
+  fp fmt
+    "@\n@[<hov 2>module %s = struct%a%t@]@\nend@\n"
+    name write_type_equal type_infos other
+
+let write_helper_module_commands fmt ginfo =
+  let err =
+    if ginfo.commands_info = [] then
+      Some "failwith \"commands are not available for this sensor.\""
+    else
+      None
+  in
+  let ns, cs = List.split ginfo.commands_info in
+  let cmd = "commands" in
+  write_helper_module fmt
+    (ginfo.module_commands, (cmd, ginfo.type_commands),
+     (fun fmt -> write_to_string fmt (cmd, cs, ns, err)))
+
+let write_helper_module_modes fmt ginfo =
+  let m = "modes" in
+  let (ns, cs, _, _) = List.split4 ginfo.modes_info in
+  write_helper_module fmt
+    (ginfo.module_modes, (m, ginfo.type_modes),
+     (fun fmt ->
+        write_of_string fmt (m, ns, cs);
+        write_to_string fmt (m, cs, ns, None);
+        fp fmt "@\n@[let default_mode = %s@]" (List.hd cs)))
+    
+
+(*
+   val writer
+*)
+let write_vals fmt (ginfo, doc) =
+  List.iter (fun (_, _, fname, nb) ->
+      fp fmt "@\nval %s : %s" fname (type_of_nb nb);
+      if doc then
+        fp fmt "@\n(** [%s ()] returns the \
+                current value of the mode %s *)@\n" fname fname
+    ) ginfo.modes_info
+
+
+(*
    module type writer
 *)
 
-let write_include_abstract_sensor fmt (type_commands, type_modes) =
-  fp fmt "@[<hov 2>include Sensor.AbstractSensor@\n";
-  fp fmt "with type commands := %s@\n" type_commands;
-  fp fmt " and type modes    := %s@]@\n" type_modes
+let write_include_abstract_sensor fmt ginfo =
+  fp fmt "@\n@[<hov 2>include Sensor.AbstractSensor@\n";
+  fp fmt "with type commands := %s@\n" ginfo.type_commands;
+  fp fmt " and type modes    := %s@]@\n" ginfo.type_modes
 
-let write_module_type
-    fmt (module_type_name, type_modes, type_commands,
-         ctors_cmds, informations, doc) =
-  let ctors = List.map (fun (_, x, _, _) -> x) informations in
-  let vals  = List.map (fun (_, _, x, y) -> (x, y)) informations in
+let write_module_type fmt ((ginfo, doc) as state) =
   fp fmt
-    "@\n@[<hov 2>module type %s = sig@\n@\n%a%a%a%a@]@\nend@\n@\n"
-    module_type_name
-    write_type_commands (type_commands, ctors_cmds, doc)
-    write_type_modes (type_modes, ctors, doc)
-    write_include_abstract_sensor
-    ((if ctors_cmds <> [] then type_commands else "unit"), type_modes)
-    write_vals (vals, doc)
+    "@\n@[<hov 2>module type %s = sig%a%a%a%a@]@\nend@\n"
+    ginfo.module_type_name
+    write_type_commands state
+    write_type_modes state
+    write_include_abstract_sensor ginfo
+    write_vals state
 
+(*
+   write functors for module implementation
+*)
+let write_functors fmt ginfo =
+  List.iter (fun (x, y) -> fp fmt "@;<1 2>(%s : %s)" x y) ginfo.functors
 
 (* The module implementation writer for ML files. *)
-let write_module_ml fmt name driver_name module_commands module_mode
-    path_mode type_modes type_commands cmds informations =
-  let write_functor fmt functors =
-    List.iter (fun (x, y) -> fp fmt "@ (%s : %s)" x y) functors
-  in
-  let write_module_commands fmt (ns, cs) =
-    let err = "failwith \"commands are not available for this sensor.\"" in
-    let (type_commands, cs, ns, err) =
-      if ns <> [] then (type_commands, cs, ns, None)
-      else ("unit", [], [], Some err)
-    in
-      write_helper_module fmt
-        (module_commands, ("commands", type_commands), (fun fmt ->
-             write_to_string fmt ("commands", cs, ns, err)))
-  in
-  let write_module_mode fmt (ns, cs) =
-    write_helper_module fmt
-      (module_mode, ("modes", type_modes), (fun fmt ->
-          write_of_string fmt ("modes", ns, cs);
-          write_to_string fmt ("modes", cs, ns, None);
-          fp fmt "@[let default_mode = %s@]" (List.hd cs)))
-  in
+let write_module_ml fmt ginfo =
   let write_path_maker fmt =
-    fp fmt "@\n@[<hov 2>module %s = Path_finder.Make(struct@\n\
+    fp fmt "@\n@[<hov 4>module %s = Path_finder.Make(struct@\n\
             @[let prefix = \"/sys/class/lego-sensor\"@]@\n\
             @[<hov 2>let conditions = [\
             @\n(\"name\", \"%s\");\
             @\n(\"port\", string_of_output_port P.output_port)\
             @]@\n]\
-            @]@\nend)@\n"
-      path_mode driver_name;
+            @]@\n  end)@\n"
+      ginfo.module_path_finder ginfo.driver_name;
   in
   let write_includes fmt =
-    fp fmt "@\n@[<hov 2>include Make_abstract_sensor\
-            (%s)@;<0>(%s)@;<0>(DI)@;<0>(%s)@\n"
-      (name ^ "Commands") module_mode path_mode
+    fp fmt "@\n@[<hov 4>include Make_abstract_sensor\
+            (%s)@;<0>(%s)@;<0>(DI)@;<0>(%s)@]@\n"
+      ginfo.module_commands ginfo.module_modes ginfo.module_path_finder
   in
-  let write_lets fmt vals =
-    List.iter (fun (c, fn, n) ->
-        fp fmt "@\n@[let %s = %s@ %s@]" fn (function_of_nb n) c
-      ) vals
+  let write_lets fmt ginfo =
+    List.iter (fun (_, constructor, fname, nb_params) ->
+        fp fmt "@\n@[let %s = %s@ %s@]"
+          fname (function_of_nb nb_params) constructor
+      ) ginfo.modes_info
   in
-
-  let names = List.map (fun (n, _, _, _) -> n) informations in
-  let ctors = List.map (fun (_, c, _, _) -> c) informations in
-  let lets  = List.map (fun (_, c, fn, n) -> (c, fn, n)) informations in
-
-  let cmds_ctors =
-    List.map (fun x -> (mk_ctor (modifier uppercase "-" "_" x))) cmds
-  in
-  
   fp fmt
-    "@\n@[<hov 2>module %s%a = struct@\n%a%a%a%a@\n%t%t%a@]@\nend@\n@\n"
-    name
-    write_functor [("DI", "DEVICE_INFO"); ("P", "OUTPUT_PORT")]
-    write_type_commands (type_commands, cmds_ctors, false)
-    write_type_modes (type_modes, ctors, false)
-    write_module_commands (cmds, cmds_ctors)
-    write_module_mode (names, ctors)
+    "@\n@[<hov 2>module %s%a = struct%a%a%a%a%t%t%a@]@\nend@\n@\n"
+    ginfo.module_name
+    write_functors ginfo
+    write_type_commands (ginfo, false)
+    write_type_modes (ginfo, false)
+    write_helper_module_commands ginfo
+    write_helper_module_modes ginfo
     write_path_maker
     write_includes
-    write_lets lets
+    write_lets ginfo
 
 (* The module implementation writer on MLI file. *)
-let write_module_mli fmt name module_name module_type_name =
-  fp fmt "@[module %s (DI : Device.DEVICE_INFO) (P: Port.OUTPUT_PORT) : %s@]@\n"
-    module_name module_type_name;
-  fp fmt "@[(** Implementation of %s. *)@]@\n" name
+let write_module_mli fmt ginfo =
+  fp fmt "@\n@[<hov 2>module %s%a@;<1 4>: %s@]"
+    ginfo.module_name write_functors ginfo ginfo.module_type_name;
+  fp fmt "@\n@[(** Implementation of %s. *)@]@\n" ginfo.pretty_name
 
-let write_mli_header fmt name link =
-  fp fmt "@[(** Implementation of the sensor %s.@;<1 4>Documentation {{:%s} page} *)@]@\n"
-    name link
+let write_mli_header fmt ginfo =
+  fp fmt "@[(** Implementation of the sensor %s.@;<1 4>\
+          Documentation {{:%s} page} *)@]@\n"
+    ginfo.sensor_name ginfo.link
 
 let write_license fmt =
   fp fmt
@@ -390,30 +433,48 @@ let write_compilation_flag fmt =
           End:@\n\
           *)@]@\n"
 
+
 let generate_sensor sensor where =
-  let name = the sensor.name in
-  let pretty_name = modifier capitalize "[A-Z]" " \\0" name in
-  let module_name = modifier capitalize "" "" name in
-  let module_type_name = modifier uppercase "[A-Z]" "_\\0" name in
-  let type_commands = modifier lowercase "[A-Z]" "_\\0" name ^ "_commands" in
-  let module_commands =  module_name ^ "Commands" in
-  let type_modes = modifier lowercase "[A-Z]" "_\\0" name ^ "_modes" in
-  let module_modes = module_name ^ "Modes" in
-  let path_finder = module_name ^ "PathFinder" in
-  let modes_informations =
-    List.map (fun (mode, name, nb) ->
-        let ctor = mk_ctor (modifier uppercase "-" "_" mode) in
-        let fname = modifier lowercase " " "_" name in
-        mode, (* The str-value : kind-like-this *)
-        ctor, (* constructor : KIND_LIKE_THIS *)
-        fname, (* fname : kind_like_this *)
-        nb
-      ) sensor.modes
+  let sensor_name = the sensor.name in
+  let pretty_name = modifier capitalize "[A-Z]" " \\0" sensor_name in
+  let link        = the sensor.link in
+  let driver_name = the sensor.driver_name in
+  
+  let functors    = [("DI", "DEVICE_INFO"); ("P", "OUTPUT_PORT")] in
+  
+    
+  (* Modules *)
+  let module_name        = modifier capitalize "" "" sensor_name in
+  let module_type_name   = modifier uppercase "[A-Z]" "_\\0" sensor_name in
+  let module_commands    = module_name ^ "Commands" in
+  let module_modes       = module_name ^ "Modes" in
+  let module_path_finder = module_name ^ "PathFinder" in
+
+  let basic_type = modifier lowercase "[A-Z]" "_\\0" sensor_name in
+  (* Commands *)
+  let type_commands = basic_type ^ "_commands" in
+  let commands_info = List.map (fun x ->
+      (x, mk_ctor (modifier uppercase "-" "_" x))
+    ) sensor.commands
   in
 
-  let ctors_commands =
-    List.map (fun x -> mk_ctor (modifier uppercase "-" "_" x)) sensor.commands
+  (* Modes *)
+  let type_modes = basic_type ^ "_modes" in
+  let modes_info = List.map (fun (mode, name, nb_params) ->
+      let ctor = mk_ctor (modifier uppercase "-" "_" mode) in
+      let fname = modifier lowercase " " "_" name in
+      (mode, ctor, fname, nb_params)
+    ) sensor.modes
   in
+
+  let generator_informations = {
+    sensor_name;        pretty_name;     driver_name;
+    link;               functors;        module_name;
+    module_type_name;   module_commands; module_modes;
+    module_path_finder; type_commands;   commands_info;
+    type_modes;         modes_info
+  } in
+  
   
   let mlbuffer  = Buffer.create 42 in
   let mlibuffer = Buffer.create 42 in
@@ -432,24 +493,18 @@ let generate_sensor sensor where =
   (* Licenses *)
   write_on_both_t write_license;
 
-  write_mli_header mlifmt (the sensor.name) (the sensor.link);
+  write_mli_header mlifmt generator_informations;
   
   (* Opens *)
   write_on_both write_opens [ "Device"; "Port"; "Sensor" ];
 
   (* Module type *)
-  let module_type doc =
-    (module_type_name, type_modes, type_commands,
-     ctors_commands, modes_informations, doc)
-  in
-  write_module_type mlfmt  (module_type false);
-  write_module_type mlifmt (module_type true);
+  write_module_type mlfmt  (generator_informations, false);
+  write_module_type mlifmt (generator_informations, true);
 
   (* Module implementation *)
-  write_module_ml mlfmt module_name (the sensor.driver_name) module_commands
-    module_modes path_finder type_modes type_commands sensor.commands
-    modes_informations;
-  write_module_mli mlifmt pretty_name module_name module_type_name;
+  write_module_ml  mlfmt  generator_informations; 
+  write_module_mli mlifmt generator_informations;
   
   write_on_both (fun fmt -> fp fmt "@]@\n%t@.") write_compilation_flag;
   (Buffer.to_bytes mlbuffer, Buffer.to_bytes mlibuffer)
