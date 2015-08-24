@@ -17,6 +17,7 @@
                     { "mode" : "norm", "name" : "normalized values", "nb" : 4 },
                     { "mode" : "all", "name" : "all values", "nb" : 4 }
                 ],
+                "commands" : [ "reset", "cal" ],
                 "link" : "http://www.ev3dev.org/docs/sensors/hitechnic-nxt-color-sensor/"
             },
             
@@ -278,6 +279,7 @@
                 "modes" : [
                     { "mode" : "hub", "name" : "hub status", "nb" : 2 }
                 ],
+                "commands" : [ "out-off", "out-on", "clear-err" ],
                 "link" : "http://www.ev3dev.org/docs/sensors/lego-wedo-usb-hub/"
             },
 
@@ -385,6 +387,7 @@
                     { "mode" : "accel", "name" : "acceleration", "nb" : 3 },
                     { "mode" : "all", "name" : "all values", "nb" : 5 }
                 ],
+                "commands" : [ "reset", "accel-2g", "accel-4g", "accel-8g" ],
                 "link" : "http://www.ev3dev.org/docs/sensors/microinfinity-digital-gyroscope-and-accelerometer/"
             }
         ]
@@ -410,6 +413,8 @@
                     { "mode" : "gyro", "name" : "gyroscope", "nb" : 3 }
                     //          { "mode" : "all", "name" : "all values", "nb" : 1 }
                 ],
+                "commands" : [ "begin-comp-cal", "end-comp-cal", "accel-2g",
+                               "accel-4g", "accel-8g", "accel-16g" ],
                 "link" : "http://www.ev3dev.org/docs/sensors/mindsensors.com-gyro-multisensitivity-accelerometer-and-compass/"
             },
             
@@ -423,6 +428,7 @@
                     { "mode" : "speed", "name" : "speed", "nb" : 1 },
                     { "mode" : "all", "name" : "all values", "nb" : 3 }
                 ],
+                "commands" : [ "reset" ],
                 "link" : "http://www.ev3dev.org/docs/sensors/mindsensors.com-glidewheel-as/"
             },
             
@@ -442,6 +448,8 @@
                     { "mode" : "cal", "name" : "calibrated values", "nb" : 3 },
                     { "mode" : "raw", "name" : "raw values", "nb" : 3 }
                 ],
+                "commands" : [ "cal-white", "cal-black", "sleep", "wake", "60hz",
+                               "50hz", "universal" ],
                 "link" : "http://www.ev3dev.org/docs/sensors/mindsensors.com-light-sensor-array/"
             },
             
@@ -455,6 +463,9 @@
                     { "mode" : "cal", "name" : "calibrated values", "nb" : 8 },
                     { "mode" : "raw", "name" : "raw values", "nb" : 8 }
                 ],
+                "commands" : [ "cal-white", "cal-black", "sleep", "wake",
+                               "inv-col", "rst-col", "snap", "60hz", "50hz",
+                               "universal" ],
                 "link" : "http://www.ev3dev.org/docs/sensors/mindsensors.com-line-follower-sensor/"
             },
             
