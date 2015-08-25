@@ -38,8 +38,8 @@ type sensor = {
   commands : string list;
 }
 
-let empty_sensor = {
-  path = "";
+let mk_sensor path = {
+  path;
   name = None;
   driver_name = None;
   modes = [];
@@ -48,7 +48,7 @@ let empty_sensor = {
 }
 
 let the = function
-  | None -> assert false
+  | None -> failwith "the: None is not expected"
   | Some s -> s
 
 (*
@@ -57,11 +57,27 @@ let the = function
 
 *)
 
-let extract_string key = function
-  | `String s -> (s : string)
-  | _ -> failwith ("Expect a string for key '" ^ key ^ "'")
+exception Parse_failure of string
 
-let sensor_of_association assocs sensor =
+let parse_failure fmt =
+  Printf.ksprintf (fun msg -> raise (Parse_failure msg)) fmt
+
+let extract_string key = function
+  | `String s -> s
+  | _ -> parse_failure "Expected a string for key '%s'" key
+
+let extract_assocs = function
+  | `Assoc a ->
+    [a]
+  | `List l  ->
+    List.map (function
+        | `Assoc a -> a
+        | _ -> parse_failure "extract_assocs: on `List, expects only `Assoc"
+      ) l
+  | _ ->
+    parse_failure "extract_assocs: expects `Assoc or `List of `Assoc"
+
+let sensor_of_association sensor assocs =
   let rec aux sensor = function
     | [] -> sensor
     | (left, right) :: xs ->
@@ -74,24 +90,12 @@ let sensor_of_association assocs sensor =
               driver_name = Some (extract_string "driver_name" right) } xs
 
       | "modes" ->
-        let mode assoc =
-          match assoc with
-          | `Assoc ([
-              ("mode", `String mmode);
-              ("name", `String mname);
-              ("nb", `Int i)
-            ]) ->
-            (mmode, mname, i)
-          | _ -> failwith "A mode must be {mode:string,name:string,nb:int}"
+        let mode = function
+          | [("mode", `String mode); ("name", `String name); ("nb", `Int i)] ->
+            (mode, name, i)
+          | _ -> parse_failure "modes: expects keys 'mode', 'name' and 'nb'"
         in
-        let modes =
-          begin match right with
-          | (`Assoc _) as assoc -> [mode assoc]
-          | `List l -> List.map mode l 
-          | _ -> failwith "For 'modes' key, only expects an assoc or a list."
-          end
-        in
-        aux { sensor with modes } xs
+        aux { sensor with modes = List.map mode (extract_assocs right) } xs
 
       | "link" ->
         aux { sensor with link = Some (extract_string "link" right) } xs
@@ -101,46 +105,26 @@ let sensor_of_association assocs sensor =
           begin match right with
           | `String s -> [s]
           | `List l   -> List.map (extract_string "commands") l
-          | _ -> failwith "Expected string or list after commands."
+          | _ -> parse_failure "commands: expects string of list of string"
           end
         in
         aux { sensor with commands } xs
 
-      | x -> failwith ("Unknown key '" ^ x ^ "'")
+      | x ->
+        parse_failure "Uknown key '%s'" x
   in
   aux sensor assocs
 
 let sensor_of_json = function
   | [("folder", `String path); ("sensors", sensors)] ->
-    let sensor = { empty_sensor with path } in
-    begin match sensors with
-    | `Assoc assocs ->
-      [sensor_of_association assocs sensor]
-    | `List l ->
-      List.map (fun s ->
-          match s with
-          | `Assoc assocs ->
-            sensor_of_association assocs sensor
-          | _ ->
-            failwith "Expect Assoc"
-        ) l
-    | _ ->
-      failwith "Expect Assoc or List."
-    end
+    List.map (sensor_of_association (mk_sensor path)) (extract_assocs sensors)
   | _ ->
-    failwith "Malformed"
+    parse_failure "sensor_of_json: expects keys 'folder' and 'sensors'"
 
 let parse path =
   let json = Safe.from_file path in
-  match json with
-  | `Assoc assocs ->
-    sensor_of_json assocs
-  | `List l -> List.(flatten (map (fun x ->
-      match x with
-      | `Assoc assocs -> sensor_of_json assocs
-      | _ -> failwith "On top-level list, expects only associations."
-    ) l))
-  | _ -> failwith "On top-level, expects list or association."
+  List.(flatten (map sensor_of_json (extract_assocs json)))
+
 
 
 (*
