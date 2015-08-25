@@ -1,0 +1,40 @@
+COMPILATION_ORDER = IO.cmx path_finder.cmx port.cmx motor.cmx led.cmx \
+	power_supply.cmx sensors/sensor.cmx \
+	sensors/hiTechnic/hiTechnicNxtAccelerationSensor.cmx \
+	sensors/hiTechnic/hiTechnicNxtAngleSensor.cmx \
+	sensors/hiTechnic/hiTechnicNxtBarometricSensor.cmx \
+	sensors/hiTechnic/hiTechnicNxtColorSensor.cmx \
+	sensors/hiTechnic/hiTechnicNxtColorsensorV2.cmx \
+	sensors/hiTechnic/hiTechnicNxtCompassSensor.cmx \
+	sensors/hiTechnic/hiTechnicNxtEopd.cmx \
+	sensors/hiTechnic/hiTechnicNxtForceSensor.cmx \
+	sensors/hiTechnic/hiTechnicNxtGyroSensor.cmx \
+	sensors/hiTechnic/hiTechnicNxtIRLinkSensor.cmx \
+	sensors/hiTechnic/hiTechnicNxtIRReceiverSensor.cmx \
+	sensors/hiTechnic/hiTechnicNxtIRSeekerV2.cmx \
+	sensors/hiTechnic/hiTechnicNxtMagneticSensor.cmx \
+	sensors/hiTechnic/hiTechnicNxtPIRSensor.cmx \
+	sensors/hiTechnic/hiTechnicNxtSensorMultiplexer.cmx \
+	sensors/hiTechnic/hiTechnicNxtSuperproPrototypeBoard.cmx \
+	sensors/lego/legoEneryDisplay.cmx \
+	sensors/lego/legoEv3ColorSensor.cmx \
+	sensors/lego/legoEv3GyroSensor.cmx \
+	sensors/lego/legoEv3InfraredSensor.cmx \
+	sensors/lego/legoEv3TouchSensor.cmx \
+	sensors/lego/legoEv3UltrasonicSensor.cmx \
+	sensors/lego/legoNxtLightSensor.cmx \
+	sensors/lego/legoNxtSoundSensor.cmx \
+	sensors/lego/legoNxtTouchSensor.cmx \
+	sensors/lego/legoNxtUltrasonicSensor.cmx \
+	sensors/lego/legoWedoMotionSensor.cmx \
+	sensors/lego/legoWedoTiltSensor.cmx \
+	sensors/lego/legoWedoUsbHub.cmx \
+	sensors/microinfinity/microinfinityDigitalGyroscopeAndAccelerometer.cmx \
+	sensors/mindsensors/mindsensorsChannelServoMotor.cmx \
+	sensors/mindsensors/mindsensorsEv3LightSensorArray.cmx \
+	sensors/mindsensors/mindsensorsEv3SensorMultiplexer.cmx \
+	sensors/mindsensors/mindsensorsGlideWheelAS.cmx \
+	sensors/mindsensors/mindsensorsGyroMultiSensivityAccelerometerAndCompass.cmx \
+	sensors/mindsensors/mindsensorsLineFollowerSensor.cmx \
+	sensors/mindsensors/mindsensorsMultiplexerNxtEv3Motor.cmx \
+	sensors/mindsensors/mindsensorsTouchSensorMultiplexer.cmx

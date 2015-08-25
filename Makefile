@@ -32,8 +32,7 @@ all: depend library
 
 
 # Library compilation
-
-COMPILATION_ORDER = IO.cmx path_finder.cmx
+include Makefile.order
 
 library: depend $(SOURCES_OBJ_BYT) $(SOURCES_OBJ_NAT)
 	@ mkdir -p $(LIB_FOLDER)
