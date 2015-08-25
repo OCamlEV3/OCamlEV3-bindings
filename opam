@@ -1,7 +1,7 @@
 opam-version: "1.2"
 
 name        : "OCamlEV3-bindings"
-version     : "0.1"
+version     : "1.0-beta"
 maintainer  : "Loïc Runarvot <loic.runarvot@gmail.com>"
 authors     : "Tortrat-Gentilhomme Nicolas, Raymond Nicolas, Runarvot Loïc"
 

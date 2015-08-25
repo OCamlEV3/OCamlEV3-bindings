@@ -1,4 +1,4 @@
-version = "0.1"
+version = "1.0-beta"
 name = "OCamlEV3-bindings"
 description = " TODO "
 archive(byte) = "OCamlEV3-bindings.cma"
