@@ -1,4 +1,4 @@
-COMPILATION_ORDER = IO.cmx path_finder.cmx port.cmx motor.cmx led.cmx \
+COMPILATION_ORDER = IO.cmx path_finder.cmx port.cmx device.cmx motor.cmx led.cmx \
 	power_supply.cmx sensors/sensor.cmx \
 	sensors/hiTechnic/hiTechnicNxtAccelerationSensor.cmx \
 	sensors/hiTechnic/hiTechnicNxtAngleSensor.cmx \

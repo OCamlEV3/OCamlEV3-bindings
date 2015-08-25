@@ -18,6 +18,8 @@ OCAMLDOC_FOLDER = doc
 LIB_FOLDER = lib
 LIB_NAME   = OCamlEV3-bindings
 LIB_DIST   = $(LIB_FOLDER)/$(LIB_NAME)
+LIB_DIST_NATIVE = $(LIB_DIST).cmxa
+LIB_DIST_BYTECODE = $(LIB_DIST).cma
 
 SOURCES_FOLDER=src
 TEST=IO path_finder
@@ -28,18 +30,21 @@ SOURCES_OBJ_BYT=$(SOURCES:.ml=.cmo)
 SOURCES_OBJ_NAT=$(SOURCES:.ml=.cmx)
 
 .PHONY: all
-all: depend library
+all: depend $(LIB_DIST_NATIVE)
 
 
 # Library compilation
 include Makefile.order
 
-library: depend $(SOURCES_OBJ_BYT) $(SOURCES_OBJ_NAT)
+# library: depend $(SOURCES_OBJ_BYT) $(SOURCES_OBJ_NAT)
+# 	@ mkdir -p $(LIB_FOLDER)
+# 	$(OCAMLFIND) $(OCAMLMKLIB) $(FOLDERS_OPT) $(OCAMLFIND_FLAGS) \
+# 		-o $(LIB_DIST) $(COMPILATION_ORDER)
+
+$(LIB_DIST_NATIVE): $(SOURCES_OBJ_NAT) $(SOURCES_OBJ_BYT)
 	@ mkdir -p $(LIB_FOLDER)
-	$(OCAMLFIND) $(OCAMLMKLIB) $(FOLDERS_OPT) $(OCAMLFIND_FLAGS) \
-		-o $(LIB_DIST) $(COMPILATION_ORDER) \
-		&& echo "Library compiled." \
-		|| echo "Error while compiling library."
+	$(OCAMLFIND) $(OCAMLOPT) $(FOLDERS_OPT) $(OCAMLFIND_FLAGS) \
+		-a -o $(LIB_DIST_NATIVE) $(COMPILATION_ORDER)
 
 doc: library
 	mkdir -p $(OCAMLDOC_FOLDER)
@@ -52,7 +57,8 @@ doc: library
 
 PACKAGE = OCamlEV3-bindings
 INSTALL = META $(LIB_BYTECODE) $(LIB_NATIVE) $(SOURCES_ML) $(SOURCES_MLI) \
-		  $(SOURCES_OBJ_BYT) $(SOURCES_OBJ_NAT) $(SOURCES_CMI)
+		  $(SOURCES_OBJ_BYT) $(SOURCES_OBJ_NAT) $(SOURCES_CMI) \
+		  $(LIB_DIST).cmxa $(LIB_DIST).a
 
 install: $(LIB_BYTECODE) $(LIB_NATIVE)
 	ocamlfind install $(PACKAGE) $(INSTALL)
